@@ -26,9 +26,9 @@ _ob = OrangeBookMap()
 # Lemmatization is not important when using word2vec which runs on raw corpus
 # (see
 # https://stackoverflow.com/questions/23877375/word2vec-lemmatization-of-corpus-before-training)
-en_core_sci_lg_nlp = spacy.load(
-    "resources/models/en_core_sci_lg-0.4.0/en_core_sci_lg/en_core_sci_lg-0.4.0",
-    exclude=["tagger", "parser", "ner", "lemmatizer", "textcat", "custom"])
+# en_core_sci_lg_nlp = spacy.load(
+#     "resources/models/en_core_sci_lg-0.4.0/en_core_sci_lg/en_core_sci_lg-0.4.0",
+#     exclude=["tagger", "parser", "ner", "lemmatizer", "textcat", "custom"])
 # en_core_sci_lg_nlp=None
 
 # set number of processes for nlp.pipe for spaCy
@@ -409,7 +409,7 @@ def process_similarity_simplified():
 
         # find all other docs with the same list of NDA numbers
         similar_label_docs = list(
-            _l   abel_collection.find(
+            _label_collection.find(
                 {"application_numbers": label_doc_application_numbers}))
 
         # all_patents = [[patent_str,],]

@@ -1,7 +1,5 @@
 '''
-For the time, this will merge all old OrangeBook files so that a lookup can be
-made.  Eventually, this will place the contents of the Orange Book in MongoDB,
-and also request Orange Book data monthly.
+Module is for merging all old OrangeBook files so that a lookup can be made.
 '''
 
 import glob

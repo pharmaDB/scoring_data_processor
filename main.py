@@ -1,30 +1,40 @@
 import argparse
-import json
 import os
 
-from spl.index import process_paginated_index
-from spl.history import process_spl_history
-from spl.labels import process_historical_labels
-
-from similarity import fetch
 from similarity import run_nlp_scispacy
 
 from utils.logging import getLogger
+from utils import fetch
 
 _logger = getLogger("main")
 
-TEMP_DATA_FOLDER = "tempdata"
 MODEL_FOLDER = "resources/models"
-
+ORANGE_BOOK_FOLDER = "resources/Orange_Book"
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Process the arguments to the application.")
+        description="Process the arguments to the application."
+    )
+
     parser.add_argument(
-        "--last_nda",
-        type=str,
-        nargs="?",
-        help=("The last NDA number processed."),
+        '-ob',
+        '--update_orange_book',
+        action='store_true',
+        help=(
+            "Download the latest monthly update to the Orange Book from "
+            "https://www.fda.gov/drugs/drug-approvals-and-databases/orange-book-data-files "
+            "into '{ORANGE_BOOK_FOLDER}'."
+        ),
+    )
+
+    parser.add_argument(
+        '-ob',
+        '--update_orange_book',
+        action='store_true',
+        help=(
+            "Download the latest monthly update to the Orange Book from "
+            "https://www.fda.gov/drugs/drug-approvals-and-databases/orange-book-data-files"
+        ),
     )
     return parser.parse_args()
 
@@ -34,6 +44,12 @@ if __name__ == "__main__":
     args = parse_args()
     _logger.info(f"Running with args: {args}")
 
+    # download latest Orange Book File from fda.gov
+    if args.update_orange_book:
+        url = "https://www.fda.gov/media/76860/download"
+        file_path = fetch.download(url, ORANGE_BOOK_FOLDER)
+        fetch.extract_and_clean(file_path)
+
     # download scispaCy model
     url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/en_core_sci_lg-0.4.0.tar.gz"
     if not os.path.exists(os.path.join(MODEL_FOLDER, "en_core_sci_lg-0.4.0")):
@@ -41,7 +57,6 @@ if __name__ == "__main__":
         fetch.extract_and_clean(file_path)
 
     run_nlp_scispacy.process_similarity()
-
 
     # Fetch set_ids
     # all_set_ids = []
