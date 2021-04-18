@@ -1,3 +1,4 @@
+from bson.objectid import ObjectId
 from db.mongo import connect_mongo
 import diff_match_patch as dmp_module
 
@@ -75,6 +76,7 @@ def add_previous_and_next_labels(docs):
 def get_diff(a, b):
     diff = dmp.diff_main(a, b)
     dmp.diff_cleanupSemantic(diff)
+    diff = [list(x) for x in diff]
     return diff
 
 
@@ -230,7 +232,9 @@ def rebuild_string(diff_text, num):
         bool_text_chars_list = [e in txt for e in test_chars]
         if any(bool_text_chars_list):
             test_char = test_chars[bool_text_chars_list.index(True)]
-            leftside_txt = txt[((txt.rfind(test_char) * -1) + len(test_char)) :].lstrip()
+            leftside_txt = txt[
+                ((txt.rfind(test_char) * -1) + len(test_char)) :
+            ].lstrip()
             rebuilt_text = leftside_txt + rebuilt_text
             if diff_text[i][0] == 1 and leftside_txt:
                 addition_list.append(i)
@@ -278,7 +282,7 @@ def gather_additions(docs):
 
     Example of 'additions'
 
-    'additions':[1:{'full_text_for_diff':...,
+    'additions':[0:{'full_text_for_diff':...,
                      "scores":[
                                 {"patentNumber":"12345678",
                                  "claimNumber":5,
@@ -295,13 +299,57 @@ def gather_additions(docs):
     """
 
     for doc in docs:
-        i = len(doc["additions"]) + 1
+        if "additions" in doc.keys():
+            additions_num = len(doc["additions"])
+        else:
+            additions_num = 0
         for diff in doc["diff_against_previous_label"]:
             for j in range(len(diff["text"])):
-                if diff["text"][j] == 1:
-                    # test if addition is significant
-                    if j > 0 and text[1]:
-                        pass
+                # if the diff is an addition, and the diff is not just spaces
+                # or items that is removed by strip(), and the changes are not
+                # just capitalization, then diffs are significant
+                if (
+                    diff["text"][j][0] == 1
+                    and diff["text"][j][1].strip()
+                    and (
+                        j == 0
+                        or (
+                            j > 0
+                            and diff["text"][j][1].lower()
+                            != diff["text"][j - 1][1].lower()
+                        )
+                    )
+                    and diff["text"][j][1].strip()
+                    not in list("~`!@#$%^&*()-_=+[{}];:'\"',<>./?|")
+                ):
+                    rebuilt_string, rebuilt_index = rebuild_string(
+                        diff["text"], j
+                    )
+                    if (
+                        additions_num > 0
+                        and str(additions_num - 1) in doc["additions"].keys()
+                        and doc["additions"][str(additions_num - 1)][
+                            "full_text_for_diff"
+                        ]
+                        == rebuilt_string
+                    ):
+                        if len(diff["text"][j]) < 3:
+                            diff["text"][j].append(str(additions_num - 1))
+                        else:
+                            diff["text"][j][2] = str(additions_num - 1)
+                    else:
+                        if "additions" not in doc.keys():
+                            doc["additions"] = {}
+                        doc["additions"][str(additions_num)] = {
+                            "full_text_for_diff": rebuilt_string,
+                            "scores": [],
+                        }
+                        if len(diff["text"][j]) < 3:
+                            diff["text"][j].append(str(additions_num))
+                        else:
+                            diff["text"][j] = str(additions_num)
+                        additions_num += 1
+
     return docs
 
 
@@ -366,7 +414,7 @@ def run_diff(
             _label_collection.find({"application_numbers": application_numbers})
         )
 
-        if len(docs) > 0:
+        if len(similar_label_docs) > 0:
             similar_label_docs = sorted(
                 similar_label_docs,
                 key=lambda i: (i["published_date"]),
