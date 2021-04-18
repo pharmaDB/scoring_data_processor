@@ -287,7 +287,6 @@ def process_similarity(label_collection_name, patent_collection_name, processed_
     _patent_collection_name = patent_collection_name
     _patent_collection = db[patent_collection_name]
 
-
     # open processed_label_id_file and return a list of processed _id string
     processed_label_ids = misc.get_lines_in_file(processed_label_ids_file)
 

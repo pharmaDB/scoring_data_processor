@@ -1,7 +1,5 @@
-from bson.objectid import ObjectId
 from db.mongo import connect_mongo
 import diff_match_patch as dmp_module
-import json
 
 from utils import misc
 from utils.logging import getLogger
@@ -37,46 +35,39 @@ def add_previous_and_next_labels(docs):
                         '1 INDICATIONS AND USAGE', 'text': "..."},...]},...]
     """
 
-    if len(docs) > 0:
-        docs[0]["previous_label_published_date"] = None
-        docs[0]["previous_label_spl_id"] = 0
-        docs[0]["previous_label_spl_version"] = -1
-        docs[0]["next_label_published_date"] = None
-        docs[0]["next_label_spl_id"] = 0
-        docs[0]["next_label_spl_version"] = -1
+    docs[0]["previous_label_published_date"] = None
+    docs[0]["previous_label_spl_id"] = 0
+    docs[0]["previous_label_spl_version"] = -1
+    docs[0]["next_label_published_date"] = None
+    docs[0]["next_label_spl_id"] = 0
+    docs[0]["next_label_spl_version"] = -1
 
-        if len(docs) > 1:
-            docs[0]["next_label_published_date"] = docs[1]["published_date"]
-            docs[0]["next_label_spl_id"] = docs[1]["spl_id"]
-            docs[0]["next_label_spl_version"] = docs[1]["spl_version"]
+    if len(docs) > 1:
+        docs[0]["next_label_published_date"] = docs[1]["published_date"]
+        docs[0]["next_label_spl_id"] = docs[1]["spl_id"]
+        docs[0]["next_label_spl_version"] = docs[1]["spl_version"]
 
-            last_num = len(docs) - 1
-            for i in range(1, last_num):
-                docs[i]["previous_label_published_date"] = docs[i - 1][
-                    "published_date"
-                ]
-                docs[i]["previous_label_spl_id"] = docs[i - 1]["spl_id"]
-                docs[i]["previous_label_spl_version"] = docs[i - 1][
-                    "spl_version"
-                ]
-                docs[i]["next_label_published_date"] = docs[i + 1][
-                    "published_date"
-                ]
-                docs[i]["next_label_spl_id"] = docs[i + 1]["spl_id"]
-                docs[i]["next_label_spl_version"] = docs[i + 1]["spl_version"]
-
-            docs[last_num]["previous_label_published_date"] = docs[
-                last_num - 1
-            ]["published_date"]
-            docs[last_num]["previous_label_spl_id"] = docs[last_num - 1][
-                "spl_id"
+        last_num = len(docs) - 1
+        for i in range(1, last_num):
+            docs[i]["previous_label_published_date"] = docs[i - 1][
+                "published_date"
             ]
-            docs[last_num]["previous_label_spl_version"] = docs[last_num - 1][
-                "spl_version"
-            ]
-            docs[last_num]["next_label_published_date"] = None
-            docs[last_num]["next_label_spl_id"] = 0
-            docs[last_num]["next_label_spl_version"] = -1
+            docs[i]["previous_label_spl_id"] = docs[i - 1]["spl_id"]
+            docs[i]["previous_label_spl_version"] = docs[i - 1]["spl_version"]
+            docs[i]["next_label_published_date"] = docs[i + 1]["published_date"]
+            docs[i]["next_label_spl_id"] = docs[i + 1]["spl_id"]
+            docs[i]["next_label_spl_version"] = docs[i + 1]["spl_version"]
+
+        docs[last_num]["previous_label_published_date"] = docs[last_num - 1][
+            "published_date"
+        ]
+        docs[last_num]["previous_label_spl_id"] = docs[last_num - 1]["spl_id"]
+        docs[last_num]["previous_label_spl_version"] = docs[last_num - 1][
+            "spl_version"
+        ]
+        docs[last_num]["next_label_published_date"] = None
+        docs[last_num]["next_label_spl_id"] = 0
+        docs[last_num]["next_label_spl_version"] = -1
 
     return docs
 
@@ -104,6 +95,9 @@ def find_index(lst, key, value):
 
 
 def is_number(string):
+    """
+    Test if string is a float.
+    """
     try:
         float(string)
         return True
@@ -132,79 +126,182 @@ def add_diff_against_previous_label(docs):
         docs (list): list of sorted label docs from MongoDB having the same
                      application_numbers
     """
-    if len(docs) > 0:
-        if docs[0]["sections"]:
-            docs[0]["diff_against_previous_label"] = []
-            for section in docs[0]["sections"]:
-                docs[0]["diff_against_previous_label"].append(
-                    {
-                        "name": section["name"],
-                        "text": [[1, text] for text in section["text"]],
-                        "parent": section["parent"],
-                    }
-                )
 
-        if len(docs) > 1:
-            for i in range(1, len(docs)):
-                # print(docs[i - 1]["sections"])
-                docs[i]["diff_against_previous_label"] = []
-                # loop through all sections in prior label
-                for section in docs[i - 1]["sections"]:
-                    # if section in prior label is in current label
-                    if section["name"] in [
-                        x["name"] for x in docs[i]["sections"]
-                    ]:
-                        index = find_index(
-                            docs[i]["sections"], "name", section["name"]
-                        )
-                        docs[i]["diff_against_previous_label"].append(
-                            {
-                                "name": section["name"],
-                                "text": get_diff(
-                                    section["text"],
-                                    docs[i]["sections"][index]["text"],
-                                ),
-                                "parent": section["parent"],
-                            }
-                        )
-                    # if section in prior label is not in current label
-                    else:
-                        docs[i]["diff_against_previous_label"].append(
-                            {
-                                "name": section["name"],
-                                "text": [[-1, section["text"]]],
-                                "parent": section["parent"],
-                            }
-                        )
-                # loop through all sections in current label not in prior label
-                for section in docs[i]["sections"]:
-                    if section["name"] not in [
-                        x["name"]
-                        for x in docs[i]["diff_against_previous_label"]
-                    ]:
-                        # select location to insert if name of section includes
-                        # number
-                        insert_loc = len(docs[i]["diff_against_previous_label"])
-                        if is_number(section["name"].split()[0]):
-                            for num in range(
-                                len(docs[i]["diff_against_previous_label"])
-                            ):
-                                first_word = docs[i][
-                                    "diff_against_previous_label"
-                                ][num]["name"].split()[0]
-                                if is_number(first_word) and float(
-                                    first_word
-                                ) <= float(section["name"].split()[0]):
-                                    insert_loc = num + 1
+    if docs[0]["sections"]:
+        docs[0]["diff_against_previous_label"] = []
+        for section in docs[0]["sections"]:
+            docs[0]["diff_against_previous_label"].append(
+                {
+                    "name": section["name"],
+                    "text": [[1, text] for text in section["text"]],
+                    "parent": section["parent"],
+                }
+            )
 
-                        docs[i]["diff_against_previous_label"].insert(
-                            insert_loc,
-                            {
-                                "name": section["name"],
-                                "text": [[1, section["text"]]],
-                                "parent": section["parent"],
-                            },
-                        )
+    if len(docs) > 1:
+        for i in range(1, len(docs)):
+            # print(docs[i - 1]["sections"])
+            docs[i]["diff_against_previous_label"] = []
+            # loop through all sections in prior label
+            for section in docs[i - 1]["sections"]:
+                # if section in prior label is in current label
+                if section["name"] in [x["name"] for x in docs[i]["sections"]]:
+                    index = find_index(
+                        docs[i]["sections"], "name", section["name"]
+                    )
+                    docs[i]["diff_against_previous_label"].append(
+                        {
+                            "name": section["name"],
+                            "text": get_diff(
+                                section["text"],
+                                docs[i]["sections"][index]["text"],
+                            ),
+                            "parent": section["parent"],
+                        }
+                    )
+                # if section in prior label is not in current label
+                else:
+                    docs[i]["diff_against_previous_label"].append(
+                        {
+                            "name": section["name"],
+                            "text": [[-1, section["text"]]],
+                            "parent": section["parent"],
+                        }
+                    )
+            # loop through all sections in current label not in prior label
+            for section in docs[i]["sections"]:
+                if section["name"] not in [
+                    x["name"] for x in docs[i]["diff_against_previous_label"]
+                ]:
+                    # select location to insert if name of section includes
+                    # number
+                    insert_loc = len(docs[i]["diff_against_previous_label"])
+                    if is_number(section["name"].split()[0]):
+                        for num in range(
+                            len(docs[i]["diff_against_previous_label"])
+                        ):
+                            first_word = docs[i]["diff_against_previous_label"][
+                                num
+                            ]["name"].split()[0]
+                            if is_number(first_word) and float(
+                                first_word
+                            ) <= float(section["name"].split()[0]):
+                                insert_loc = num + 1
+
+                    docs[i]["diff_against_previous_label"].insert(
+                        insert_loc,
+                        {
+                            "name": section["name"],
+                            "text": [[1, section["text"]]],
+                            "parent": section["parent"],
+                        },
+                    )
+    return docs
+
+
+def rebuild_string(diff_text, num):
+    """
+    Give a diff_map_patch list rebuild a string around item_num.  Strings are
+    delimited by carriage returns or newline or a whole sentence.  This
+    function returns the rebuilt string and a list of indexes of additions that
+    constitute the rebuild string.
+
+    For example, diff_text:
+    [[0, 'Morphine '],[-1,'s'],[1,'S'],[0,'ulfate '],[-1, 'is an opioid']]
+    returns:
+    (Morphine Sulfate", [2])
+
+
+    Parameters:
+        diff_text (list of list): See example above
+        num (int): 0 would represent [0, 'Morphine '] in example above
+    """
+    test_chars = [".", "?", "!", "\n", "\r"]
+    addition_list = [num]
+    rebuilt_text = diff_text[num][1]
+    # find start of string
+    i = num - 1
+    while i >= 0:
+        if diff_text[i][0] == -1:
+            i -= 1
+            continue
+
+        txt = diff_text[i][1]
+        bool_text_chars_list = [e in txt for e in test_chars]
+        if any(bool_text_chars_list):
+            test_char = test_chars[bool_text_chars_list.index(True)]
+            leftside_txt = txt[((txt.rfind(test_char) * -1) + len(test_char)) :].lstrip()
+            rebuilt_text = leftside_txt + rebuilt_text
+            if diff_text[i][0] == 1 and leftside_txt:
+                addition_list.append(i)
+            break
+
+        leftside_txt = txt
+        if diff_text[i][0] == 1 and leftside_txt:
+            addition_list.append(i)
+        rebuilt_text = leftside_txt + rebuilt_text
+        i -= 1
+    # find end of string
+    i = num + 1
+    while i < len(diff_text):
+        if diff_text[i][0] == -1:
+            i += 1
+            continue
+
+        txt = diff_text[i][1]
+        bool_text_chars_list = [e in txt for e in test_chars]
+        if any(bool_text_chars_list):
+            test_char = test_chars[bool_text_chars_list.index(True)]
+            rightside_txt = txt[: (txt.find(test_char) + len(test_char))]
+            rebuilt_text = rebuilt_text + rightside_txt
+            if diff_text[i][0] == 1 and rightside_txt:
+                addition_list.append(i)
+            break
+
+        rightside_txt = txt
+        if diff_text[i][0] == 1 and rightside_txt:
+            addition_list.append(i)
+        rebuilt_text = rebuilt_text + rightside_txt
+        i += 1
+
+    addition_list = sorted(addition_list)
+    return rebuilt_text, addition_list
+
+
+def gather_additions(docs):
+    """
+    If, for each doc in docs, 'diff_against_previous_label':[{'text':[1,
+    string],}] has a value of 1, the string is an addition.  This function
+    gathers all additions in under key 'additions' and append a number X at
+    within 'text', such as {'text':[1, string_A, X],}, to reference the
+    addition entry.
+
+    Example of 'additions'
+
+    'additions':[1:{'full_text_for_diff':...,
+                     "scores":[
+                                {"patentNumber":"12345678",
+                                 "claimNumber":5,
+                                 "parentClaimNumbers":[1,2]
+                                 "score":0.5172
+                                },
+                              ]
+                   },
+                ]
+
+    Parameters:
+        docs (list): list of sorted label docs from MongoDB having the same
+                     application_numbers
+    """
+
+    for doc in docs:
+        i = len(doc["additions"]) + 1
+        for diff in doc["diff_against_previous_label"]:
+            for j in range(len(diff["text"])):
+                if diff["text"][j] == 1:
+                    # test if addition is significant
+                    if j > 0 and text[1]:
+                        pass
     return docs
 
 
@@ -269,22 +366,32 @@ def run_diff(
             _label_collection.find({"application_numbers": application_numbers})
         )
 
-        similar_label_docs = sorted(
-            similar_label_docs,
-            key=lambda i: (i["published_date"]),
-            reverse=False,
-        )
+        if len(docs) > 0:
+            similar_label_docs = sorted(
+                similar_label_docs,
+                key=lambda i: (i["published_date"]),
+                reverse=False,
+            )
 
-        similar_label_docs = add_previous_and_next_labels(similar_label_docs)
-        similar_label_docs = add_diff_against_previous_label(similar_label_docs)
-        update_db(similar_label_docs)
+            similar_label_docs = add_previous_and_next_labels(
+                similar_label_docs
+            )
+            similar_label_docs = add_diff_against_previous_label(
+                similar_label_docs
+            )
+            similar_label_docs = gather_additions(similar_label_docs)
+            update_db(similar_label_docs)
 
-        similar_label_docs_ids = [str(x["_id"]) for x in similar_label_docs]
+            similar_label_docs_ids = [str(x["_id"]) for x in similar_label_docs]
 
-        # remove similar_label_docs_ids from all_label_ids
-        all_label_ids = [
-            x for x in all_label_ids if x not in similar_label_docs_ids
-        ]
-        # store processed_label_ids and processed application_numbers to disk
-        misc.append_to_file(processed_label_ids_file, similar_label_docs_ids)
-        misc.append_to_file(processed_nda_file, str(application_numbers)[1:-1])
+            # remove similar_label_docs_ids from all_label_ids
+            all_label_ids = [
+                x for x in all_label_ids if x not in similar_label_docs_ids
+            ]
+            # store processed_label_ids and processed application_numbers to disk
+            misc.append_to_file(
+                processed_label_ids_file, similar_label_docs_ids
+            )
+            misc.append_to_file(
+                processed_nda_file, str(application_numbers)[1:-1]
+            )
