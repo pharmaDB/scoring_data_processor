@@ -340,9 +340,23 @@ def gather_additions(docs):
                     else:
                         if "additions" not in doc.keys():
                             doc["additions"] = {}
+                        # the scores are mock data at the moment
                         doc["additions"][str(additions_num)] = {
                             "full_text_for_diff": rebuilt_string,
-                            "scores": [],
+                            "scores": [
+                                {
+                                    "patentNumber": "5202128",
+                                    "claimNumber": 6,
+                                    "parentClaimNumbers": [1, 5],
+                                    "score": 0.8,
+                                },
+                                {
+                                    "patentNumber": "5202128",
+                                    "claimNumber": 5,
+                                    "parentClaimNumbers": [1],
+                                    "score": 0.5,
+                                },
+                            ],
                         }
                         if len(diff["text"][j]) < 3:
                             diff["text"][j].append(str(additions_num))
@@ -373,7 +387,7 @@ def update_db(similar_label_docs):
         else:
             _logger.info(
                 f"Uploaded to collection '{_label_collection_name}': "
-                f"{str(doc)[:500]}"
+                f"{str(doc)[:250]} ..."
             )
     return
 

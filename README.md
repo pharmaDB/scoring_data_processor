@@ -1,7 +1,7 @@
 
 
 # scoring_data_processor
-Scripts to map drug label sections to patent claims using the Orange Book Table's of Exclusivity and the scispaCy model.
+Scripts to map changes in drug label to patent claims using the Orange Book Table's of Exclusivity.
 
 
 ## MongoDB Set Up

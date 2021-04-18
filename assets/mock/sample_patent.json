@@ -1,0 +1,137 @@
+{
+    _id: ObjectId('6067476bedf3333608f5fe05'),
+    patent_number: '5202128',
+    expiration_date: '2010-04-13',
+    claims: [
+        {
+            claim_number: 1,
+            claim_text: '1. A pH-dependent sustained release pharmaceutical pellet composition for administration to a patient at a predetermined dosage and interval which comprises: a core element containing a therapeutically effective amount of at least one active ingredient having an aqueous solubility of at least 1 in 30 and a coating on said core element which comprises the following components:(a) at least 35% by weight of a matrix polymer which is insoluble at a pH of from 1 to 7.5 and contributes to the control of the rate of release of the active ingredient in the stomach and intestines;(b) from 1 to 30% of an enteric polymer which is substantially insoluble at a pH of from 1 to 4, sufficient to delay the release of the active ingredient in the stomach, but which is soluble at a pH of from 6 to 7.5 so as not to substantially delay release in the intestines;(c) from 1 to 60% of a compound soluble at a pH of from 1 to 4, sufficient to enable initiation of release of the active ingredient in the stomach;said percentages being by weight based on the total weight of components (a), (b), and (c); the ratio of the components (a), (b), and (c) in said coating being effective to allow the initiation of the release of the active ingredient in the stomach at a slow rate and to control the release in the intestines at a rate faster than that in the stomach such that a dose of the pellet composition delivers to the patient a therapeutically effective amount of said active ingredient over the course of said predetermined interval.',
+            dependencies: null
+        },
+        {
+            claim_number: 2,
+            claim_text: '2. The sustained release pharmaceutical pellet composition of claim 1 wherein the coating contains:as component (a), ethyl cellulose, a quaternary ammonium acrylic or methacrylic polymer, an acrylic or a methacrylic ester copolymer or a mixture thereof;as component (b), cellulose acetate phthalate, hydroxypropyl methylcellulose phthalate, polyvinyl acetate phthalate, methacrylic acid:acrylic acid ester copolymer, hydroxypropyl methylcellulose acetate succinate, shellac, cellulose acetate trimellitate and mixtures thereof; andas component (c), polyvinylpyrrolidone, hydroxypropyl cellulose, hydroxypropyl methylcellulose, polyethylene glycol having a molecular weight of from 1700 to 20,000polyvinyl alcohol and monomers therefor and mixtures thereof.',
+            dependencies: '1'
+        },
+        {
+            claim_number: 3,
+            claim_text: '3. The sustained release pharmaceutical pellet composition of claim 35 wherein the active ingredient of high solubility is selected from the group consisting of antihistamines, antibiotics, antituberculosis agents, cholinergic agents, antimuscarinics, sympathomimetics, sympatholytic agents, autonomic drugs, iron preparations, haemostatics, cardiac drugs, antihypertensive agents, vasodilators, non-steroidal antiinflammatory agents, opiate agonists, anticonvulsants, tranquilizers, stimulants, barbiturates, sedatives, expectorants, antiemetics, gastrointestinal drugs, heavy metal antagonists, antithyroid agents, genitourinary smooth muscle relaxants and vitamins.',
+            dependencies: '35'
+        },
+        {
+            claim_number: 4,
+            claim_text: '4. The sustained release pharmaceutical pellet composition of claim 3 wherein the active ingredient is an opiate agonist selected from the group consisting of the salts of codeine, dextromoramide, hydrocodone, hydromorphine, pethidine, methadone, morphine and propoxyphene.',
+            dependencies: '3'
+        },
+        {
+            claim_number: 5,
+            claim_text: '5. The sustained release pharmaceutical pellet composition of claim 1 wherein the active ingredient has a first dissolution profile measured at a pH of from 1 to 4, and a second dissolution profile measured at a pH of about 7.5 and wherein said first and second dissolution profile are each at least equal to the minimum dissolution required to provide substantially the same bio-availability as with an immediate release oral dosage form.',
+            dependencies: '1'
+        },
+        {
+            claim_number: 6,
+            claim_text: '6. The sustained release pharmaceutical pellet composition of claim 5 wherein the composition, in use, minimizes fluctuations in the plasma concentration of the active ingredient in said patient.',
+            dependencies: '5'
+        },
+        {
+            claim_number: 7,
+            claim_text: '7. The sustained release pharmaceutical pellet composition of claim 2 wherein the coating comprises:35to 75% by weight of component (a);2-20% by weight of component (b); and15-50% by weight of component (c).',
+            dependencies: '2'
+        },
+        {
+            claim_number: 8,
+            claim_text: '8. The sustained release pharmaceutical pellet composition of claim 2 wherein the coating also includes up to 50% of plasticizer selected from diethyl phthalate, triethyl citrate, triethyl acetyl citrate, triethyl acetin, tributyl citrate, polyethylene glycol having a molecular weight of from 200 to less than 1700 or glycerol and up to 75% of a filler selected from silicon dioxide, titanium dioxide, talc, alumina, starch, kaolin, polacrilin potassium, powdered cellulose and microcrystalline cellulose and mixtures thereof, said percentages being based on the total weight of the coating.',
+            dependencies: '2'
+        },
+        {
+            claim_number: 9,
+            claim_text: '9. The sustained release pharmaceutical pellet composition of claim 8 wherein the coating contains: component (a) 35 to 70% component (b) 4 to 20% component (c) 15 to 35% plasticizer 4 to 30%.  ',
+            dependencies: '8'
+        },
+        {
+            claim_number: 10,
+            claim_text: '10. A pH-dependent sustained release pharmaceutical pellet composition for administration to a patient at a predetermined dosage and interval which comprises: a core element containing a therapeutically effective amount of an acid addition salt of morphine and a coating on said core element which comprises the following components:(a) at least 35% by weight of a matrix polymer which is insoluble at a pH of from 1 to 7.5 and contributes to the control of the rate of release of the active ingredient in the stomach and intestines;(b) from 1 to 30% of an enteric polymer which is substantially insoluble at a pH of from 1 to 4, sufficient to delay the release of the active ingredient in the stomach, but which is soluble at a pH of from 6 to 7.5 so as not to substantially delay release in the intestines;(c) from 1 to 60% of a compound soluble at a pH of from 1 to 4, sufficient to enable initiation of release of the active ingredient in the stomach;said percentages being by weight based on the total weight of components (a), (b), and (c); the ratio of the components (a), (b), and (c) in said coating being effective to allow the initiation of the release of the active ingredient in the stomach at a slow rate and to control the release in the intestines at a rate faster than that in the stomach such that a dose of the pellet composition delivers to the patient a therapeutically effective amount of said active ingredient over the course of said predetermined interval.',
+            dependencies: null
+        },
+        {
+            claim_number: 11,
+            claim_text: '11. The sustained release pharmaceutical pellet composition of claim 10 wherein said acid addition salt of morphine is morphine sulphate.',
+            dependencies: '10'
+        },
+        {
+            claim_number: 12,
+            claim_text: '12. The sustained release pharmaceutical pellet composition of claim 10 wherein the rate of release in the intestine is 1.2 to 3 times greater than the rate of release in the stomach.',
+            dependencies: '10'
+        },
+        {
+            claim_number: 13,
+            claim_text: '13. The sustained release pharmaceutical pellet composition of claim 10 wherein the composition, in use, minimizes fluctuations in the morphine compound concentration in the plasma of said patient.',
+            dependencies: '10'
+        },
+        {
+            claim_number: 14,
+            claim_text: '14. The sustained release pharmaceutical pellet composition of claim 13 wherein, in use, the time during which the concentration of the morphine compound is greater than or equivalent to 75% of maximum morphine compound concentration in the plasma is at least 3 hours.',
+            dependencies: '13'
+        },
+        {
+            claim_number: 15,
+            claim_text: '15. The sustained release pharmaceutical pellet composition of claim 10 wherein the coating contains:as component (a), ethyl cellulose, a quaternary ammonium acrylic or methacrylic polymer, an acrylic or a methacrylic ester copolymer or a mixture thereof;as component (b), cellulose acetate phthalate, hydroxypropyl methylcellulose phthalate, polyvinyl acetate phthalate, methacrylic acid ester copolymer, hydroxypropyl methylcellulose acetate succinate, shellac, cellulose acetate trimellitate and mixtures thereof; andas component (c), polyvinylpyrrolidone, hydroxypropyl cellulose, hydroxypropyl methylcellulose, polyethylene glycol having a molecular weight of from 1700 to 20,000, polyvinyl alcohol and monomers therefor and mixtures thereof.',
+            dependencies: '10'
+        },
+        {
+            claim_number: 16,
+            claim_text: '16. The sustained release pharmaceutical pellet composition of claim 15 wherein the coating comprises:35 to 75% by weight of component (a);2-20% by weight of component (b); and15-40% by weight of component (c).',
+            dependencies: '15'
+        },
+        {
+            claim_number: 17,
+            claim_text: '17. The sustained release pharmaceutical pellet composition of claim 49 wherein the coating comprises: [high molecular weight] 15 to 40% polyethylene glycol having a molecular weight of from 1700 to 20,000 ethylcellulose 45 to 65% methacrylic acid:acrylic 4 to 20%. acid ethylester 1:1 copolymer  ',
+            dependencies: '49'
+        },
+        {
+            claim_number: 18,
+            claim_text: '18. A method for treating a pain associated with a condition in a patient which comprises administering to said patient at a predetermined dosage and interval a pH-dependent sustained release pharmaceutical pellet composition which comprises: a core element containing a therapeutically effective amount of an active compound having an aqueous solubility of at least 1 in 30 and a coating on said core element which comprises the following components:(a) at least 35% by weight of a matrix polymer which is insoluble at a pH of from 1 to 7.5 and contributes to the control of the rate of release of the active ingredient in the stomach and intestines;(b) from 1 to 30% of an enteric polymer which is substantially insoluble at a pH of from 1 to 4, sufficient to delay the release of the active ingredient in the stomach, but which is soluble at a pH of from 6 to 7.5 so as not to substantially delay release in the intestines;(c) from 1 to 60% of a compound soluble at a pH of from 1 to 4, sufficient to enable initiation of release of the active ingredient in the stomach;said percentage being by weight based on the total weight of components (a), (b), and (c); the ratio of the components (a), (b), and (c) in said coating being effective to allow the initiation of the release of the active ingredient in the stomach at a slow rate and to control the release in the intestines at a rate faster than that in the stomach such that a dose of the pellet composition delivers to the patient a therapeutically effective amount of said active ingredient over the course of said predetermined interval.',
+            dependencies: null
+        },
+        {
+            claim_number: 19,
+            claim_text: '19. The method of claim 18 wherein the pain associated conditions relate to the treatment of acute and chronic pain.',
+            dependencies: '18'
+        },
+        {
+            claim_number: 20,
+            claim_text: '20. The method of claim 19 wherein the sustained release pharmaceutical pellet composition is provided in a unit dosage form and the predetermined interval is approximately 8 to 24 hours.',
+            dependencies: '19'
+        },
+        {
+            claim_number: 21,
+            claim_text: '21. The method of claim 18 wherein the active ingredient is an acid addition salt of morphine.',
+            dependencies: '18'
+        },
+        {
+            claim_number: 22,
+            claim_text: '22. The method of claim 21 wherein the acid addition salt is morphine sulphate.',
+            dependencies: '21'
+        },
+        {
+            claim_number: 23,
+            claim_text: '23. The method of claim 21 wherein the acid addition salt is morphine hydrochloride.',
+            dependencies: '21'
+        },
+        {
+            claim_number: 24,
+            claim_text: '24. A pH-dependent sustained release pharmaceutical pellet composition for administration to a patient at a predetermined dosage and interval which comprises: a core element containing a therapeutically effective amount of at least one active ingredient having an aqueous solubility of a least 1 in 30 and a coating on said core element which comprises the following components:(a) at least 35% by weight of a matrix polymer which is insoluble at a pH of from 1 to 7.5 and is composed of ethyl cellulose, a quaternary ammonium acrylic or methacrylic polymer, an acrylic or a methacrylic ester copolymer or a mixture thereof which contributes to the control of the release of the active ingredient in the stomach and intestines;(b) from 1 to 30% of an enteric polymer which is substantially insoluble at a pH of from 1 to 4, sufficient to delay the release of the active ingredient in the stomach, but which is soluble at a pH of from 6 to 7.5 so as not to substantially delay release in the intestines;(c) from 1 to 60% of a compound soluble at a pH of from 1 to 4, sufficient to enable initiation of release of the active ingredient in the stomach;said percentages being by weight based on the total weight of components (a), (b), and (c); the ratio of the components (a), (b), and (c) in said coating being effective to allow the initiation of the release of the active ingredient in the stomach at a slow rate and to control the release in the intestines at a rate faster than that in the stomach such that a dose of the pellet composition delivers to the patient a therapeutically effective amount of said active ingredient over the course of said predetermined interval.',
+            dependencies: null
+        },
+        {
+            claim_number: 25,
+            claim_text: '25. A pH-dependent sustained release pharmaceutical pellet composition for administration to a patient at a predetermined dosage and interval which comprises: a core element containing a therapeutically effective amount of an acid addition salt of morphine and a coating on said core element which comprises the following components:(a) at least 35% by weight of a matrix polymer which is insoluble at a pH of from 1 to 7.5 and is composed of ethyl cellulose, a quaternary ammonium acrylic or methacrylic polymer, an acrylic or a methacrylic ester copolymer or a mixture thereof which contributes to the control of the release of the active ingredient in the stomach and intestines;(b) from 1 to 30% of an enteric polymer which is substantially insoluble at a pH of from 1 to 4, sufficient to delay the release of the active ingredient in the stomach, but which is soluble at a pH of from 6 to 7.5 so as not to substantially delay release in the intestines;(c) from 1 to 60% of a compound soluble at a pH of from 1 to 4, sufficient to enable initiation of release of the active ingredient in the stomach;said percentages being by weight based on the total weight of components (a), (b), and (c); the ratio of the components (a), (b), and (c) in said coating being effective to allow the initiation of the release of the active ingredient in the stomach at a slow rate and to control the release in the intestines at a rate faster than that in the stomach such that a dose of the pellet composition delivers to the patient a therapeutically effective amount of said active ingredient over the course of said predetermined interval.',
+            dependencies: null
+        },
+        {
+            claim_number: 26,
+            claim_text: '26. A method for treating a pain associated with a condition in a patient which comprises administering to said patient at a predetermined dosage and interval a pH-dependent sustained release pharmaceutical pellet composition which comprises: a core element containing a therapeutically effective amount of an active compound having an aqueous solubility of at least 1 in 30 and a coating on said core element which comprises the following components:(a) at least 35% by weight of a matrix polymer which is insoluble at a pH of from 1 to 7.5 and is composed of ethyl cellulose, a quaternary ammonium acrylic or methacrylic polymer, an acrylic or a methacrylic ester copolymer or a mixture thereof which contributes to the control of the release of the active ingredient in the stomach and intestines;(b) from 1 to 30% of an enteric polymer which is substantially insoluble at a pH of from 1 to 4, sufficient to delay the release of the active ingredient in the stomach, but which is soluble at a pH of from 6 to 7.5 so as not to substantially delay release in the intestines;(c) from 1 to 60% of a compound soluble at a pH of from 1 to 4, sufficient to enable initiation of release of the active ingredient in the stomach;said percentage being by weight based on the total weight of components (a), (b), and (c); the ratio of the components (a), (b), and (c) in said coating being effective to allow the initiation of the release of the active ingredient in the stomach at a slow rate and to control the release in the intestines at a rate faster than that in the stomach such that a dose of the pellet composition delivers to the patient a therapeutically effective amount of said active ingredient over the course of said predetermined interval.',
+            dependencies: null
+        }
+    ]
+}
