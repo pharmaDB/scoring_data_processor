@@ -42,6 +42,7 @@ class MongoClient:
         return self.db_client[collection_name]
 
 
+
 def connect_mongo():
     try:
         host, port, db_name = (

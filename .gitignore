@@ -11,4 +11,7 @@ tempdata/
 # Models for natural language processing
 resources/models/
 
+# log files of processed labels
+resources/processed_log/
+
 Pipfile.lock

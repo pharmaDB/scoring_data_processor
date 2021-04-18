@@ -14,6 +14,7 @@ pandas = "*"
 scispacy = "*"
 spacy-transformers = "*"
 spacy = "*"
+diff-match-patch = "*"
 
 [dev-packages]
 

@@ -1,15 +1,32 @@
 import argparse
 import os
 
-from similarity import run_nlp_scispacy
+# from similarity import run_nlp_scispacy
+from diff import run_diff
 
 from utils.logging import getLogger
 from utils import fetch
 
 _logger = getLogger("main")
 
-MODEL_FOLDER = "resources/models"
-ORANGE_BOOK_FOLDER = "resources/Orange_Book"
+
+RESOURCE_FOLDER = "resources"
+MODEL_FOLDER = os.path.join(RESOURCE_FOLDER, "models")
+ORANGE_BOOK_FOLDER = os.path.join(RESOURCE_FOLDER, "Orange_Book")
+PROCESSED_LOGS=os.path.join(RESOURCE_FOLDER, "processed_log")
+PROCESSED_ID_DIFF_FILE = os.path.join(PROCESSED_LOGS, "processed_id_diff.csv")
+PROCESSED_NDA_DIFF_FILE = os.path.join(
+    PROCESSED_LOGS, "processed_nda_diff.csv"
+)
+PROCESSED_ID_SIMILARITY_FILE = os.path.join(
+    PROCESSED_LOGS, "processed_id_similarity.csv"
+)
+PROCESSED_NDA_SIMILARITY_FILE = os.path.join(
+    PROCESSED_LOGS, "processed_NDA_similarity.csv"
+)
+LABEL_COLLECTION = "labels"
+PATENT_COLLECTION = "patents"
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -17,9 +34,9 @@ def parse_args():
     )
 
     parser.add_argument(
-        '-ob',
-        '--update_orange_book',
-        action='store_true',
+        "-ob",
+        "--update_orange_book",
+        action="store_true",
         help=(
             "Download the latest monthly update to the Orange Book from "
             "https://www.fda.gov/drugs/drug-approvals-and-databases/orange-book-data-files "
@@ -28,14 +45,15 @@ def parse_args():
     )
 
     parser.add_argument(
-        '-ob',
-        '--update_orange_book',
-        action='store_true',
+        "-r",
+        "--rerun",
+        action="store_true",
         help=(
-            "Download the latest monthly update to the Orange Book from "
-            "https://www.fda.gov/drugs/drug-approvals-and-databases/orange-book-data-files"
+            "Delete all process csv's of MongoDB ObjectId and NDAs from folder"
+            " '{RESOURCE_FOLDER}', then rerun all diffs and similarity."
         ),
     )
+
     return parser.parse_args()
 
 
@@ -44,59 +62,43 @@ if __name__ == "__main__":
     args = parse_args()
     _logger.info(f"Running with args: {args}")
 
+
+    run_diff_and_similarity = False
+
+    print(args.update_orange_book)
+
     # download latest Orange Book File from fda.gov
     if args.update_orange_book:
         url = "https://www.fda.gov/media/76860/download"
         file_path = fetch.download(url, ORANGE_BOOK_FOLDER)
         fetch.extract_and_clean(file_path)
+    else:
+        run_diff_and_similarity = True
 
-    # download scispaCy model
-    url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/en_core_sci_lg-0.4.0.tar.gz"
-    if not os.path.exists(os.path.join(MODEL_FOLDER, "en_core_sci_lg-0.4.0")):
-        file_path = fetch.download(url, MODEL_FOLDER)
-        fetch.extract_and_clean(file_path)
+    # rerun all
+    if args.rerun:
+        if os.path.exists(PROCESSED_ID_DIFF_FILE):
+            os.remove(PROCESSED_ID_DIFF_FILE)
+        if os.path.exists(PROCESSED_NDA_DIFF_FILE):
+            os.remove(PROCESSED_NDA_DIFF_FILE)
+        if os.path.exists(PROCESSED_ID_SIMILARITY_FILE):
+            os.remove(PROCESSED_ID_SIMILARITY_FILE)
+        if os.path.exists(PROCESSED_NDA_SIMILARITY_FILE):
+            os.remove(PROCESSED_NDA_SIMILARITY_FILE)
+        run_diff_and_similarity = True
 
-    run_nlp_scispacy.process_similarity()
+    if run_diff_and_similarity:
+        # download scispaCy model
+        url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/en_core_sci_lg-0.4.0.tar.gz"
+        # if not os.path.exists(
+        if os.path.exists(
+            os.path.join(MODEL_FOLDER, "en_core_sci_lg-0.4.0")
+        ):
+            file_path = fetch.download(url, MODEL_FOLDER)
+            # fetch.extract_and_clean(file_path)
 
-    # Fetch set_ids
-    # all_set_ids = []
-    # if args.set_ids_from_file:
-    #     # Read set ids from the resource file
-    #     all_set_ids = get_set_ids_from_file(args.set_ids_from_file)
-    # elif args.start_page and args.num_pages:
-    #     # Get SPL index data
-    #     all_spls, end_page = process_paginated_index(
-    #         start_page=args.start_page, num_pages=args.num_pages
-    #     )
-    #     # Get unique setids, for the subsequent steps
-    #     all_set_ids = list(set(map(lambda x: x["setid"], all_spls)))
-    #     # Write data obtained into a json file
-    #     if args.write_index_data:
-    #         with open(
-    #             os.path.join(
-    #                 TEMP_DATA_FOLDER,
-    #                 f"spl_index_pages_{args.start_page}_to_{end_page}.json",
-    #             ),
-    #             "w+",
-    #         ) as f:
-    #             f.write(json.dumps(all_spls))
+        run_diff.run_diff(
+            LABEL_COLLECTION, PROCESSED_ID_DIFF_FILE, PROCESSED_NDA_DIFF_FILE
+        )
 
-    # # Get SetID history, for all unique setids retrieved
-    # all_setid_history = process_spl_history(all_set_ids)
-
-    # # Write data obtained into a json file
-    # if args.write_history_data:
-    #     with open(
-    #         os.path.join(
-    #             TEMP_DATA_FOLDER,
-    #             f"spl_history_pages.json",
-    #         ),
-    #         "w+",
-    #     ) as f:
-    #         f.write(json.dumps(all_setid_history))
-
-    # # Get label text for each SPL version and write to MongoDB if any
-    # # version contains an association with and NDA number.
-    # process_historical_labels(
-    #     all_setid_history, os.path.join(TEMP_DATA_FOLDER, "label_data")
-    # )
+        # run_nlp_scispacy.process_similarity(LABEL_COLLECTION, PATENT_COLLECTION, PROCESSED_ID_SIMILARITY_FILE, PROCESSED_NDA_SIMILARITY_FILE)
