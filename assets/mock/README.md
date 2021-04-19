@@ -63,6 +63,8 @@ additions: {
     }
 ```
 
-Notice that for `diff_against_previous_label`, the second entry is `[1,'...','0']`.  Since this is an addition signified by the 1, a third value `'0'` is added to this entry.  `'0'` refers to `additions['0']`.
+Notice that for `diff_against_previous_label`, the second entry for `'text'` is `[1,'...','0']`.  Since this is an addition, signified by the 1, a third value `'0'` is added to this entry.  `'0'` refers to `additions['0']`.  Additions are referenced in this manner, since multiple additions may exists for the same sentence, so it would be wasteful in space to rewrite the entirety of the addition after each space.
+
+`full_text_for_diff` is still a work in progress, but it should read from the start of sentence to the end of sentence for a sentence having an addition.  Start or ends of sentences are determined by line breaks, carriage returns, periods, exclamations, or question marks.
 
 The scores for the mock data are all the same for now for every additions.
