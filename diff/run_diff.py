@@ -387,7 +387,7 @@ def update_db(similar_label_docs):
         else:
             _logger.info(
                 f"Uploaded to collection '{_label_collection_name}': "
-                f"{str(doc)[:250]} ..."
+                f"{str(doc)[:250]}" + ("" if len(str(doc)) < 250 else "...")
             )
     return
 

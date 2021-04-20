@@ -28,10 +28,29 @@ def append_to_file(file_name, data):
 
     with open(file_name, "a") as f:
         for line in lines:
-            f.write(line)
+            f.write(str(line))
             f.write("\n")
 
-    _logger.info(f"Appended to file: {file_name} line: {str(lines)}")
+    _logger.info(
+        f"Append to file: {file_name}, data: {str(lines)[:250]}"
+        + ("" if len(str(lines)) < 250 else "...")
+    )
+
+
+def store_to_file(file_name, data):
+    """Store string or list of string to new file"""
+    if os.path.exists(file_name):
+        answer = ""
+        while answer.lower() not in ["y", "n", "yes", "no"]:
+            answer = input(
+                f"File {file_name} already exists! Overwrite [y/n]: "
+            )
+        if answer.lower() in ["y", "yes"]:
+            os.remove(file_name)
+        else:
+            _logger.error(f"Unable to overwrite and create file: {file_name}")
+            return
+    append_to_file(file_name, data)
 
 
 def get_num_in_str(text):
