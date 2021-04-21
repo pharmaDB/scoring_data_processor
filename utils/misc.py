@@ -83,3 +83,20 @@ def find_index(lst, key, value):
         if dic[key] == value:
             return i
     return -1
+
+
+def reorg_list_dict(lst, key1, key2):
+    """
+    Given a list of dictionaries, [{key1:value1, key2:value2,},{key3:value3,
+    key4:value4,},] return a dictionary of {value1: value2, value3:value4,}
+
+    Parameters:
+        lst (list): list to be searched for index
+        key1 (immutable object): value of key1 to be turned into new key
+        key2 (mutable object): value of key2 to be turned into value of value
+                                of key1
+    """
+    rdict = {}
+    for x in lst:
+        rdict[x[key1]] = x[key2]
+    return rdict

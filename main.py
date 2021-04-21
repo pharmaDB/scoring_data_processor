@@ -175,6 +175,7 @@ def reimport_collection(collection_name, file_name):
             doc = json.loads(line)
             doc["_id"] = ObjectId(doc["_id"]["$oid"])
             collection.insert_one(doc)
+    _logger.info(f"Reimported '{collection_name}' with '{file_name}'")
 
 
 def export_all_NDA(file_name):

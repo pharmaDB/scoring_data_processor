@@ -80,6 +80,21 @@ def get_diff(a, b):
     return diff
 
 
+def remove_newlines(docs):
+    """
+    This function removes all newlines in docs[X]['sections']['text'],
+    since bs4 text features inserts newlines for certain XML in odd locations.
+
+    Parameters:
+        docs (list): list of sorted label docs from MongoDB having the same
+                     application_numbers
+    """
+    for doc in docs:
+        for section in doc["sections"]:
+            section["text"] = " ".join(section["text"].split())
+    return docs
+
+
 def add_diff_against_previous_label(docs):
     """
     Assuming that labels docs are sorted, this method adds a
@@ -108,14 +123,13 @@ def add_diff_against_previous_label(docs):
             docs[0]["diff_against_previous_label"].append(
                 {
                     "name": section["name"],
-                    "text": [[1, text] for text in section["text"]],
+                    "text": [[1, section["text"]]],
                     "parent": section["parent"],
                 }
             )
 
     if len(docs) > 1:
         for i in range(1, len(docs)):
-            # print(docs[i - 1]["sections"])
             docs[i]["diff_against_previous_label"] = []
             section_names = [x["name"] for x in docs[i]["sections"]]
             # loop through all sections in prior label
@@ -141,7 +155,7 @@ def add_diff_against_previous_label(docs):
                         {
                             "name": section_prior["name"],
                             "text": [[-1, section_prior["text"]]],
-                            "parent": docs[i]["sections"][s_index]["parent"],
+                            "parent": section_prior["parent"],
                         }
                     )
             section_names_of_diff_against_previous_label = [
@@ -198,55 +212,70 @@ def rebuild_string(diff_text, num):
         num (int): index in diff_match_patch list; 0 would represent [0,
                    'Morphine '] in example above
     """
-    test_chars = [".", "?", "!", "\n", "\r"]
+    test_chars = [". ", "? ", "! ", "] ", "\n", "\r"]
     addition_list = [num]
     rebuilt_text = diff_text[num][1]
-    # find start of string
+
+    # rebuilt left end
     i = num - 1
     while i >= 0:
         if diff_text[i][0] == -1:
             i -= 1
             continue
-
         txt = diff_text[i][1]
-        bool_text_chars_list = [e in txt for e in test_chars]
-        if any(bool_text_chars_list):
-            test_char = test_chars[bool_text_chars_list.index(True)]
+        # test if any test_chars is in txt and truncate at rightmost test_char
+        loc_test_chars_list = [txt.rfind(e) for e in test_chars]
+        if max(loc_test_chars_list) > -1:
+            # test_char is rightmost index of any test_chars in txt
+            test_char = test_chars[
+                loc_test_chars_list.index(max(loc_test_chars_list))
+            ]
             leftside_txt = txt[
-                ((txt.rfind(test_char) * -1) + len(test_char)) :
+                (max(loc_test_chars_list) + len(test_char)) :
             ].lstrip()
             rebuilt_text = leftside_txt + rebuilt_text
             if diff_text[i][0] == 1 and leftside_txt:
                 addition_list.append(i)
             break
-
+        # for case when there is not test_chars in txt
         leftside_txt = txt
         if diff_text[i][0] == 1 and leftside_txt:
             addition_list.append(i)
         rebuilt_text = leftside_txt + rebuilt_text
         i -= 1
-    # find end of string
-    i = num + 1
-    while i < len(diff_text):
-        if diff_text[i][0] == -1:
-            i += 1
-            continue
 
-        txt = diff_text[i][1]
-        bool_text_chars_list = [e in txt for e in test_chars]
-        if any(bool_text_chars_list):
-            test_char = test_chars[bool_text_chars_list.index(True)]
-            rightside_txt = txt[: (txt.find(test_char) + len(test_char))]
-            rebuilt_text = rebuilt_text + rightside_txt
+    test_chars = [". ", "? ", "! ", " [", "\n", "\r"]
+
+    # if the text does not end with characters in test_chars
+    if not any([diff_text[num][1].rstrip().endswith(x) for x in test_chars]):
+        # rebuild right end
+        i = num + 1
+        while i < len(diff_text):
+            if diff_text[i][0] == -1:
+                i += 1
+                continue
+            txt = diff_text[i][1]
+            # test if any test_chars is in txt and truncate at leftmost test_char
+            loc_test_chars_list = [txt.find(e) for e in test_chars]
+            if max(loc_test_chars_list) > -1:
+                min_loc=min([x for x in loc_test_chars_list if x > -1])
+                # test_char is leftmost index of any test_chars in txt
+                test_char = test_chars[
+                    loc_test_chars_list.index(
+                        min_loc
+                    )
+                ]
+                rightside_txt = txt[: (min_loc + len(test_char))]
+                rebuilt_text = rebuilt_text + rightside_txt
+                if diff_text[i][0] == 1 and rightside_txt:
+                    addition_list.append(i)
+                break
+            # for case when there is not test_chars in txt
+            rightside_txt = txt
             if diff_text[i][0] == 1 and rightside_txt:
                 addition_list.append(i)
-            break
-
-        rightside_txt = txt
-        if diff_text[i][0] == 1 and rightside_txt:
-            addition_list.append(i)
-        rebuilt_text = rebuilt_text + rightside_txt
-        i += 1
+            rebuilt_text = rebuilt_text + rightside_txt
+            i += 1
 
     addition_list = sorted(addition_list)
     return rebuilt_text, addition_list
@@ -277,7 +306,6 @@ def gather_additions(docs):
         docs (list): list of sorted label docs from MongoDB having the same
                      application_numbers
     """
-
     for doc in docs:
         # if "additions" in doc.keys():
         #     additions_num = len(doc["additions"])
@@ -420,6 +448,7 @@ def run_diff(
             similar_label_docs = add_previous_and_next_labels(
                 similar_label_docs
             )
+            similar_label_docs = remove_newlines(similar_label_docs)
             similar_label_docs = add_diff_against_previous_label(
                 similar_label_docs
             )

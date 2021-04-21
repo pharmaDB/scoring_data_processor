@@ -146,8 +146,6 @@ class Test_run_diff(unittest.TestCase):
         addition_list = [5, 8, 11, 14]
         rebuilt_str, rebuilt_list = rebuild_string(self.super_text, 11)
 
-        print(rebuilt_str)
-
         self.assertEqual(orig_text, rebuilt_str)
         self.assertEqual(addition_list, rebuilt_list)
 
