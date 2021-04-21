@@ -1,8 +1,10 @@
 
 
 # scoring_data_processor
-Scripts to map changes in drug label to patent claims using the Orange Book Table's of Exclusivity.
+This package maps changes in drug label to patent claims using the Orange Book Table's of Exclusivity.
 
+Running this package without any optional argument will calculate and store diffs between adjacent labels (by date) for
+each drug as defined by NDA number(s) into the label collection of the MongoDB database. The diffs will also be collated to patent claims from the patents collection of the MongoDB database. Labels that are already processed are stored in `resources/processed_log/processed_id_diff.csv` and `resources/processed_log/processed_id_similarity.csv`. These labels will not be re-processed unless optional argument `-r` is set. Running optional arguments other than `-r` will not additionally run the diffing steps or diffs-to-patent-claims mapping unless those flags are set.
 
 ## MongoDB Set Up
 The connection info for the Mongo DB instance is set in the `.env` file. This should work for a standard MongoDB set up on localhost. If using a different set of DB configs, this file must be updated.

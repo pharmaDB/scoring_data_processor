@@ -35,9 +35,9 @@ PATENT_COLLECTION = "patents"
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Running this package without any optional argument will calculated and store diffs between adjacent labels (by date) for each drug as defined by NDA number(s) into the label collection of the MongoDB database.  The name of the MongoDB database is set in the .env file.  The diffs will also be collated to patent claims from the patents collection of the MongoDB database.  "
+        description="Running this package without any optional argument will calculate and store diffs between adjacent labels (by date) for each drug as defined by NDA number(s) into the label collection of the MongoDB database.  The name of the MongoDB database is set in the .env file.  The diffs will also be collated to patent claims from the patents collection of the MongoDB database.  "
         f"Labels that are already processed are stored in {PROCESSED_ID_DIFF_FILE} and {PROCESSED_ID_SIMILARITY_FILE}.  These labels will not be re-processed unless optional argument '-r' is set. "
-        "Running optional arguments other than '-r' will not additionally run the diffing steps or diffs-to-patent-claims mapping."
+        "Running optional arguments other than '-r' will not additionally run the diffing steps or diffs-to-patent-claims mapping unless those flags are set."
     )
 
     parser.add_argument(
