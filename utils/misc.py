@@ -56,3 +56,30 @@ def store_to_file(file_name, data):
 def get_num_in_str(text):
     """Return number in word of letters and digits (ex: 'NDA019501')"""
     return int(re.match(r"([a-z]+)([0-9]+)", text, re.I).groups()[1])
+
+
+def is_number(string):
+    """
+    Test if string is a float.
+    """
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
+
+
+def find_index(lst, key, value):
+    """
+    Given a list of dictionaries, [{key:value,},] return index of list with key
+    and value.
+
+    Parameters:
+        lst (list): list to be searched for index
+        key (immutable key): key to match
+        value: value to match
+    """
+    for i, dic in enumerate(lst):
+        if dic[key] == value:
+            return i
+    return -1

@@ -67,6 +67,19 @@ def parse_args():
     )
 
     parser.add_argument(
+        "-apj",
+        "--all_patents_from_Orange_Book_json",
+        nargs="?",
+        type=Path,
+        const=Path(__file__).absolute().parent / "assets" / "all_patents.json",
+        help=(
+            "Output list of patents from Orange Book to File_Name. If unset, "
+            "File_Name is '/assets/all_patents.json'."
+        ),
+        metavar=("File_Name"),
+    )
+
+    parser.add_argument(
         "-ml",
         "--missing_labels_from_database",
         nargs="?",
@@ -88,6 +101,21 @@ def parse_args():
         help=(
             "Output list of patents from Orange Book not in MongoDB to "
             "File_Name. If unset, File_Name is '/assets/missing_patents'."
+        ),
+        metavar=("File_Name"),
+    )
+
+    parser.add_argument(
+        "-mpj",
+        "--missing_patents_from_database_json",
+        nargs="?",
+        type=Path,
+        const=Path(__file__).absolute().parent
+        / "assets"
+        / "missing_patents.json",
+        help=(
+            "Output list of patents from Orange Book not in MongoDB to "
+            "File_Name. If unset, File_Name is '/assets/missing_patents.json'."
         ),
         metavar=("File_Name"),
     )
@@ -156,15 +184,23 @@ def export_all_labels(file_name):
     misc.store_to_file(file_name, all_labels_in_Orange_Book)
 
 
-def export_all_patents(file_name):
-    """Exports list of all patents from the Orange Book to a file"""
+def export_all_patents(file_name, json_convert=False):
+    """
+    Exports list of all patents from the Orange Book to a file. If
+    json_convert is True, the export is formatted as json.
+    """
     ob = OrangeBookMap()
     all_patents_in_Orange_Book = ob.get_all_patents()
-    misc.store_to_file(file_name, all_patents_in_Orange_Book)
+    if not json_convert:
+        misc.store_to_file(file_name, all_patents_in_Orange_Book)
+    else:
+        misc.store_to_file(file_name, json.dumps(all_patents_in_Orange_Book))
 
 
 def export_missing_labels(file_name):
-    """Exports list of missing labels from the database to a file"""
+    """
+    Exports list of missing labels from the database to a file.
+    """
     db = connect_mongo()
     label_collection = db[LABEL_COLLECTION]
     ob = OrangeBookMap()
@@ -176,8 +212,11 @@ def export_missing_labels(file_name):
     misc.store_to_file(file_name, labels_in_OB_not_in_Mongo)
 
 
-def export_missing_patents(file_name):
-    """Exports list of missing patents from the database to a file"""
+def export_missing_patents(file_name, json_convert=False):
+    """
+    Exports list of missing patents from the database to a file. If
+    json_convert is True, the export is formatted as json.
+    """
     db = connect_mongo()
     patent_collection = db[PATENT_COLLECTION]
     ob = OrangeBookMap()
@@ -186,7 +225,10 @@ def export_missing_patents(file_name):
     patents_in_OB_not_in_Mongo = [
         x for x in all_patents_in_Orange_Book if x not in all_patents_in_MongoDB
     ]
-    misc.store_to_file(file_name, patents_in_OB_not_in_Mongo)
+    if not json_convert:
+        misc.store_to_file(file_name, patents_in_OB_not_in_Mongo)
+    else:
+        misc.store_to_file(file_name, json.dumps(patents_in_OB_not_in_Mongo))
 
 
 if __name__ == "__main__":
@@ -201,12 +243,16 @@ if __name__ == "__main__":
         export_all_labels(args.all_labels_from_Orange_Book)
     if args.all_patents_from_Orange_Book:
         export_all_patents(args.all_patents_from_Orange_Book)
+    if args.all_patents_from_Orange_Book_json:
+        export_all_patents(args.all_patents_from_Orange_Book_json, True)
 
     # export list of missing patents or labels from the database
     if args.missing_labels_from_database:
         export_missing_labels(args.missing_labels_from_database)
     if args.missing_patents_from_database:
         export_missing_patents(args.missing_patents_from_database)
+    if args.missing_patents_from_database_json:
+        export_missing_patents(args.missing_patents_from_database_json, True)
 
     # download latest Orange Book File from fda.gov
     if args.update_orange_book:

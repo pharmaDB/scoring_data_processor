@@ -80,33 +80,6 @@ def get_diff(a, b):
     return diff
 
 
-def find_index(lst, key, value):
-    """
-    Given a list of dictionaries, [{key:value,},] return index of list with key
-    and value.
-
-    Parameters:
-        lst (list): list to be searched for index
-        key (immutable key): key to match
-        value: value to match
-    """
-    for i, dic in enumerate(lst):
-        if dic[key] == value:
-            return i
-    return -1
-
-
-def is_number(string):
-    """
-    Test if string is a float.
-    """
-    try:
-        float(string)
-        return True
-    except ValueError:
-        return False
-
-
 def add_diff_against_previous_label(docs):
     """
     Assuming that labels docs are sorted, this method adds a
@@ -144,30 +117,31 @@ def add_diff_against_previous_label(docs):
         for i in range(1, len(docs)):
             # print(docs[i - 1]["sections"])
             docs[i]["diff_against_previous_label"] = []
+            section_names = [x["name"] for x in docs[i]["sections"]]
             # loop through all sections in prior label
-            for section in docs[i - 1]["sections"]:
+            for section_prior in docs[i - 1]["sections"]:
                 # if section in prior label is in current label
-                if section["name"] in [x["name"] for x in docs[i]["sections"]]:
-                    index = find_index(
-                        docs[i]["sections"], "name", section["name"]
+                if section_prior["name"] in section_names:
+                    s_index = misc.find_index(
+                        docs[i]["sections"], "name", section_prior["name"]
                     )
                     docs[i]["diff_against_previous_label"].append(
                         {
-                            "name": section["name"],
+                            "name": section_prior["name"],
                             "text": get_diff(
-                                section["text"],
-                                docs[i]["sections"][index]["text"],
+                                section_prior["text"],
+                                docs[i]["sections"][s_index]["text"],
                             ),
-                            "parent": section["parent"],
+                            "parent": docs[i]["sections"][s_index]["parent"],
                         }
                     )
                 # if section in prior label is not in current label
                 else:
                     docs[i]["diff_against_previous_label"].append(
                         {
-                            "name": section["name"],
-                            "text": [[-1, section["text"]]],
-                            "parent": section["parent"],
+                            "name": section_prior["name"],
+                            "text": [[-1, section_prior["text"]]],
+                            "parent": docs[i]["sections"][s_index]["parent"],
                         }
                     )
             # loop through all sections in current label not in prior label
@@ -178,14 +152,14 @@ def add_diff_against_previous_label(docs):
                     # select location to insert if name of section includes
                     # number
                     insert_loc = len(docs[i]["diff_against_previous_label"])
-                    if is_number(section["name"].split()[0]):
+                    if misc.is_number(section["name"].split()[0]):
                         for num in range(
                             len(docs[i]["diff_against_previous_label"])
                         ):
                             first_word = docs[i]["diff_against_previous_label"][
                                 num
                             ]["name"].split()[0]
-                            if is_number(first_word) and float(
+                            if misc.is_number(first_word) and float(
                                 first_word
                             ) <= float(section["name"].split()[0]):
                                 insert_loc = num + 1
@@ -299,10 +273,12 @@ def gather_additions(docs):
     """
 
     for doc in docs:
-        if "additions" in doc.keys():
-            additions_num = len(doc["additions"])
-        else:
-            additions_num = 0
+        # if "additions" in doc.keys():
+        #     additions_num = len(doc["additions"])
+        # else:
+        #     additions_num = 0
+        doc["additions"] = {}
+        additions_num = 0
         for diff in doc["diff_against_previous_label"]:
             for j in range(len(diff["text"])):
                 # if the diff is an addition, and the diff is not just spaces
