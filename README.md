@@ -36,9 +36,17 @@ This will load the `database_before` collections into MongoDB.  The following co
 ## Running the Code
 Requires a minimum python version of `3.6` to run.
 
+### Install
+
 To install:
 
 `pip3 install -r requirements.txt`
+
+or
+
+`pipenv install`
+
+If `pipenv` is used all subsequent `python3` commands should be replaced with `pipenv run python`.
 
 ### Usage Examples
 
@@ -77,9 +85,7 @@ To read help:
 
 Unit tests are run with:
 
-`
-python -m unittest
-`
+`python3 -m unittest`
 
 ## Code Formatting
 It is recommended to use the [Black Code Formatter](https://github.com/psf/black) which can be installed as a plugin for most IDEs. `pyproject.toml` holds the formatter settings.

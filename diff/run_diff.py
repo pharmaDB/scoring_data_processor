@@ -144,11 +144,15 @@ def add_diff_against_previous_label(docs):
                             "parent": docs[i]["sections"][s_index]["parent"],
                         }
                     )
+            section_names_of_diff_against_previous_label = [
+                x["name"] for x in docs[i]["diff_against_previous_label"]
+            ]
             # loop through all sections in current label not in prior label
             for section in docs[i]["sections"]:
-                if section["name"] not in [
-                    x["name"] for x in docs[i]["diff_against_previous_label"]
-                ]:
+                if (
+                    section["name"]
+                    not in section_names_of_diff_against_previous_label
+                ):
                     # select location to insert if name of section includes
                     # number
                     insert_loc = len(docs[i]["diff_against_previous_label"])
@@ -177,20 +181,22 @@ def add_diff_against_previous_label(docs):
 
 def rebuild_string(diff_text, num):
     """
-    Give a diff_map_patch list rebuild a string around item_num.  Strings are
+    Give a diff_map_patch list rebuild a string around index num.  Strings are
     delimited by carriage returns or newline or a whole sentence.  This
     function returns the rebuilt string and a list of indexes of additions that
     constitute the rebuild string.
 
-    For example, diff_text:
-    [[0, 'Morphine '],[-1,'s'],[1,'S'],[0,'ulfate '],[-1, 'is an opioid']]
+    For example:
+    rebuild_string([[0, 'Morphine '],[-1,'s'],[1,'S'],[0,'ulfate '],[-1, 'is an
+        opioid']],2)
     returns:
     (Morphine Sulfate", [2])
 
 
     Parameters:
         diff_text (list of list): See example above
-        num (int): 0 would represent [0, 'Morphine '] in example above
+        num (int): index in diff_match_patch list; 0 would represent [0,
+                   'Morphine '] in example above
     """
     test_chars = [".", "?", "!", "\n", "\r"]
     addition_list = [num]
@@ -258,9 +264,9 @@ def gather_additions(docs):
 
     'additions':[0:{'full_text_for_diff':...,
                      "scores":[
-                                {"patentNumber":"12345678",
-                                 "claimNumber":5,
-                                 "parentClaimNumbers":[1,2]
+                                {"patent_number":"12345678",
+                                 "claim_number":5,
+                                 "parent_claim_numbers":[1,2]
                                  "score":0.5172
                                 },
                               ]
@@ -321,15 +327,15 @@ def gather_additions(docs):
                             "full_text_for_diff": rebuilt_string,
                             "scores": [
                                 {
-                                    "patentNumber": "5202128",
-                                    "claimNumber": 6,
-                                    "parentClaimNumbers": [1, 5],
+                                    "patent_number": "5202128",
+                                    "claim_number": 6,
+                                    "parent_claim_numbers": [1, 5],
                                     "score": 0.8,
                                 },
                                 {
-                                    "patentNumber": "5202128",
-                                    "claimNumber": 5,
-                                    "parentClaimNumbers": [1],
+                                    "patent_number": "5202128",
+                                    "claim_number": 5,
+                                    "parent_claim_numbers": [1],
                                     "score": 0.5,
                                 },
                             ],
