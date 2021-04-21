@@ -29,9 +29,9 @@ mongoimport --db test --collection labels --file patents.bson
 ```
 or 
 
-```python3 main.py -rip -ril```
+`python3 main.py -rip -ril` once the Install instructions below are completed.
 
-This will load the `database_before` collections into MongoDB.  The following code can then be run to turn collections in `assets/database_before/` into the collections in `assets/database_after/`.
+This will load the `assets/database_before/` collections into MongoDB.  The following code can then be run to turn collections in `assets/database_before/` into the collections in `assets/database_after/`.
 
 ## Running the Code
 Requires a minimum python version of `3.6` to run.
@@ -68,6 +68,10 @@ To output a list of all patents from the Orange Book:
 
 `python3 main.py -ap <filename>`
 
+To output a list of all patents from the Orange Book as a json file:
+
+`python3 main.py -apj <filename>`
+
 To output a list of missing NDA from the database that are in the Orange Book:
 
 `python3 main.py -mn <filename>`
@@ -76,6 +80,9 @@ To output a list of missing patents from the database that are in the Orange Boo
 
 `python3 main.py -mp <filename>`
 
+To output a list of missing patents from the database that are in the Orange Book as a json file:
+
+`python3 main.py -mpj <filename>`
 
 To read help:
 
