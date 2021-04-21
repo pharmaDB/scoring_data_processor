@@ -41,14 +41,14 @@ def parse_args():
     )
 
     parser.add_argument(
-        "-al",
-        "--all_labels_from_Orange_Book",
+        "-an",
+        "--all_NDA_from_Orange_Book",
         nargs="?",
         type=Path,
-        const=Path(__file__).absolute().parent / "assets" / "all_labels",
+        const=Path(__file__).absolute().parent / "assets" / "all_NDA",
         help=(
-            "Output list of all labels from Orange Book to File_Name. If unset"
-            ", File_Name is '/assets/all_labels'."
+            "Output list of all NDA from Orange Book to File_Name. If unset"
+            ", File_Name is '/assets/all_NDA'."
         ),
         metavar=("File_Name"),
     )
@@ -80,14 +80,14 @@ def parse_args():
     )
 
     parser.add_argument(
-        "-ml",
-        "--missing_labels_from_database",
+        "-mn",
+        "--missing_NDA_from_database",
         nargs="?",
         type=Path,
-        const=Path(__file__).absolute().parent / "assets" / "missing_labels",
+        const=Path(__file__).absolute().parent / "assets" / "missing_NDA",
         help=(
-            "Output list of labels from Orange Book not in MongoDB to "
-            "File_Name. If unset, File_Name is '/assets/missing_labels'."
+            "Output list of NDA from Orange Book not in MongoDB to "
+            "File_Name. If unset, File_Name is '/assets/missing_NDA'."
         ),
         metavar=("File_Name"),
     )
@@ -177,11 +177,11 @@ def reimport_collection(collection_name, file_name):
             collection.insert_one(doc)
 
 
-def export_all_labels(file_name):
-    """Exports list of all labels from the Orange Book to a file"""
+def export_all_NDA(file_name):
+    """Exports list of all NDA from the Orange Book to a file"""
     ob = OrangeBookMap()
-    all_labels_in_Orange_Book = ob.get_all_nda()
-    misc.store_to_file(file_name, all_labels_in_Orange_Book)
+    all_NDA_in_Orange_Book = ob.get_all_nda()
+    misc.store_to_file(file_name, all_NDA_in_Orange_Book)
 
 
 def export_all_patents(file_name, json_convert=False):
@@ -197,19 +197,19 @@ def export_all_patents(file_name, json_convert=False):
         misc.store_to_file(file_name, json.dumps(all_patents_in_Orange_Book))
 
 
-def export_missing_labels(file_name):
+def export_missing_NDA(file_name):
     """
-    Exports list of missing labels from the database to a file.
+    Exports list of missing NDA from the database to a file.
     """
     db = connect_mongo()
     label_collection = db[LABEL_COLLECTION]
     ob = OrangeBookMap()
-    all_labels_in_Orange_Book = ob.get_all_nda()
-    all_labels_in_MongoDB = label_collection.distinct("application_numbers")
-    labels_in_OB_not_in_Mongo = [
-        x for x in all_labels_in_Orange_Book if x not in all_labels_in_MongoDB
+    all_NDA_in_Orange_Book = ob.get_all_nda()
+    all_NDA_in_MongoDB = label_collection.distinct("application_numbers")
+    NDA_in_OB_not_in_Mongo = [
+        x for x in all_NDA_in_Orange_Book if x not in all_NDA_in_MongoDB
     ]
-    misc.store_to_file(file_name, labels_in_OB_not_in_Mongo)
+    misc.store_to_file(file_name, NDA_in_OB_not_in_Mongo)
 
 
 def export_missing_patents(file_name, json_convert=False):
@@ -238,27 +238,27 @@ if __name__ == "__main__":
 
     run_diff_and_similarity = False
 
-    # export all patents or labels from the Orange Book
-    if args.all_labels_from_Orange_Book:
-        export_all_labels(args.all_labels_from_Orange_Book)
-    if args.all_patents_from_Orange_Book:
-        export_all_patents(args.all_patents_from_Orange_Book)
-    if args.all_patents_from_Orange_Book_json:
-        export_all_patents(args.all_patents_from_Orange_Book_json, True)
-
-    # export list of missing patents or labels from the database
-    if args.missing_labels_from_database:
-        export_missing_labels(args.missing_labels_from_database)
-    if args.missing_patents_from_database:
-        export_missing_patents(args.missing_patents_from_database)
-    if args.missing_patents_from_database_json:
-        export_missing_patents(args.missing_patents_from_database_json, True)
-
     # download latest Orange Book File from fda.gov
     if args.update_orange_book:
         url = "https://www.fda.gov/media/76860/download"
         file_path = fetch.download(url, ORANGE_BOOK_FOLDER)
         fetch.extract_and_clean(file_path)
+
+    # export all patents or NDA from the Orange Book
+    if args.all_NDA_from_Orange_Book:
+        export_all_NDA(args.all_NDA_from_Orange_Book)
+    if args.all_patents_from_Orange_Book:
+        export_all_patents(args.all_patents_from_Orange_Book)
+    if args.all_patents_from_Orange_Book_json:
+        export_all_patents(args.all_patents_from_Orange_Book_json, True)
+
+    # export list of missing patents or NDA from the database
+    if args.missing_NDA_from_database:
+        export_missing_NDA(args.missing_NDA_from_database)
+    if args.missing_patents_from_database:
+        export_missing_patents(args.missing_patents_from_database)
+    if args.missing_patents_from_database_json:
+        export_missing_patents(args.missing_patents_from_database_json, True)
 
     # reimport of label or patent collections; for development
     if args.reimport_labels:
