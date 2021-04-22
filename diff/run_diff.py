@@ -254,10 +254,8 @@ def rebuild_string(diff_text, num):
     test_chars = [". ", "? ", "! ", " [", "\n", "\r"]
 
     # if the text at num does not end with characters in [".", "?", "!"]
-    if (
-        not any(
-            [diff_text[num][1].rstrip().endswith(x) for x in [".", "?", "!"]]
-        )
+    if not (
+        any([diff_text[num][1].rstrip().endswith(x) for x in [".", "?", "!"]])
         and len(diff_text[num][1].rstrip()) > 1
         and not misc.is_number(diff_text[num][1].rstrip()[-2])
     ):
@@ -300,7 +298,7 @@ def gather_additions(docs):
 
     Example of 'additions'
 
-    'additions':[0:{'full_text_for_diff':...,
+    'additions':[0:{'expanded_context'::...,
                      "scores":[
                                 {"patent_number":"12345678",
                                  "claim_number":5,
@@ -316,17 +314,15 @@ def gather_additions(docs):
                      application_numbers
     """
     for doc in docs:
-        # if "additions" in doc.keys():
-        #     additions_num = len(doc["additions"])
-        # else:
-        #     additions_num = 0
         doc["additions"] = {}
         additions_num = 0
         for diff in doc["diff_against_previous_label"]:
             for j in range(len(diff["text"])):
                 # if the diff is an addition, and the diff is not just spaces
-                # or items that is removed by strip(), and the changes are not
-                # just capitalization, then diffs are significant
+                # or items that is removed by strip(), or the changes are not
+                # just capitalization, or the changes are not just a stray
+                # punctuation, then diffs are significant and the text should
+                # be rebuilt around diff
                 if (
                     diff["text"][j][0] == 1
                     and diff["text"][j][1].strip()
@@ -344,11 +340,12 @@ def gather_additions(docs):
                     rebuilt_string, rebuilt_index = rebuild_string(
                         diff["text"], j
                     )
+                    # if rebuilt_string is same a prior rebuilt_string
                     if (
                         additions_num > 0
                         and str(additions_num - 1) in doc["additions"].keys()
                         and doc["additions"][str(additions_num - 1)][
-                            "full_text_for_diff"
+                            "expanded_content"
                         ]
                         == rebuilt_string
                     ):
@@ -357,11 +354,9 @@ def gather_additions(docs):
                         else:
                             diff["text"][j][2] = str(additions_num - 1)
                     else:
-                        if "additions" not in doc.keys():
-                            doc["additions"] = {}
                         # the scores are mock data at the moment
                         doc["additions"][str(additions_num)] = {
-                            "full_text_for_diff": rebuilt_string,
+                            "expanded_content": rebuilt_string,
                             "scores": [
                                 {
                                     "patent_number": "5202128",
@@ -380,7 +375,7 @@ def gather_additions(docs):
                         if len(diff["text"][j]) < 3:
                             diff["text"][j].append(str(additions_num))
                         else:
-                            diff["text"][j] = str(additions_num)
+                            diff["text"][j][2] = str(additions_num)
                         additions_num += 1
 
     return docs
