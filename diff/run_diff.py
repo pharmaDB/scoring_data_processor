@@ -223,6 +223,13 @@ def rebuild_string(diff_text, num):
             i -= 1
             continue
         txt = diff_text[i][1]
+
+        # if txt is a complete sentence do not add to rebuilt string.
+        if any(
+            [txt.rstrip().endswith(x) for x in [".", "?", "!"]]
+        ) and not misc.is_number(rebuilt_text[0]):
+            break
+
         # test if any test_chars is in txt and truncate at rightmost test_char
         loc_test_chars_list = [txt.rfind(e) for e in test_chars]
         if max(loc_test_chars_list) > -1:
@@ -246,8 +253,14 @@ def rebuild_string(diff_text, num):
 
     test_chars = [". ", "? ", "! ", " [", "\n", "\r"]
 
-    # if the text does not end with characters in test_chars
-    if not any([diff_text[num][1].rstrip().endswith(x) for x in test_chars]):
+    # if the text at num does not end with characters in [".", "?", "!"]
+    if (
+        not any(
+            [diff_text[num][1].rstrip().endswith(x) for x in [".", "?", "!"]]
+        )
+        and len(diff_text[num][1].rstrip()) > 1
+        and not misc.is_number(diff_text[num][1].rstrip()[-2])
+    ):
         # rebuild right end
         i = num + 1
         while i < len(diff_text):
@@ -258,13 +271,9 @@ def rebuild_string(diff_text, num):
             # test if any test_chars is in txt and truncate at leftmost test_char
             loc_test_chars_list = [txt.find(e) for e in test_chars]
             if max(loc_test_chars_list) > -1:
-                min_loc=min([x for x in loc_test_chars_list if x > -1])
+                min_loc = min([x for x in loc_test_chars_list if x > -1])
                 # test_char is leftmost index of any test_chars in txt
-                test_char = test_chars[
-                    loc_test_chars_list.index(
-                        min_loc
-                    )
-                ]
+                test_char = test_chars[loc_test_chars_list.index(min_loc)]
                 rightside_txt = txt[: (min_loc + len(test_char))]
                 rebuilt_text = rebuilt_text + rightside_txt
                 if diff_text[i][0] == 1 and rightside_txt:
@@ -330,7 +339,7 @@ def gather_additions(docs):
                         )
                     )
                     and diff["text"][j][1].strip()
-                    not in list("~`!@#$%^&*()-_=+[{}];:'\"',<>./?|")
+                    not in list("~`’!@#$%^&*()-_=+[{}];:'\"',<>./?|")
                 ):
                     rebuilt_string, rebuilt_index = rebuild_string(
                         diff["text"], j

@@ -38,7 +38,7 @@ diff_against_previous_label: [
     }
 additions: {
         '0': {
-            full_text_for_diff: 'rphine Sulfate Injection is indicated for the management of pain severe enough to require an opioid analgesic and for which alternative treatments are inadequate.\nLimitations of Use\nBecause of the risks of addiction, abuse, and misuse with opioids, even at recommended doses \n  [see Warnings and Precautions (\n5.1\n)], reserve Morphine Sulfate Injection for use in patients for whom alternative treatment options [e.g., non-opioid analgesics or opioid combination products]:\nHave not been tolerated, or are not expected to be tolerated,\nHave not provided adequate analgesia, or are not expected to provide adequate analgesia',
+            full_text_for_diff: '\nLimitations of Use\nBecause of the risks of addiction, abuse, and misuse with opioids, even at recommended doses \n  [see Warnings and Precautions (\n5.1\n)], reserve Morphine Sulfate Injection for use in patients for whom alternative treatment options [e.g., non-opioid analgesics or opioid combination products]:\nHave not been tolerated, or are not expected to be tolerated,\nHave not provided adequate analgesia, or are not expected to provide adequate analgesia',
             scores: [
                 {
                     patentNumber: '5202128',
