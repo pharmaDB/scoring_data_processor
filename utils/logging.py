@@ -3,7 +3,8 @@ import logging
 _FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
 
-def getLogger(name):
+def getLogger(name, level=logging.INFO):
+
     # Set up console log handler
     ch = logging.StreamHandler()
     ch.setLevel(logging.INFO)
@@ -11,6 +12,6 @@ def getLogger(name):
 
     # Create logger
     logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(level)
     logger.addHandler(ch)
     return logger

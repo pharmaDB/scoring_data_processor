@@ -1,13 +1,13 @@
 import argparse
 import os
 import json
-from bson.objectid import ObjectId
 from pathlib import Path
 import sys
 
 # from similarity import run_nlp_scispacy
+from similarity import run_similarity
 from diff import run_diff
-from db.mongo import connect_mongo
+from db.mongo import connect_mongo, reimport_collection
 
 from orangebook.merge import OrangeBookMap
 from utils.logging import getLogger
@@ -164,20 +164,6 @@ def parse_args():
     return parser.parse_args()
 
 
-def reimport_collection(collection_name, file_name):
-    """Reimports collection into MongoDB"""
-    db = connect_mongo()
-    collection = db[collection_name]
-    collection.drop()
-    with open(file_name, "r") as f:
-        lines = f.readlines()
-        for line in lines:
-            doc = json.loads(line)
-            doc["_id"] = ObjectId(doc["_id"]["$oid"])
-            collection.insert_one(doc)
-    _logger.info(f"Reimported '{collection_name}' with '{file_name}'")
-
-
 def export_all_NDA(file_name):
     """Exports list of all NDA from the Orange Book to a file"""
     ob = OrangeBookMap()
@@ -298,6 +284,13 @@ if __name__ == "__main__":
 
         run_diff.run_diff(
             LABEL_COLLECTION, PROCESSED_ID_DIFF_FILE, PROCESSED_NDA_DIFF_FILE
+        )
+
+        run_similarity.run_similarity(
+            LABEL_COLLECTION,
+            PATENT_COLLECTION,
+            PROCESSED_ID_SIMILARITY_FILE,
+            PROCESSED_NDA_SIMILARITY_FILE,
         )
 
         # run_nlp_scispacy.process_similarity(LABEL_COLLECTION, PATENT_COLLECTION, PROCESSED_ID_SIMILARITY_FILE, PROCESSED_NDA_SIMILARITY_FILE)

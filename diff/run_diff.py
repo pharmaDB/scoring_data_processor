@@ -1,5 +1,5 @@
 from bson.objectid import ObjectId
-from db.mongo import connect_mongo
+from db.mongo import connect_mongo, update_db
 import diff_match_patch as dmp_module
 
 from utils import misc
@@ -251,7 +251,7 @@ def rebuild_string(diff_text, num):
         rebuilt_text = leftside_txt + rebuilt_text
         i -= 1
 
-    test_chars = [". ", "? ", "! ", " [", "\n", "\r"]
+    test_chars = [".", "?", "!", " [", "\n", "\r"]
 
     # if the text at num does not end with characters in [".", "?", "!"]
     if not (
@@ -381,39 +381,41 @@ def gather_additions(docs):
     return docs
 
 
-def update_db(similar_label_docs):
+def setup_MongoDB(label_collection_name, alt_db_name=""):
     """
-    Update all docs in similar_label_docs in the _label_collection
+    This method sets up the MongoDB connection for all methods for this module.
 
     Parameters:
-        similar_label_docs (list): list of sorted label docs from MongoDB
-                                   having the same application_numbers
+        label_collection_name (String): name of the label collection
+        alt_db_name (String): this is an optional argument that will set the
+                    db_name to a value other than the value in the .env file.
     """
-    for doc in similar_label_docs:
-        result = _label_collection.replace_one({"_id": doc["_id"]}, doc)
-        if result.matched_count < 1:
-            _logger.error(
-                "Unable to update scores for label id: {str(doc['_id'])}; "
-                "set_id: {doc['set_id']}; spl_id: {doc['spl_id']}; "
-                "spl_version: {doc['spl_version']}; published_date: "
-                "{doc['published_date']}"
-            )
-        else:
-            _logger.info(
-                f"Uploaded to collection '{_label_collection_name}': "
-                f"{str(doc)[:250]}" + ("" if len(str(doc)) < 250 else "...")
-            )
-    return
-
-
-def run_diff(
-    label_collection_name, processed_label_ids_file, processed_nda_file
-):
-    # Set up MongoDb Connection
-    db = connect_mongo()
+    db = connect_mongo(alt_db_name)
     global _label_collection_name, _label_collection
     _label_collection_name = label_collection_name
     _label_collection = db[label_collection_name]
+
+
+def run_diff(
+    label_collection_name,
+    processed_label_ids_file,
+    processed_nda_file,
+    alt_db_name="",
+):
+    """
+    This method calls other methods in this module and tracks completed
+    label IDs and completed NDA numbers.
+
+    Parameters:
+        label_collection_name (String): name of the label collection
+        processed_label_ids_file (Path): location to store processed ids
+        processed_nda_file (Path): location to store processed NDAs
+        alt_db_name (String): This is an optional argument that will set the
+                    db_name to a value other than the value in the .env file.
+                    Used mainly for unit-tests.
+    """
+
+    setup_MongoDB(label_collection_name, alt_db_name="")
 
     # open processed_label_id_file and return a list of processed _id string
     processed_label_ids = misc.get_lines_in_file(processed_label_ids_file)
@@ -438,37 +440,28 @@ def run_diff(
         )["application_numbers"]
 
         # find all other docs with the same list of NDA numbers
+        # len(similar_label_docs) is at least 1
         similar_label_docs = list(
             _label_collection.find({"application_numbers": application_numbers})
         )
+        similar_label_docs = sorted(
+            similar_label_docs,
+            key=lambda i: (i["published_date"]),
+            reverse=False,
+        )
 
-        if len(similar_label_docs) > 0:
-            similar_label_docs = sorted(
-                similar_label_docs,
-                key=lambda i: (i["published_date"]),
-                reverse=False,
-            )
+        similar_label_docs = add_previous_and_next_labels(similar_label_docs)
+        similar_label_docs = remove_newlines(similar_label_docs)
+        similar_label_docs = add_diff_against_previous_label(similar_label_docs)
+        similar_label_docs = gather_additions(similar_label_docs)
+        update_db(_label_collection_name, similar_label_docs, alt_db_name)
 
-            similar_label_docs = add_previous_and_next_labels(
-                similar_label_docs
-            )
-            similar_label_docs = remove_newlines(similar_label_docs)
-            similar_label_docs = add_diff_against_previous_label(
-                similar_label_docs
-            )
-            similar_label_docs = gather_additions(similar_label_docs)
-            update_db(similar_label_docs)
+        similar_label_docs_ids = [str(x["_id"]) for x in similar_label_docs]
 
-            similar_label_docs_ids = [str(x["_id"]) for x in similar_label_docs]
-
-            # remove similar_label_docs_ids from all_label_ids
-            all_label_ids = [
-                x for x in all_label_ids if x not in similar_label_docs_ids
-            ]
-            # store processed_label_ids and processed application_numbers to disk
-            misc.append_to_file(
-                processed_label_ids_file, similar_label_docs_ids
-            )
-            misc.append_to_file(
-                processed_nda_file, str(application_numbers)[1:-1]
-            )
+        # remove similar_label_docs_ids from all_label_ids
+        all_label_ids = [
+            x for x in all_label_ids if x not in similar_label_docs_ids
+        ]
+        # store processed_label_ids and processed application_numbers to disk
+        misc.append_to_file(processed_label_ids_file, similar_label_docs_ids)
+        misc.append_to_file(processed_nda_file, str(application_numbers)[1:-1])
