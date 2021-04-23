@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Provides for functions to turn a dictionary of claims (ex: {claim_num
 (int):claim_text (str),...}) to an ordered dictionary of claims, wherein
@@ -196,6 +195,8 @@ def dependent_to_independent_claim(od):
         od (OrderedDict): An OrderedDict of {claim_num (int): claim_text (str),..}
     """
 
+    print(str(od)[:500])
+
     if not od:
         return OrderedDict()
 
@@ -204,6 +205,8 @@ def dependent_to_independent_claim(od):
     claim_parent_text_od = OrderedDict()
 
     all_claim_nums = list(od.keys())
+
+    print(all_claim_nums)
 
     for key, claim_text in od.items():
         # drop first word if claim text begins with number, for example: '\n1.'
@@ -219,6 +222,11 @@ def dependent_to_independent_claim(od):
     # claim_parent_text_list is a list of
     # [(claim_num,([parent_claim_num,..],"text_without_parent_claim")),..]
     claim_parent_text_list = list(claim_parent_text_od.items())
+
+    print(str(claim_parent_text_list[1]))
+    print(str(claim_parent_text_list[2]))
+    print(str(claim_parent_text_list[3]))
+    print(str(claim_parent_text_list[4]))
 
     # no_dependent_od is returned and consists of:
     # {claim_num: [{'parent_clm': [], "text": claim_text },   ],
@@ -279,6 +287,7 @@ def dependent_to_independent_claim(od):
                 break
             run_loop = False
 
+    print("***")
     return no_dependent_od
 
 

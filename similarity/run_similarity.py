@@ -49,8 +49,8 @@ def get_claims_in_patents_db(all_patents):
             # claims is in form [{'claim_number': 1, 'claim_text': '...'},]
             claims = patent_from_collection["claims"]
             sorted(claims, key=lambda i: i["claim_number"])
-            for claims in claims:
-                claim_num_text_od[int(claims["claim_number"])] = claims[
+            for claim in claims:
+                claim_num_text_od[int(claim["claim_number"])] = claim[
                     "claim_text"
                 ]
         patent_od[patent] = claim_num_text_od
@@ -81,6 +81,8 @@ def patent_claims_longhand_form_from_NDA(application_numbers):
         """
         return_od = OrderedDict()
         for patent, claim_od in od.items():
+            print(patent)
+            # print(str(claim_od)[:500])
             return_od[patent] = dependent_to_independent_claim(claim_od)
         return return_od
 
@@ -88,11 +90,13 @@ def patent_claims_longhand_form_from_NDA(application_numbers):
     all_patents = [
         _ob.get_patents(misc.get_num_in_str(nda)) for nda in application_numbers
     ]
-    print(all_patents)
+    # print(all_patents)
     # flatten all_patents into [patent_str,]
     all_patents = [j for i in all_patents for j in i]
     # patent_od = OrderedDict of {patent_str:{claim_num:claim_text,},}
     patent_od = get_claims_in_patents_db(all_patents)
+    # print(str(patent_od)[:500])
+    print("test***")
     # claims_longhand_od = {patent_str:{claim_num (int):[{'parent_clm':
     #           [independent_claim, ..., grand-parent_claim ,
     #           parent_claim,],'text': claim_text},],},}

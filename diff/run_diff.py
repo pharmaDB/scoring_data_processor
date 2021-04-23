@@ -414,8 +414,7 @@ def run_diff(
                     db_name to a value other than the value in the .env file.
                     Used mainly for unit-tests.
     """
-
-    setup_MongoDB(label_collection_name, alt_db_name="")
+    setup_MongoDB(label_collection_name, alt_db_name)
 
     # open processed_label_id_file and return a list of processed _id string
     processed_label_ids = misc.get_lines_in_file(processed_label_ids_file)
