@@ -286,11 +286,11 @@ if __name__ == "__main__":
             LABEL_COLLECTION, PROCESSED_ID_DIFF_FILE, PROCESSED_NDA_DIFF_FILE
         )
 
-        run_similarity.run_similarity(
-            LABEL_COLLECTION,
-            PATENT_COLLECTION,
-            PROCESSED_ID_SIMILARITY_FILE,
-            PROCESSED_NDA_SIMILARITY_FILE,
-        )
+        # run_similarity.run_similarity(
+        #     LABEL_COLLECTION,
+        #     PATENT_COLLECTION,
+        #     PROCESSED_ID_SIMILARITY_FILE,
+        #     PROCESSED_NDA_SIMILARITY_FILE,
+        # )
 
         # run_nlp_scispacy.process_similarity(LABEL_COLLECTION, PATENT_COLLECTION, PROCESSED_ID_SIMILARITY_FILE, PROCESSED_NDA_SIMILARITY_FILE)

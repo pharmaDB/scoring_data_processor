@@ -30,41 +30,43 @@ diff_against_previous_label: [
             ],
             [
                 1,
-                '\nLimitations of Use\nBecause of the risks of addiction, abuse, and misuse with opioids, even at recommended doses \n  [see Warnings and Precautions (\n5.1\n)], reserve Morphine Sulfate Injection for use in patients for whom alternative treatment options [e.g., non-opioid analgesics or opioid combination products]:\nHave not been tolerated, or are not expected to be tolerated,\nHave not provided adequate analgesia, or are not expected to provide adequate analgesia',
-                '0'
+                ' Limitations of Use Because of the risks of addiction, abuse, and misuse with opioids, even at recommended doses [see Warnings and Precautions ( 5.1 )], reserve Morphine Sulfate Injection for use in patients for whom alternative treatment options [e.g., non-opioid analgesics or opioid combination products]: Have not been tolerated, or are not expected to be tolerated, Have not provided adequate analgesia, or are not expected to provide adequate analgesia'
             ]
         ],
-    ...
-    }
-additions: {
-        '0': {
-            full_text_for_diff: '\nLimitations of Use\nBecause of the risks of addiction, abuse, and misuse with opioids, even at recommended doses \n  [see Warnings and Precautions (\n5.1\n)], reserve Morphine Sulfate Injection for use in patients for whom alternative treatment options [e.g., non-opioid analgesics or opioid combination products]:\nHave not been tolerated, or are not expected to be tolerated,\nHave not provided adequate analgesia, or are not expected to provide adequate analgesia',
-            scores: [
-                {
-                    patentNumber: '5202128',
-                    claimNumber: 6,
-                    parentClaimNumbers: [
-                        1,
-                        5
-                    ],
-                    score: 0.8
-                },
-                {
-                    patentNumber: '5202128',
-                    claimNumber: 5,
-                    parentClaimNumbers: [
-                        1
-                    ],
-                    score: 0.5
-                }
-            ]
-        },
-    ...
-    }
+        parent: null,
+        additions: [
+            {
+                indices: [
+                    1
+                ],
+                expanded_context: ' Limitations of Use Because of the risks of addiction, abuse, and misuse with opioids, even at recommended doses [see Warnings and Precautions ( 5.1 )], reserve Morphine Sulfate Injection for use in patients for whom alternative treatment options [e.g., non-opioid analgesics or opioid combination products]: Have not been tolerated, or are not expected to be tolerated, Have not provided adequate analgesia, or are not expected to provide adequate analgesia',
+                scores: [
+                    {
+                        patent_number: '5202128',
+                        claim_number: 6,
+                        parent_claim_numbers: [
+                            1,
+                            5
+                        ],
+                        score: 0.8
+                    },
+                    {
+                        patent_number: '5202128',
+                        claim_number: 5,
+                        parent_claim_numbers: [
+                            1
+                        ],
+                        score: 0.5
+                    }
+                ]
+            }
+        ]
+    },
+]
 ```
 
-Notice that for `diff_against_previous_label`, the second entry for `'text'` is `[1,'...','0']`.  Since this is an addition, signified by the 1, a third value `'0'` is added to this entry.  `'0'` refers to `additions['0']`.  Additions are referenced in this manner, since multiple additions may exists for the same sentence, so it would be wasteful in space to rewrite the entirety of the addition after each space.
+Note that `indices` refers to the index of the `text` starting with index 0.  `indices` is a list, since two indices may share same expanded_text.
 
-`full_text_for_diff` is still a work in progress, but it should read from the start of sentence to the end of sentence for a sentence having an addition.  Start or ends of sentences are determined by line breaks, carriage returns, periods, exclamations, or question marks.
+`expanded_context` should read from the start of sentence to the end of sentence for a sentence having an addition.  Start or ends of sentences are determined by line breaks, carriage returns, periods, exclamations, or question marks.
 
-The scores for the mock data are all the same for now for every additions.
+The scores for the mock data are all the same for now for every additions.  The particular patent and claim are in `patent.json`.
