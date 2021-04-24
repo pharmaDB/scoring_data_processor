@@ -1,5 +1,5 @@
 import unittest
-from diff.run_diff import rebuild_string
+from diff.run_diff import rebuild_string, find_end
 import copy
 
 
@@ -148,6 +148,22 @@ class Test_run_diff(unittest.TestCase):
 
         self.assertEqual(orig_text, rebuilt_str)
         self.assertEqual(addition_list, rebuilt_list)
+
+    def test_find_end(self):
+        a = ". Edetate disodium 0.2 mg.  Testing."
+        b = "Edetate disodium 0.2 mg."
+        c = "a!"
+        self.assertEqual(find_end(a, "."), 0)
+        self.assertEqual(find_end(a, ".", reverse=True), 35)
+        self.assertEqual(
+            find_end(
+                b,
+                ".",
+            ),
+            23,
+        )
+        self.assertEqual(find_end(b, ".", reverse=True), 23)
+        self.assertEqual(find_end(c, "!"), 1)
 
 
 if __name__ == "__main__":

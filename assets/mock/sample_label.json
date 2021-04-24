@@ -241,7 +241,7 @@
                     indices: [
                         8
                     ],
-                    expanded_context: 'Monitor patients closely for respiratory depression, especially within the first 24 to 72 hours of initiating therapy and following dosage increases with Morphine Sulfate Injection and adjust the dosage accordingly [',
+                    expanded_context: 'Monitor patients closely for respiratory depression, especially within the first 24 to 72 hours of initiating therapy and following dosage increases with Morphine Sulfate Injection and adjust the dosage accordingly [see Warnings and Precautions ( 5.2)].',
                     scores: [
                         {
                             patent_number: '5202128',
@@ -1009,7 +1009,7 @@
                     indices: [
                         31
                     ],
-                    expanded_context: 'The inactive ingredients in Morphine Sulfate Injection, USP include: Edetate disodium 0.2 mg; citric acid 0.',
+                    expanded_context: 'The inactive ingredients in Morphine Sulfate Injection, USP include: Edetate disodium 0.2 mg; citric acid 0.4 mg; sodium chloride to adjust isotonicity and water for injection.',
                     scores: [
                         {
                             patent_number: '5202128',

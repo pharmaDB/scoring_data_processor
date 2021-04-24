@@ -1,6 +1,7 @@
 from bson.objectid import ObjectId
 from db.mongo import connect_mongo, update_db
 import diff_match_patch as dmp_module
+import re
 
 from utils import misc
 from utils.logging import getLogger
@@ -194,12 +195,40 @@ def add_diff_against_previous_label(docs):
     return docs
 
 
+def find_end(str, query, reverse=False):
+    """
+    Similar to find/rfind for end of sentence punctuation, but considers edge
+    case of '.'
+    """
+    if query == ".":
+        loc_list = [m.start() for m in re.finditer(r"\.", str)]
+        if reverse:
+            loc_list.reverse()
+        for loc in loc_list:
+            # test left hand side of '.' if '.' is preceded by lowercase letter
+            # upper case letter may be an initial
+            test_str = str[:loc]
+            if len(test_str) > 0 and test_str[-1].islower():
+                return loc
+            # test right side to see if not followed by number, or followed by
+            # upper letter
+            test_str = str[loc:]
+            if len(test_str) > 1 and not test_str[0].isnumeric():
+                test_str = test_str[1:].lstrip()
+                if len(test_str) > 0 and test_str[0].isupper():
+                    return loc
+        return -1
+    elif reverse:
+        return str.rfind(query)
+    else:
+        return str.find(query)
+
+
 def rebuild_string(diff_text, num):
     """
     Give a diff_map_patch list rebuild a string around index num.  Strings are
-    delimited by carriage returns or newline or a whole sentence.  This
-    function returns the rebuilt string and a list of indexes of additions that
-    constitute the rebuild string.
+    delimited by test_chars.  This function returns the rebuilt string and a
+    list of indexes of additions that constitute the rebuild string.
 
     For example:
     rebuild_string([[0, 'Morphine '],[-1,'s'],[1,'S'],[0,'ulfate '],[-1, 'is an
@@ -213,7 +242,8 @@ def rebuild_string(diff_text, num):
         num (int): index in diff_match_patch list; 0 would represent [0,
                    'Morphine '] in example above
     """
-    test_chars = [". ", "? ", "! ", "] ", "\n", "\r"]
+    # test_chars = [".", "?", "!", "\n", "\r"]
+    test_chars = [".", "?", "!"]
     addition_list = [num]
     rebuilt_text = diff_text[num][1]
 
@@ -226,13 +256,20 @@ def rebuild_string(diff_text, num):
         txt = diff_text[i][1]
 
         # if txt is a complete sentence do not add to rebuilt string.
-        if any(
-            [txt.rstrip().endswith(x) for x in [".", "?", "!"]]
-        ) and not misc.is_number(rebuilt_text[0]):
+        if (
+            txt.rstrip().endswith(".")
+            and (
+                (len(rebuilt_text) > 0 and not rebuilt_text[0].isnumeric())
+                or (
+                    len(rebuilt_text.lstrip()) > 0
+                    and rebuilt_text.lstrip()[0].isupper()
+                )
+            )
+        ) or any([txt.rstrip().endswith(x) for x in ["?", "!"]]):
             break
 
         # test if any test_chars is in txt and truncate at rightmost test_char
-        loc_test_chars_list = [txt.rfind(e) for e in test_chars]
+        loc_test_chars_list = [find_end(txt, e, True) for e in test_chars]
         if max(loc_test_chars_list) > -1:
             # test_char is rightmost index of any test_chars in txt
             test_char = test_chars[
@@ -252,38 +289,41 @@ def rebuild_string(diff_text, num):
         rebuilt_text = leftside_txt + rebuilt_text
         i -= 1
 
-    test_chars = [".", "?", "!", " [", "\n", "\r"]
+    # rebuild right end
+    i = num + 1
+    while i < len(diff_text):
+        if diff_text[i][0] == -1:
+            i += 1
+            continue
+        txt = diff_text[i][1]
 
-    # if the text at num does not end with characters in [".", "?", "!"]
-    if not (
-        any([diff_text[num][1].rstrip().endswith(x) for x in [".", "?", "!"]])
-        and len(diff_text[num][1].rstrip()) > 1
-        and not misc.is_number(diff_text[num][1].rstrip()[-2])
-    ):
-        # rebuild right end
-        i = num + 1
-        while i < len(diff_text):
-            if diff_text[i][0] == -1:
-                i += 1
-                continue
-            txt = diff_text[i][1]
-            # test if any test_chars is in txt and truncate at leftmost test_char
-            loc_test_chars_list = [txt.find(e) for e in test_chars]
-            if max(loc_test_chars_list) > -1:
-                min_loc = min([x for x in loc_test_chars_list if x > -1])
-                # test_char is leftmost index of any test_chars in txt
-                test_char = test_chars[loc_test_chars_list.index(min_loc)]
-                rightside_txt = txt[: (min_loc + len(test_char))]
-                rebuilt_text = rebuilt_text + rightside_txt
-                if diff_text[i][0] == 1 and rightside_txt:
-                    addition_list.append(i)
-                break
-            # for case when there is not test_chars in txt
-            rightside_txt = txt
+        # if rebuilt_text ends with [".", "?", "!"]
+        if (
+            rebuilt_text.rstrip().endswith(".")
+            and (
+                (len(txt) > 0 and not txt[0].isnumeric())
+                or (len(txt.lstrip()) > 0 and txt.lstrip()[0].isupper())
+            )
+        ) or any([rebuilt_text.rstrip().endswith(x) for x in ["?", "!"]]):
+            break
+
+        # test if any test_chars is in txt and truncate at leftmost test_char
+        loc_test_chars_list = [find_end(txt, e) for e in test_chars]
+        if max(loc_test_chars_list) > -1:
+            min_loc = min([x for x in loc_test_chars_list if x > -1])
+            # test_char is leftmost index of any test_chars in txt
+            test_char = test_chars[loc_test_chars_list.index(min_loc)]
+            rightside_txt = txt[: (min_loc + len(test_char))]
+            rebuilt_text = rebuilt_text + rightside_txt
             if diff_text[i][0] == 1 and rightside_txt:
                 addition_list.append(i)
-            rebuilt_text = rebuilt_text + rightside_txt
-            i += 1
+            break
+        # for case when there is not test_chars in txt
+        rightside_txt = txt
+        if diff_text[i][0] == 1 and rightside_txt:
+            addition_list.append(i)
+        rebuilt_text = rebuilt_text + rightside_txt
+        i += 1
 
     addition_list = sorted(addition_list)
     return rebuilt_text, addition_list
