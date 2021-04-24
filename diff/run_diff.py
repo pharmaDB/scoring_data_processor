@@ -343,7 +343,7 @@ def gather_additions(docs):
                     # if rebuilt_string is same a prior rebuilt_string
                     if (
                         len(diff["additions"]) > 0
-                        and rebuild_string
+                        and rebuilt_string
                         == diff["additions"][-1]["expanded_context"]
                     ):
                         diff["additions"][-1]["indices"].append(j)
