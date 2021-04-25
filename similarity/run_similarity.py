@@ -22,14 +22,15 @@ _ob = OrangeBookMap()
 
 def get_claims_in_patents_db(all_patents):
     """
-    Returns an OrderedDict of {patent_str:{claim_num:claim_text,},} from
-    mongodb
+    Returns an dict of OrderedDict {patent_str:OrderedDict([(claim_num,
+    claim_text), ]), } from mongodb.  Order of claim number is important for
+    references to preceding claims, so the inner dict must be an OrderedDict.
 
     Parameters:
         all_patents (list): example: ['4139619', '4596812']
     """
-    # patent_od is returned and has form {patent_str:{claim_num:claim_text,},}
-    patent_od = OrderedDict()
+    # patent_dict is returned and has form {patent_str:{claim_num:claim_text,},}
+    patent_dict = {}
     for patent in all_patents:
         claim_num_text_od = OrderedDict()
         # patent_from_collection ex: {'_id': ObjectId('unique_string'),
@@ -53,55 +54,37 @@ def get_claims_in_patents_db(all_patents):
                 claim_num_text_od[int(claim["claim_number"])] = claim[
                     "claim_text"
                 ]
-        patent_od[patent] = claim_num_text_od
-    return patent_od
+        patent_dict[patent] = claim_num_text_od
+    return patent_dict
 
 
 def patent_claims_longhand_form_from_NDA(application_numbers):
     """
-    Return OrderedDict of {patent_str:{claim_num (int):[{'parent_clm':
-    [independent_claim, ..., grand-parent_claim , parent_claim,],'text':
-    claim_text},],},} wherein the value assigned to claim_num contains all
-    intepretation of that claim when written in long hand form, without any
-    dependencies
+    Return dict of:
+        {patent_str: {claim_num (int): [{'parent_clm': [independent_claim_num,
+        ..., parent_claim_num, grand-parent_claim_num], 'text': claim_text}, ],
+        }, }
+    wherein the value assigned to claim_num is a list that contains all
+    interpretation of that claim when written in long hand form, without any
+    dependencies.
 
     Parameters:
         application_numbers (list): a list of application numbers such as
                                     ['NDA204223',]
     """
-
-    def patent_claims_to_longhand(od):
-        """
-        Return OrderedDict of {patent_str:{claim_num (int):[{'parent_clm':
-        [independent_claim, ..., grand-parent_claim , parent_claim,],'text':
-        claim_text},],},}
-
-        Parameters:
-            od (OrderedDict): {patent_str:{claim_num:claim_text,},}
-        """
-        return_od = OrderedDict()
-        for patent, claim_od in od.items():
-            print(patent)
-            # print(str(claim_od)[:500])
-            return_od[patent] = dependent_to_independent_claim(claim_od)
-        return return_od
-
     # all_patents = [[patent_str,],]
     all_patents = [
         _ob.get_patents(misc.get_num_in_str(nda)) for nda in application_numbers
     ]
-    # print(all_patents)
     # flatten all_patents into [patent_str,]
     all_patents = [j for i in all_patents for j in i]
-    # patent_od = OrderedDict of {patent_str:{claim_num:claim_text,},}
-    patent_od = get_claims_in_patents_db(all_patents)
-    # print(str(patent_od)[:500])
-    print("test***")
-    # claims_longhand_od = {patent_str:{claim_num (int):[{'parent_clm':
-    #           [independent_claim, ..., grand-parent_claim ,
-    #           parent_claim,],'text': claim_text},],},}
-    claims_longhand_od = patent_claims_to_longhand(patent_od)
-    return claims_longhand_od
+    # patent_dict = {patent_str:OrderedDict([(claim_num, claim_text),]),}
+    patent_dict = get_claims_in_patents_db(all_patents)
+    # patent_longhand_dict is returned
+    patent_longhand_dict = {}
+    for patent, claim_od in patent_dict.items():
+        patent_longhand_dict[patent] = dependent_to_independent_claim(claim_od)
+    return patent_longhand_dict
 
 
 def setup_MongoDB(

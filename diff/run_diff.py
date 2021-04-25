@@ -282,7 +282,7 @@ def rebuild_string(diff_text, num):
             if diff_text[i][0] == 1 and leftside_txt:
                 addition_list.append(i)
             break
-        # for case when there is not test_chars in txt
+        # for case when there is no test_chars in txt, append txt to left side
         leftside_txt = txt
         if diff_text[i][0] == 1 and leftside_txt:
             addition_list.append(i)
@@ -297,7 +297,7 @@ def rebuild_string(diff_text, num):
             continue
         txt = diff_text[i][1]
 
-        # if rebuilt_text ends with [".", "?", "!"]
+        # if rebuilt_text ends with [".", "?", "!"] do not add to right end
         if (
             rebuilt_text.rstrip().endswith(".")
             and (
@@ -318,7 +318,7 @@ def rebuild_string(diff_text, num):
             if diff_text[i][0] == 1 and rightside_txt:
                 addition_list.append(i)
             break
-        # for case when there is not test_chars in txt
+        # for case when there is not test_chars in txt, append entire txt
         rightside_txt = txt
         if diff_text[i][0] == 1 and rightside_txt:
             addition_list.append(i)

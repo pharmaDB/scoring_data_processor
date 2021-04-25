@@ -21,15 +21,14 @@ def drop_claim_number(text):
         text (string): claim text as a string
     """
     if bool(
-        re.match(r".*(\d+)\.([a-zA-Z]+)", text.split(" ", 1)[0].strip("\n"))
-    ):
-        text = (
-            text.split(" ", 1)[0].split(".", 1)[1] + " " + text.split(" ", 1)[1]
-        )
-    if bool(re.match(r".*(\d+)\.$", text.split(" ", 1)[0].strip("\n"))):
-        text = text.split(" ", 1)[1]
-    if bool(re.match(r".*(\d+)$", text.split(". ", 1)[0].strip("\n"))):
-        text = text.split(". ", 1)[1]
+            re.match(r'.*(\d+)\.([a-zA-Z]+)',
+                     text.split(' ', 1)[0].strip('\n'))):
+        text = text.split(' ', 1)[0].split('.', 1)[1] + ' ' + text.split(
+            ' ', 1)[1]
+    if bool(re.match(r'.*(\d+)\.$', text.split(' ', 1)[0].strip('\n'))):
+        text = text.split(' ', 1)[1]
+    if bool(re.match(r'.*(\d+)$', text.split('. ', 1)[0].strip('\n'))):
+        text = text.split('. ', 1)[1]
     return text
 
 
@@ -41,9 +40,9 @@ def drop_reference_numbers(text):
     Parameters:
         text (string): claim text as a string
     """
-    if bool(re.match(r".*\([a-zA-Z0-9]+\).*", text.strip("\n"))):
-        text = re.sub(r" \([a-zA-Z0-9]+\)", "", text)
-        text = re.sub(r"\([a-zA-Z0-9]+\)", "", text)
+    if bool(re.match(r'.*\([a-zA-Z0-9]+\).*', text.strip('\n'))):
+        text = re.sub(r' \([a-zA-Z0-9]+\)', '', text)
+        text = re.sub(r'\([a-zA-Z0-9]+\)', '', text)
     return text
 
 
@@ -61,24 +60,24 @@ def extract_alternative_numbers(text):
     # Add to claim_num all claim all claims in range
     # for case when ranges are written as '1-2'
     # findall_range ex: ['1-2', '3 - 4']
-    findall_range = re.findall(r"\d+(?:-| - )\d+", text)
+    findall_range = re.findall(r'\d+(?:-| - )\d+', text)
     if bool(findall_range):
         for range_ in findall_range:
             i = range_.split("-")
             claim_num.extend(range(int(i[0].strip()), int(i[1].strip()) + 1))
-        text = re.sub(r"\d+(?:-| - )\d+", "", text)
+        text = re.sub(r'\d+(?:-| - )\d+', '', text)
 
     # for case when ranges are written as '1 to 2'
     # findall_range ex: ['1 to 2', '3 to 4']
-    findall_range = re.findall(r"\d+ to \d+", text)
+    findall_range = re.findall(r'\d+ to \d+', text)
     if bool(findall_range):
         for range_ in findall_range:
             i = range_.split("-")
             claim_num.extend(range(int(i[0]), int(i[1]) + 1))
-        text = re.sub(r"\d+ to \d+", "", text)
+        text = re.sub(r'\d+ to \d+', '', text)
 
     # for all other cases of numbers in text; ex. '1, 2'
-    findall_range = re.findall(r"\d+", text)
+    findall_range = re.findall(r'\d+', text)
     # convert string to int
     findall_range = [int(i) for i in findall_range]
     claim_num.extend(findall_range)
@@ -107,24 +106,20 @@ def get_parent_claim(text, preceding_claims):
     """
     # test if substring with '... claim(s) [number] ...' is recited in text
     matching_search_obj = re.search(
-        r" (?:as|according to|of)\W+(?:\w+\W+){,6}(?:claims|claim)(?: or| and| \d+(?:-| - | to )\d+,| \d+(?:-| - | to )\d+| \d+,| \d+)+ inclusive",
+        r' (?:as|according to|of)\W+(?:\w+\W+){,6}(?:claims|claim)(?: or| and| \d+(?:-| - | to )\d+,| \d+(?:-| - | to )\d+| \d+,| \d+)+ inclusive',
         text,
-        flags=re.IGNORECASE,
-    )
+        flags=re.IGNORECASE)
 
     # re.search() again without the word 'inclusive'
     if not bool(matching_search_obj):
         matching_search_obj = re.search(
-            r" (?:as|according to|of)\W+(?:\w+\W+){,6}(?:claims|claim)(?: or| and| \d+(?:-| - | to )\d+,| \d+(?:-| - | to )\d+| \d+,| \d+)+",
+            r' (?:as|according to|of)\W+(?:\w+\W+){,6}(?:claims|claim)(?: or| and| \d+(?:-| - | to )\d+,| \d+(?:-| - | to )\d+| \d+,| \d+)+',
             text,
-            flags=re.IGNORECASE,
-        )
+            flags=re.IGNORECASE)
 
     if bool(matching_search_obj):
         search_span = matching_search_obj.span()
-        text_with_match_removed = (
-            text[: search_span[0]] + text[search_span[1] :]
-        )
+        text_with_match_removed = text[:search_span[0]] + text[search_span[1]:]
 
         matching_search_str = matching_search_obj.group(0)
         claim_num = extract_alternative_numbers(matching_search_str)
@@ -133,24 +128,20 @@ def get_parent_claim(text, preceding_claims):
 
     # test if 'any one of preceding claims' or variant is recited
     matching_search_obj = re.search(
-        r" (?:as|according to|of)\W+(?:\w+\W+){,6}(?:preceding|previous|prior|above|aforementioned|aforesaid|aforestated|former) (?:claims|claim)",
+        r' (?:as|according to|of)\W+(?:\w+\W+){,6}(?:preceding|previous|prior|above|aforementioned|aforesaid|aforestated|former) (?:claims|claim)',
         text,
-        flags=re.IGNORECASE,
-    )
+        flags=re.IGNORECASE)
 
     # re.search() again for variants of test above for words after claim(s)
     if not bool(matching_search_obj):
         matching_search_obj = re.search(
-            r" (?:as|according to|of)\W+(?:\w+\W+){,6}(?:claims|claim) (?:preceding|previously recited|prior|above|aforementioned|aforesaid|aforestated|former)",
+            r' (?:as|according to|of)\W+(?:\w+\W+){,6}(?:claims|claim) (?:preceding|previously recited|prior|above|aforementioned|aforesaid|aforestated|former)',
             text,
-            flags=re.IGNORECASE,
-        )
+            flags=re.IGNORECASE)
 
     if bool(matching_search_obj):
         search_span = matching_search_obj.span()
-        text_with_match_removed = (
-            text[: search_span[0]] + text[search_span[1] :]
-        )
+        text_with_match_removed = text[:search_span[0]] + text[search_span[1]:]
 
         return preceding_claims, text_with_match_removed
 
@@ -160,17 +151,17 @@ def get_parent_claim(text, preceding_claims):
 
 def dependent_to_independent_claim(od):
     """
-    Returns an dict of:
-        {claim_num (int): [{'parent_clm': [independent_claim_num, ...,
-        parent_claim_num, grand-parent_claim_num], 'text': claim_text}, ], }
+    Returns an OrderedDict of {claim_num (int):[{'parent_clm':
+    [independent_claim, ..., grand-parent_claim , parent_claim,],'text':
+    claim_text},],}
     for a patent, wherein all dependent claims are turned independent.
 
-    For example, if the patent claims from argument od are:
-        OrderedDict([
-            (1, "A gadget comprising X.\n"),
-            (2, "A gadget comprising Y.\n"),
-            (3, "The gadget of any prior claim comprising Z.\n"),
-        ])
+    For example, if the patent claims are:
+        {
+            1: "A gadget comprising X.\n",
+            2: "A gadget comprising Y.\n",
+            3: "The gadget of any prior claim comprising Z.\n",
+        }
 
     This function returns:
         {
@@ -201,16 +192,22 @@ def dependent_to_independent_claim(od):
         }
 
     Parameters:
-        od (OrderedDict): OrderedDict([(claim_num, claim_text), ...])
+        od (OrderedDict): An OrderedDict of {claim_num (int): claim_text (str),..}
     """
 
-    if not od:
-        return {}
+    print(str(od)[:500])
 
-    # claim_parent_text_od = OrderedDict([ (claim_num, ([parent_claim_num,..],
-    #                        "text_without_parent_claim")), ...])
+    if not od:
+        return OrderedDict()
+
+    # claim_parent_text_od is OrderedDict of
+    # {claim_num:([parent_claim_num,..],"text_without_parent_claim"),..}
     claim_parent_text_od = OrderedDict()
+
     all_claim_nums = list(od.keys())
+
+    print(all_claim_nums)
+
     for key, claim_text in od.items():
         # drop first word if claim text begins with number, for example: '\n1.'
         claim_text = drop_claim_number(claim_text)
@@ -220,19 +217,27 @@ def dependent_to_independent_claim(od):
 
         # split claim_text into a list of parent claims and remainder claim text
         claim_parent_text_od[key] = get_parent_claim(
-            claim_text, all_claim_nums[: all_claim_nums.index(key)]
-        )
+            claim_text, all_claim_nums[:all_claim_nums.index(key)])
 
     # claim_parent_text_list is a list of
     # [(claim_num,([parent_claim_num,..],"text_without_parent_claim")),..]
     claim_parent_text_list = list(claim_parent_text_od.items())
 
-    # no_dependent_dict is the dict returned by the function and consists of
-    # {claim_num: [{'parent_clm': [], "text": claim_text },]
-    no_dependent_dict = {}
+    print(str(claim_parent_text_list[1]))
+    print(str(claim_parent_text_list[2]))
+    print(str(claim_parent_text_list[3]))
+    print(str(claim_parent_text_list[4]))
+
+    # no_dependent_od is returned and consists of:
+    # {claim_num: [{'parent_clm': [], "text": claim_text },   ],
+    no_dependent_od = OrderedDict()
 
     i = 0
-    len_at_loop_start = len(claim_parent_text_list)
+    # run_loop stops while loop below after i travels the length of
+    # claim_parent_text_list, and does not add an element to no_dependent_od
+    # for case when there is a dependency issue in patent
+    run_loop = True
+
     # while claim_parent_text_list is not empty
     while claim_parent_text_list:
         claim_num = claim_parent_text_list[i][0]
@@ -241,56 +246,49 @@ def dependent_to_independent_claim(od):
         text_without_parent_claim = claim_parent_text_list[i][1][1]
         if not parent_claim_num_list:
             # list of parent_claim_num is empty; don't increment i
-            no_dependent_dict[claim_num] = [
-                {"parent_clm": [], "text": text_without_parent_claim}
+            no_dependent_od[claim_num] = [
+                OrderedDict([('parent_clm', []),
+                             ('text', text_without_parent_claim)])
             ]
             claim_parent_text_list.pop(i)
-            continue
+            run_loop = True
         else:
-            # if all claims in parent_claim_num_list is in no_dependent_dict
+            # ensure that all claims in parent_claim_num_list elements are in no_dependent_od
             parent_claim_not_ready_list = [
-                True if j not in no_dependent_dict.keys() else False
+                True if j not in no_dependent_od else False
                 for j in parent_claim_num_list
             ]
             if not any(parent_claim_not_ready_list):
-                # add all claim alternatives to alternative_list
+
+                # add all claim alternatives to a list
                 alternative_list = []
                 for parent_claim in parent_claim_num_list:
-                    for parent_item in no_dependent_dict[parent_claim]:
-                        alternative_list.append(
-                            {
-                                "parent_clm": parent_item["parent_clm"]
-                                + [parent_claim],
-                                "text": parent_item["text"]
-                                + " "
-                                + text_without_parent_claim,
-                            }
-                        )
-                no_dependent_dict[claim_num] = alternative_list
-                claim_parent_text_list.pop(i)
-                continue
-            else:
-                i += 1
-                if i >= len(claim_parent_text_list):
-                    if len(claim_parent_text_list) == len_at_loop_start:
-                        # In this case, all items in claim_parent_text_list has
-                        # been traversed, but there are no more items than can
-                        # be popped.  Move remaining claim_parent_text_list
-                        # items to no_dependent_od and break loop.
-                        for elem in claim_parent_text_list:
-                            claim_num = elem[0]
-                            parent_claim_num_list = elem[1][0]
-                            text_without_parent_claim = elem[1][1]
-                            no_dependent_dict[claim_num] = [
-                                {
-                                    "parent_clm": parent_claim_num_list,
-                                    "text": text_without_parent_claim,
-                                }
-                            ]
-                        break
-                    else:
-                        # re-loop through items in claim_parent_text_list
-                        len_at_loop_start = len(claim_parent_text_list)
-                        i = 0
+                    # no_dependent_od consists of:
+                    # {claim_num: [{'parent_clm': [], "text": claim_text },],
+                    for item in no_dependent_od[parent_claim]:
+                        item_parent_clm_list = item['parent_clm']
+                        item_text = item['text']
+                        new_od = OrderedDict([
+                            ('parent_clm',
+                             item_parent_clm_list + [parent_claim]),
+                            ('text',
+                             item_text + ' ' + text_without_parent_claim)
+                        ])
+                        alternative_list.append(new_od)
 
-    return no_dependent_dict
+                no_dependent_od[claim_num] = alternative_list
+                claim_parent_text_list.pop(i)
+                run_loop = True
+
+        if i > len(claim_parent_text_list) - 1:
+            # ensure that i always points to a claim_parent_text_list element
+            i = 0
+            if not run_loop:
+                break
+            run_loop = False
+
+    print("***")
+    return no_dependent_od
+
+
+
