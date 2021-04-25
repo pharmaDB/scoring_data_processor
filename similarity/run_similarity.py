@@ -83,7 +83,9 @@ def patent_claims_longhand_form_from_NDA(application_numbers):
     # patent_longhand_dict is returned
     patent_longhand_dict = {}
     for patent, claim_od in patent_dict.items():
-        patent_longhand_dict[patent] = dependent_to_independent_claim(claim_od)
+        patent_longhand_dict[patent] = dependent_to_independent_claim(
+            claim_od, patent
+        )
     return patent_longhand_dict
 
 

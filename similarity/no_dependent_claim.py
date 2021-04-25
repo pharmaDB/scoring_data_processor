@@ -10,6 +10,9 @@ particular, these features are provided by dependent_to_independent_claim().
 
 import re
 from collections import OrderedDict
+from utils.logging import getLogger
+
+_logger = getLogger(__name__)
 
 
 def drop_claim_number(text):
@@ -158,7 +161,7 @@ def get_parent_claim(text, preceding_claims):
     return [], text
 
 
-def dependent_to_independent_claim(od):
+def dependent_to_independent_claim(od, patent_num):
     """
     Returns an dict of:
         {claim_num (int): [{'parent_clm': [independent_claim_num, ...,
@@ -202,6 +205,7 @@ def dependent_to_independent_claim(od):
 
     Parameters:
         od (OrderedDict): OrderedDict([(claim_num, claim_text), ...])
+        patent_num (string or num): patent_num is used for logging errors
     """
 
     if not od:
@@ -245,7 +249,6 @@ def dependent_to_independent_claim(od):
                 {"parent_clm": [], "text": text_without_parent_claim}
             ]
             claim_parent_text_list.pop(i)
-            continue
         else:
             # if all claims in parent_claim_num_list is in no_dependent_dict
             parent_claim_not_ready_list = [
@@ -268,29 +271,36 @@ def dependent_to_independent_claim(od):
                         )
                 no_dependent_dict[claim_num] = alternative_list
                 claim_parent_text_list.pop(i)
-                continue
             else:
+                # jump to next item in claim_parent_text_list
                 i += 1
-                if i >= len(claim_parent_text_list):
-                    if len(claim_parent_text_list) == len_at_loop_start:
-                        # In this case, all items in claim_parent_text_list has
-                        # been traversed, but there are no more items than can
-                        # be popped.  Move remaining claim_parent_text_list
-                        # items to no_dependent_od and break loop.
-                        for elem in claim_parent_text_list:
-                            claim_num = elem[0]
-                            parent_claim_num_list = elem[1][0]
-                            text_without_parent_claim = elem[1][1]
-                            no_dependent_dict[claim_num] = [
-                                {
-                                    "parent_clm": parent_claim_num_list,
-                                    "text": text_without_parent_claim,
-                                }
-                            ]
-                        break
-                    else:
-                        # re-loop through items in claim_parent_text_list
-                        len_at_loop_start = len(claim_parent_text_list)
-                        i = 0
+        if i >= len(claim_parent_text_list):
+            # if popped item or i+=1 results in i pointing to outside list
+            if (
+                len(claim_parent_text_list) == len_at_loop_start
+                and len(claim_parent_text_list) > 0
+            ):
+                # In this case, all items in claim_parent_text_list has
+                # been traversed, but there are no more items than can
+                # be popped.  Move first remaining claim_parent_text_list
+                # item to no_dependent_od.
+                elem = claim_parent_text_list[0]
+                claim_num = elem[0]
+                parent_claim_num_list = elem[1][0]
+                text_without_parent_claim = elem[1][1]
+                _logger.info(
+                    f"Patent: {str(patent_num)} has dependent claim "
+                    f"{str(claim_num)} with missing parent claim(s)."
+                )
+                no_dependent_dict[claim_num] = [
+                    {
+                        "parent_clm": parent_claim_num_list,
+                        "text": text_without_parent_claim,
+                    }
+                ]
+                claim_parent_text_list.pop(0)
+            # re-loop through items in claim_parent_text_list
+            len_at_loop_start = len(claim_parent_text_list)
+            i = 0
 
     return no_dependent_dict

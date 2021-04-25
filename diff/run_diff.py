@@ -81,19 +81,19 @@ def get_diff(a, b):
     return diff
 
 
-def remove_newlines(docs):
-    """
-    This function removes all newlines in docs[X]['sections']['text'],
-    since bs4 text features inserts newlines for certain XML in odd locations.
+# def remove_newlines(docs):
+#     """
+#     This function removes all newlines in docs[X]['sections']['text'],
+#     since bs4 text features inserts newlines for certain XML in odd locations.
 
-    Parameters:
-        docs (list): list of sorted label docs from MongoDB having the same
-                     application_numbers
-    """
-    for doc in docs:
-        for section in doc["sections"]:
-            section["text"] = " ".join(section["text"].split())
-    return docs
+#     Parameters:
+#         docs (list): list of sorted label docs from MongoDB having the same
+#                      application_numbers
+#     """
+#     for doc in docs:
+#         for section in doc["sections"]:
+#             section["text"] = " ".join(section["text"].split())
+#     return docs
 
 
 def add_diff_against_previous_label(docs):
@@ -480,7 +480,7 @@ def run_diff(
         )
 
         similar_label_docs = add_previous_and_next_labels(similar_label_docs)
-        similar_label_docs = remove_newlines(similar_label_docs)
+        # similar_label_docs = remove_newlines(similar_label_docs)
         similar_label_docs = add_diff_against_previous_label(similar_label_docs)
         similar_label_docs = gather_additions(similar_label_docs)
         update_db(_label_collection_name, similar_label_docs, alt_db_name)
