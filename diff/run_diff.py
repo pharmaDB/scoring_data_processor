@@ -38,11 +38,11 @@ def add_previous_and_next_labels(docs):
     """
 
     docs[0]["previous_label_published_date"] = None
-    docs[0]["previous_label_spl_id"] = 0
-    docs[0]["previous_label_spl_version"] = -1
+    docs[0]["previous_label_spl_id"] = None
+    docs[0]["previous_label_spl_version"] = None
     docs[0]["next_label_published_date"] = None
-    docs[0]["next_label_spl_id"] = 0
-    docs[0]["next_label_spl_version"] = -1
+    docs[0]["next_label_spl_id"] = None
+    docs[0]["next_label_spl_version"] = None
 
     if len(docs) > 1:
         docs[0]["next_label_published_date"] = docs[1]["published_date"]
@@ -68,8 +68,8 @@ def add_previous_and_next_labels(docs):
             "spl_version"
         ]
         docs[last_num]["next_label_published_date"] = None
-        docs[last_num]["next_label_spl_id"] = 0
-        docs[last_num]["next_label_spl_version"] = -1
+        docs[last_num]["next_label_spl_id"] = None
+        docs[last_num]["next_label_spl_version"] = None
 
     return docs
 
