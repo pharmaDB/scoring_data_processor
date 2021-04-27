@@ -54,13 +54,19 @@ class Test_run_similarity(unittest.TestCase):
         a = r.get_claims_in_patents_db(["5202128", "5378474"])
         self.assertIn("5202128", a)
         self.assertIn("5378474", a)
-        # for patent in a.keys():
-        #     for claim in a[patent].keys():
-        #         print(claim, a[patent][claim])
 
     def test_patent_claims_longhand_form_from_NDA(self):
-        # print(["ND020616"])
-        print(r.patent_claims_longhand_form_from_NDA(["NDA020616"]))
+        result = r.patent_claims_longhand_form_from_NDA(["NDA020616"])
+        self.assertEqual(
+            list(result.keys()),
+            ["5202128", "5378474"],
+        )
+        self.assertEqual(
+            sorted(list(result["5202128"].keys())), list(range(1, 27))
+        )
+        self.assertEqual(
+            result["5378474"][2][0]['parent_clm'], [1]
+        )
 
 
 if __name__ == "__main__":

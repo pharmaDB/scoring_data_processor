@@ -333,21 +333,21 @@ def gather_additions(docs):
     """
     If, for each doc in docs, 'diff_against_previous_label':[{'text':[1,
     string],}] has a value of 1, the string is an addition.  This function
-    gathers all additions in under key 'additions' and within each section of
-    diff_against_previous_label.
+    gathers all additions in a label under key 'additions' and append a number
+    X at within 'text', such as {'text':[1, string_A, X],}, to reference the
+    addition entry.
 
     Example of 'additions'
 
-    'additions':[{  'indices':[1,2],
-                    'expanded_context':'...',
+    'additions':[0:{'expanded_context'::...,
                      "scores":[
                                 {"patent_number":"12345678",
                                  "claim_number":5,
-                                 "parent_claim_numbers":[1,2]
+                                 "parent_claim_numbers":[1,2],
                                  "score":0.5172
                                 },
                               ]
-                 },
+                   },
                 ]
 
     Parameters:
@@ -355,8 +355,9 @@ def gather_additions(docs):
                      application_numbers
     """
     for doc in docs:
+        doc["additions"] = {}
+        additions_num = 0
         for diff in doc["diff_against_previous_label"]:
-            diff["additions"] = []
             for j in range(len(diff["text"])):
                 # if the diff is an addition, and the diff is not just spaces
                 # or items that is removed by strip(), or the changes are not
@@ -382,32 +383,35 @@ def gather_additions(docs):
                     )
                     # if rebuilt_string is same a prior rebuilt_string
                     if (
-                        len(diff["additions"]) > 0
-                        and rebuilt_string
-                        == diff["additions"][-1]["expanded_context"]
+                        additions_num > 0
+                        and str(additions_num - 1) in doc["additions"].keys()
+                        and doc["additions"][str(additions_num - 1)][
+                            "expanded_content"
+                        ]
+                        == rebuilt_string
                     ):
-                        diff["additions"][-1]["indices"].append(j)
+                        diff["text"][j].append(str(additions_num - 1))
                     else:
-                        diff["additions"].append(
-                            {
-                                "indices": [j],
-                                "expanded_context": rebuilt_string,
-                                "scores": [
-                                    {
-                                        "patent_number": "5202128",
-                                        "claim_number": 6,
-                                        "parent_claim_numbers": [1, 5],
-                                        "score": 0.8,
-                                    },
-                                    {
-                                        "patent_number": "5202128",
-                                        "claim_number": 5,
-                                        "parent_claim_numbers": [1],
-                                        "score": 0.5,
-                                    },
-                                ],
-                            }
-                        )
+                        # the scores are mock data at the moment
+                        doc["additions"][str(additions_num)] = {
+                            "expanded_content": rebuilt_string,
+                            "scores": [
+                                {
+                                    "patent_number": "5202128",
+                                    "claim_number": 6,
+                                    "parent_claim_numbers": [1, 5],
+                                    "score": 0.8,
+                                },
+                                {
+                                    "patent_number": "5202128",
+                                    "claim_number": 5,
+                                    "parent_claim_numbers": [1],
+                                    "score": 0.5,
+                                },
+                            ],
+                        }
+                        diff["text"][j].append(str(additions_num))
+                        additions_num += 1
     return docs
 
 

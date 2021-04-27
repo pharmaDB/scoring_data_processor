@@ -89,6 +89,35 @@ def patent_claims_longhand_form_from_NDA(application_numbers):
     return patent_longhand_dict
 
 
+def patent_dict_of_dict_to_list(dict_of_dict):
+    """
+    Return list of:
+        [patent_num, claim_num, parent_clm_list, claim_text]
+
+    Wherein parent_clm_list is:
+        [independent_claim_num, ..., parent_claim_num, grand-parent_claim_num]
+
+    Parameters:
+        dict_of_dict (dict): {patent_str: {claim_num (int): [{'parent_clm':
+                    [independent_claim_num, ..., parent_claim_num,
+                    grand-parent_claim_num], 'text': claim_text}, ], }, }
+
+    """
+    return_list = []
+    for patent_num in dict_of_dict.keys():
+        for claim_num, value_list in dict_of_dict[patent_num].items():
+            for value_elem in value_list:
+                return_list.append(
+                    [
+                        patent_num,
+                        claim_num,
+                        value_elem["parent_clm"],
+                        value_elem["text"],
+                    ]
+                )
+    return return_list
+
+
 def setup_MongoDB(
     label_collection_name, patent_collection_name, alt_db_name=""
 ):
@@ -108,6 +137,23 @@ def setup_MongoDB(
     _label_collection = db[label_collection_name]
     _patent_collection_name = patent_collection_name
     _patent_collection = db[patent_collection_name]
+
+
+def additions_in_diff_against_previous_label(docs):
+    """
+    Add additions back to each diff_against_previous_label['text'][X][0] that
+    is 1.  This feature is requested by the front end.
+
+    Parameters:
+    docs (list): list of sorted label docs from mongodb having the same
+                 application_numbers
+    """
+    for doc in docs:
+        if doc["additions"]:
+            for diff in doc["diff_against_previous_label"]:
+                for text in diff["text"]:
+                    if text[0] == 1 and len(text) > 2 and text[2]:
+                        text.append(doc["additions"][text[2]])
 
 
 def run_similarity(
@@ -167,16 +213,10 @@ def run_similarity(
             reverse=False,
         )
 
-        patent_od = patent_claims_longhand_form_from_NDA(application_numbers)
+        patent_dict = patent_claims_longhand_form_from_NDA(application_numbers)
+        patent_list = patent_dict_of_dict_to_list(patent_dict)
 
-        # similar_label_docs = add_previous_and_next_labels(
-        #     similar_label_docs
-        # )
-        # similar_label_docs = remove_newlines(similar_label_docs)
-        # similar_label_docs = add_diff_against_previous_label(
-        #     similar_label_docs
-        # )
-        # similar_label_docs = gather_additions(similar_label_docs)
+        additions_in_diff_against_previous_label(similar_label_docs)
 
         update_db(_label_collection_name, similar_label_docs, alt_db_name)
 
