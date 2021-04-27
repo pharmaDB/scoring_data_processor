@@ -118,6 +118,51 @@ def patent_dict_of_dict_to_list(dict_of_dict):
     return return_list
 
 
+def get_list_of_additions(docs):
+    """
+    Return a list of expanded_content from the additions of all docs in
+    similar_label_docs
+
+    Parameters:
+        docs (list): list of label docs from MongoDB having the same
+                     application_numbers
+    """
+    return_list = []
+    for doc in docs:
+        if doc["additions"]:
+            for value in doc["additions"].values():
+                return_list.append(value["expanded_content"])
+    return return_list
+
+
+def rank_and_score(docs, additions_list, patent_list):
+    """
+    Returns a list of label docs in MongoDB format, wherein each doc includes
+    doc['additions'][X]['scores'] if doc['additions'][X] exists.
+
+    Example of doc['additions'][X]['scores']:
+        [
+            {
+                patent_number: '5202128',
+                claim_number: 6,
+                parent_claim_numbers: [
+                    1,
+                    5
+                ],
+                score: 0.8
+            },
+        ]
+
+    Parameters:
+        docs (list): list of label docs from MongoDB having the same
+                     application_numbers
+        additions_list (list): [expanded_content, ...]
+        patent_list (list): [patent_num, claim_num, parent_clm_list, claim_text]
+    """
+
+    return docs
+
+
 def setup_MongoDB(
     label_collection_name, patent_collection_name, alt_db_name=""
 ):
@@ -207,14 +252,21 @@ def run_similarity(
         similar_label_docs = list(
             _label_collection.find({"application_numbers": application_numbers})
         )
-        similar_label_docs = sorted(
-            similar_label_docs,
-            key=lambda i: (i["published_date"]),
-            reverse=False,
-        )
+        # similar_label_docs = sorted(
+        #     similar_label_docs,
+        #     key=lambda i: (i["published_date"]),
+        #     reverse=False,
+        # )
 
         patent_dict = patent_claims_longhand_form_from_NDA(application_numbers)
+        # patent_list = [[patent_num, claim_num, parent_clm_list, claim_text],]
         patent_list = patent_dict_of_dict_to_list(patent_dict)
+        # additions_list = [expanded_content, expanded_content...]
+        additions_list = get_list_of_additions(similar_label_docs)
+
+        similar_label_docs = rank_and_score(
+            similar_label_docs, additions_list, patent_list
+        )
 
         additions_in_diff_against_previous_label(similar_label_docs)
 
