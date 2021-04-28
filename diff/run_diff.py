@@ -2,6 +2,7 @@ from bson.objectid import ObjectId
 from db.mongo import connect_mongo, update_db
 import diff_match_patch as dmp_module
 import re
+from itertools import groupby
 
 from utils import misc
 from utils.logging import getLogger
@@ -36,7 +37,6 @@ def add_previous_and_next_labels(docs):
                     '4', 'published_date': '2020-01-29', 'sections': [{'name':
                         '1 INDICATIONS AND USAGE', 'text': "..."},...]},...]
     """
-
     docs[0]["previous_label_published_date"] = None
     docs[0]["previous_label_spl_id"] = None
     docs[0]["previous_label_spl_version"] = None
@@ -87,8 +87,8 @@ def get_diff(a, b):
 #     since bs4 text features inserts newlines for certain XML in odd locations.
 
 #     Parameters:
-#         docs (list): list of sorted label docs from MongoDB having the same
-#                      application_numbers
+#         docs (list): list of label docs from MongoDB having the same
+#         application_numbers
 #     """
 #     for doc in docs:
 #         for section in doc["sections"]:
@@ -415,6 +415,31 @@ def gather_additions(docs):
     return docs
 
 
+def group_label_docs_by_set_id(docs):
+    """
+    This function groups the docs by 'set_id" and returns a list of list,
+    wherein the inner list share the same set_id.
+
+    Return example:
+        [[{set_id:X,},{set_id:X,}],[{set_id:Y,},{set_id:Y,}],]
+
+    Parameters:
+        docs (list): list of label docs from MongoDB having the same
+                     application_numbers
+    """
+
+    def key_func(k):
+        return k["set_id"]
+
+    docs = sorted(
+        docs,
+        key=key_func,
+        reverse=False,
+    )
+    return_list = [list(value) for key, value in groupby(docs, key=key_func)]
+    return return_list
+
+
 def setup_MongoDB(label_collection_name, alt_db_name=""):
     """
     This method sets up the MongoDB connection for all methods for this module.
@@ -477,16 +502,24 @@ def run_diff(
         similar_label_docs = list(
             _label_collection.find({"application_numbers": application_numbers})
         )
-        similar_label_docs = sorted(
-            similar_label_docs,
-            key=lambda i: (i["published_date"]),
-            reverse=False,
-        )
-
-        similar_label_docs = add_previous_and_next_labels(similar_label_docs)
         # similar_label_docs = remove_newlines(similar_label_docs)
-        similar_label_docs = add_diff_against_previous_label(similar_label_docs)
-        similar_label_docs = gather_additions(similar_label_docs)
+
+        groups_by_set_id = group_label_docs_by_set_id(similar_label_docs)
+        for set_id_group in groups_by_set_id:
+            # sort by published_date
+            set_id_group = sorted(
+                set_id_group,
+                key=lambda i: (i["published_date"]),
+                reverse=False,
+            )
+            set_id_group = add_previous_and_next_labels(set_id_group)
+            set_id_group = add_diff_against_previous_label(set_id_group)
+            set_id_group = gather_additions(set_id_group)
+        # ungroup similar_label_docs by set id
+        similar_label_docs = [
+            item for sublist in groups_by_set_id for item in sublist
+        ]
+
         update_db(_label_collection_name, similar_label_docs, alt_db_name)
 
         similar_label_docs_ids = [str(x["_id"]) for x in similar_label_docs]
