@@ -29,6 +29,12 @@ PROCESSED_ID_SIMILARITY_FILE = os.path.join(
 PROCESSED_NDA_SIMILARITY_FILE = os.path.join(
     PROCESSED_LOGS, "processed_NDA_similarity.csv"
 )
+UNPROCESSED_ID_SIMILARITY_FILE = os.path.join(
+    PROCESSED_LOGS, "unprocessed_id_similarity.csv"
+)
+UNPROCESSED_NDA_SIMILARITY_FILE = os.path.join(
+    PROCESSED_LOGS, "unprocessed_NDA_similarity.csv"
+)
 LABEL_COLLECTION = "labels"
 PATENT_COLLECTION = "patents"
 
@@ -267,6 +273,10 @@ if __name__ == "__main__":
             os.remove(PROCESSED_ID_SIMILARITY_FILE)
         if os.path.exists(PROCESSED_NDA_SIMILARITY_FILE):
             os.remove(PROCESSED_NDA_SIMILARITY_FILE)
+        if os.path.exists(UNPROCESSED_ID_SIMILARITY_FILE):
+            os.remove(UNPROCESSED_ID_SIMILARITY_FILE)
+        if os.path.exists(UNPROCESSED_NDA_SIMILARITY_FILE):
+            os.remove(UNPROCESSED_NDA_SIMILARITY_FILE)
         run_diff_and_similarity = True
 
     if len(sys.argv) == 1:
@@ -291,6 +301,8 @@ if __name__ == "__main__":
             PATENT_COLLECTION,
             PROCESSED_ID_SIMILARITY_FILE,
             PROCESSED_NDA_SIMILARITY_FILE,
+            UNPROCESSED_ID_SIMILARITY_FILE,
+            UNPROCESSED_NDA_SIMILARITY_FILE,
         )
 
         # run_nlp_scispacy.process_similarity(LABEL_COLLECTION, PATENT_COLLECTION, PROCESSED_ID_SIMILARITY_FILE, PROCESSED_NDA_SIMILARITY_FILE)
