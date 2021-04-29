@@ -396,18 +396,18 @@ def gather_additions(docs):
                         doc["additions"][str(additions_num)] = {
                             "expanded_content": rebuilt_string,
                             "scores": [
-                                {
-                                    "patent_number": "5202128",
-                                    "claim_number": 6,
-                                    "parent_claim_numbers": [1, 5],
-                                    "score": 0.8,
-                                },
-                                {
-                                    "patent_number": "5202128",
-                                    "claim_number": 5,
-                                    "parent_claim_numbers": [1],
-                                    "score": 0.5,
-                                },
+                                # {
+                                #     "patent_number": "5202128",
+                                #     "claim_number": 6,
+                                #     "parent_claim_numbers": [1, 5],
+                                #     "score": 0.8,
+                                # },
+                                # {
+                                #     "patent_number": "5202128",
+                                #     "claim_number": 5,
+                                #     "parent_claim_numbers": [1],
+                                #     "score": 0.5,
+                                # },
                             ],
                         }
                         diff["text"][j].append(str(additions_num))
