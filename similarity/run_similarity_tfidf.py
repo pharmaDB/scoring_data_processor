@@ -1,7 +1,10 @@
 from collections import OrderedDict
 from bson.objectid import ObjectId
-from sentence_transformers import SentenceTransformer, util
+import re
+import spacy
 import html
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 from orangebook.merge import OrangeBookMap
 from similarity.no_dependent_claim import dependent_to_independent_claim
@@ -20,17 +23,17 @@ _patent_collection = None
 # initialize OrangeBookMap
 _ob = OrangeBookMap()
 
-# initialize SentenceTransformer models
-_device = "cpu"
-# model = SentenceTransformer("allenai/scibert_scivocab_uncased", device=_device)
-# model = SentenceTransformer("allenai/scibert_scivocab_cased", device = "cpu")
-# model = SentenceTransformer("dmis-lab/biobert-large-cased-v1.1", device=_device)
-# model = SentenceTransformer("stsb-distilbert-base", device=_device)
-model = SentenceTransformer("stsb-distilroberta-base-v2", device=_device)
+# Load scispaCy Models
+# _en_core_sci_lg_nlp.pipe_names -> ['tok2vec', 'tagger', 'attribute_ruler',
+# 'lemmatizer', 'parser', 'ner']
+_en_core_sci_lg_nlp = spacy.load(
+    "resources/models/en_core_sci_lg-0.4.0/en_core_sci_lg/en_core_sci_lg-0.4.0",
+    exclude=[],
+)
+# set number of processes for nlp.pipe for spaCy
+_N_PROCESS = 3
 
-# common value is 512, longer sentences are truncated
-# print("Max Sequence Length:", model.max_seq_length)
-model.max_seq_length = 512
+vectorizer = TfidfVectorizer()
 
 
 def get_claims_in_patents_db(all_patents):
@@ -152,47 +155,88 @@ def get_list_of_additions(docs):
     return return_list
 
 
-def preprocess(matrix, index, trunc_clm=False):
+def preprocess(matrix, index, steps=["punct", "lemma", "stopwords"]):
     """
     Takes as list of lists (in other words a matrix), and returns a list of
-    pre-proposed sentences for all elements at the index specified for the
+    pre-processed sentences for all elements at the index specified for the
     inner list.
 
-    For BERT models, dropping punctuation affects accuracy. See
-    https://www.aclweb.org/anthology/2020.pam-1.15.pdf.  The BERT models
-    should also handle case or uncased situations automatically.
-
-    Bert models generally are not able to embed text with more than 512 tokens
-    and will automatically truncate longer text inputs.  (The exception to rule
-    is for models such as Longformer or Bert-AL, or Reformer. However Bert-AL
-    and Reformer are unavailable as HuggingFace models, and Longformer performs
-    poorly based on a few similarity test case examples.) To process longer
-    claim text, this method can the end of the claim if trunc_clm is True. The
-    end of the claims, when written in long hand form is more important, since
-    it is generally where new claim subject matter is recited for dependent
-    claims.
+    Preprocessing includes removal of endlines, removal of stopwords
 
     Parameters:
         matrix (list): a list of lists
         index (int): index of inner list starting at 0.
-        trunc_clm (bool): optional parameter to keep preamble and end of claim text
+        steps (list): one of ["punct", "lemma", "stopwords"]
     """
 
-    def remove_endline_plus_truncate(text, trunc_clm):
-        text_split = text.split()
-        if (
-            trunc_clm
-            and model.max_seq_length
-            and len(text_split) > model.max_seq_length
-        ):
-            return " ".join(text_split[-model.max_seq_length :])
-        else:
-            return " ".join(text_split)
+    def remove_endline(text):
+        text = re.sub(r"(\n)", " ", text)
+        text = re.sub(r"(\r)", "", text)
+        return text
 
-    return_list = [
-        remove_endline_plus_truncate(row[index], trunc_clm) for row in matrix
-    ]
+    def preprocess_with_spacy_nlp(text_list, steps):
+        """
+        This method can remove punctuation,
+        Parameters:
+            text_list (list): list of strings
+            steps (list): one of ["punct", "lemma", "stopwords"]
+        """
+        # make a copy of text_lis
+        return_list = text_list
+        if any(item in ["punct", "lemma", "stopwords"] for item in steps):
+            # 'lemmatizer' required 'tagger' and 'attribute_ruler'
+            nlp_list = list(
+                _en_core_sci_lg_nlp.pipe(
+                    return_list,
+                    disable=["tok2vec", "ner"],
+                    n_process=_N_PROCESS,
+                )
+            )
+            return_list = [
+                " ".join(
+                    [
+                        token.lemma_ if "lemma" in steps else token.text
+                        for token in doc
+                        if (
+                            (
+                                ("punct" in steps and not token.is_punct)
+                                or "punct" not in steps
+                            )
+                            and (
+                                ("stopwords" in steps and not token.is_stop)
+                                or "stopwords" not in steps
+                            )
+                        )
+                    ]
+                )
+                for doc in nlp_list
+            ]
+        return return_list
+
+    return_list = [remove_endline(row[index]) for row in matrix]
+    return_list = preprocess_with_spacy_nlp(return_list, steps)
     return return_list
+
+
+def similarity_matrix(embed_A, embed_B):
+    """
+    This method returns a matrix such as:
+        [[X, X, X],
+        [X, X, X]]
+    wherein each row represents the similarity measurement between an embedding
+    from embed_A to each of the embeddings in embed_B.
+
+    Parameters:
+        embed_A (ndarray): ndarray object generated by scikit-learn of shape
+                           (n_samples, n_features)
+        embed_B (ndarray): ndarray object generated by scikit-learn of shape
+                           (n_samples, n_features) to be compared to embed_A
+    """
+    matrix = [[0] * embed_B.shape[0] for y in range(embed_A.shape[0])]
+    for i in range(embed_A.shape[0]):
+        for j in range(embed_B.shape[0]):
+            matrix[i][j] = cosine_similarity(embed_A[i], embed_B[j]).item()
+    return matrix
 
 
 def rank_and_score(docs, additions_list, patent_list, num_scores=3):
@@ -223,23 +267,14 @@ def rank_and_score(docs, additions_list, patent_list, num_scores=3):
     """
     # create 2 lists of cleaned texts (ex: [expanded_content,] or [claim_text,])
     additions = preprocess(additions_list, 0)
-    claims = preprocess(patent_list, 3, True)
+    claims = preprocess(patent_list, 3)
 
-    # Compute embedding for both lists
-    additions_embeddings = model.encode(
-        additions,
-        convert_to_tensor=True,
-    )
-    claims_embeddings = model.encode(
-        claims,
-        convert_to_tensor=True,
-    )
+    all_embeddings = vectorizer.fit_transform(additions + claims)
+    additions_embeddings = all_embeddings[: len(additions)]
+    claims_embeddings = all_embeddings[len(additions) :]
 
     # Compute cosine-similarity for every additions to every claim
-    cosine_scores = util.pytorch_cos_sim(
-        additions_embeddings, claims_embeddings
-    )
-    cosine_scores = cosine_scores.tolist()
+    cosine_scores = similarity_matrix(additions_embeddings, claims_embeddings)
     indices_of_claims = list(range(len(claims)))
 
     # addition_to_score_index= {"expanded_content":[(score, index),]} wherein

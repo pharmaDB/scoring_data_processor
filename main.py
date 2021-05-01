@@ -4,11 +4,8 @@ import json
 from pathlib import Path
 import sys
 
-# from similarity import run_nlp_scispacy
-from similarity import run_similarity
 from diff import run_diff
 from db.mongo import connect_mongo, reimport_collection
-
 from orangebook.merge import OrangeBookMap
 from utils.logging import getLogger
 from utils import fetch
@@ -163,8 +160,29 @@ def parse_args():
         action="store_true",
         help=(
             "Reimport patent collection from assets/database_before/ "
-            "(for development"
+            "(for development)"
         ),
+    )
+
+    parser.add_argument(
+        "-spacy",
+        "--spacy_word2vec",
+        action="store_true",
+        help=("Run similarity with SpaCy's word2vec"),
+    )
+
+    parser.add_argument(
+        "-tfidf",
+        "--tfidf",
+        action="store_true",
+        help=("Run similarity with TF-IDF."),
+    )
+
+    parser.add_argument(
+        "-bert",
+        "--bert",
+        action="store_true",
+        help=("Run similarity with Bert.  This is default if flag is not set."),
     )
 
     return parser.parse_args()
@@ -284,25 +302,52 @@ if __name__ == "__main__":
         run_diff_and_similarity = True
 
     if run_diff_and_similarity:
-        # download scispaCy model
-        url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/en_core_sci_lg-0.4.0.tar.gz"
-        if not os.path.exists(
-            os.path.join(MODEL_FOLDER, "en_core_sci_lg-0.4.0")
-        ):
-            file_path = fetch.download(url, MODEL_FOLDER)
-            # fetch.extract_and_clean(file_path)
 
         run_diff.run_diff(
             LABEL_COLLECTION, PROCESSED_ID_DIFF_FILE, PROCESSED_NDA_DIFF_FILE
         )
 
-        run_similarity.run_similarity(
-            LABEL_COLLECTION,
-            PATENT_COLLECTION,
-            PROCESSED_ID_SIMILARITY_FILE,
-            PROCESSED_NDA_SIMILARITY_FILE,
-            UNPROCESSED_ID_SIMILARITY_FILE,
-            UNPROCESSED_NDA_SIMILARITY_FILE,
-        )
+        if args.spacy_word2vec or args.tfidf:
+            # download scispaCy model
+            url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/en_core_sci_lg-0.4.0.tar.gz"
+            if not os.path.exists(
+                os.path.join(MODEL_FOLDER, "en_core_sci_lg-0.4.0")
+            ):
+                file_path = fetch.download(url, MODEL_FOLDER)
+                fetch.extract_and_clean(file_path)
 
-        # run_nlp_scispacy.process_similarity(LABEL_COLLECTION, PATENT_COLLECTION, PROCESSED_ID_SIMILARITY_FILE, PROCESSED_NDA_SIMILARITY_FILE)
+        if args.spacy_word2vec:
+            from similarity import run_similarity_spacy
+
+            run_similarity_spacy.run_similarity(
+                LABEL_COLLECTION,
+                PATENT_COLLECTION,
+                PROCESSED_ID_SIMILARITY_FILE,
+                PROCESSED_NDA_SIMILARITY_FILE,
+                UNPROCESSED_ID_SIMILARITY_FILE,
+                UNPROCESSED_NDA_SIMILARITY_FILE,
+            )
+
+        elif args.tfidf:
+            from similarity import run_similarity_tfidf
+
+            run_similarity_tfidf.run_similarity(
+                LABEL_COLLECTION,
+                PATENT_COLLECTION,
+                PROCESSED_ID_SIMILARITY_FILE,
+                PROCESSED_NDA_SIMILARITY_FILE,
+                UNPROCESSED_ID_SIMILARITY_FILE,
+                UNPROCESSED_NDA_SIMILARITY_FILE,
+            )
+
+        else:
+            from similarity import run_similarity_bert
+
+            run_similarity_bert.run_similarity(
+                LABEL_COLLECTION,
+                PATENT_COLLECTION,
+                PROCESSED_ID_SIMILARITY_FILE,
+                PROCESSED_NDA_SIMILARITY_FILE,
+                UNPROCESSED_ID_SIMILARITY_FILE,
+                UNPROCESSED_NDA_SIMILARITY_FILE,
+            )

@@ -7,7 +7,7 @@ def getLogger(name, level=logging.INFO):
 
     # Set up console log handler
     ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
+    ch.setLevel(level)
     ch.setFormatter(logging.Formatter(_FORMAT))
 
     # Create logger

@@ -17,6 +17,7 @@ spacy = "*"
 diff-match-patch = "*"
 torch = "==1.8.1"
 sentence-transformers = "*"
+sklearn = "*"
 
 [dev-packages]
 
