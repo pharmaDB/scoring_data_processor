@@ -15,35 +15,6 @@ _config = dict(
 )
 
 
-class MongoClient:
-    def __init__(self, db_client):
-        self.db_client = db_client
-
-    def find(self, collection_name, query):
-        collection = self.__get_collection(collection_name)
-        results = None
-        if type(query) == dict:
-            query = [query]
-        if not len(query):
-            results = collection.find()
-        elif len(query) == 1:
-            results = collection.find(query[0])
-        else:
-            results = collection.find({"$and": query})
-        return results
-
-    def insert(self, collection_name, document):
-        collection = self.__get_collection(collection_name)
-        collection.insert(document)
-
-    def upsert(self, collection_name, query, document):
-        collection = self.__get_collection(collection_name)
-        collection.update(query, document, upsert=True)
-
-    def __get_collection(self, collection_name):
-        return self.db_client[collection_name]
-
-
 def connect_mongo(alt_db_name=""):
     """
     This method connects to MongoDB and returns a MongoDB database object
@@ -96,6 +67,11 @@ def reimport_collection(collection_name, file_name, alt_db_name=""):
         for line in lines:
             doc = json.loads(line)
             doc["_id"] = ObjectId(doc["_id"]["$oid"])
+            # additional code to process oid in claims
+            if "claims" in doc.keys():
+                for item in doc["claims"]:
+                    if "_id" in item.keys():
+                        item["_id"] = ObjectId(item["_id"]["$oid"])
             collection.insert_one(doc)
     _logger.info(f"Reimported '{collection_name}' with '{file_name}'")
 

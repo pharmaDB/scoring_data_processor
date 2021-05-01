@@ -5,13 +5,31 @@ from utils.logging import getLogger
 _logger = getLogger(__name__)
 
 
-def get_lines_in_file(file_name):
-    """Returns a list of a lines in a file"""
+def get_lines_in_file(file_name, csv_column=None):
+    """
+    Returns a list of a lines in a file.  If csv_column is set, the list will
+    only be for data in that column of csv.  Empty lines or column values are
+    not returned.
+
+    Parameters:
+        csv_column (int): index of the csv column to collect
+    """
     if os.path.exists(file_name):
         f = open(file_name, "r")
-        completed_label_id = [line.strip() for line in f if line.strip()]
+        if not csv_column:
+            return_list = [line.strip() for line in f if line.strip()]
+        else:
+            return_list = []
+            for line in f:
+                if line.strip():
+                    split_line = line.split(",")
+                    if (
+                        len(split_line) > csv_column
+                        and split_line[csv_column].strip()
+                    ):
+                        return_list.append(split_line[csv_column].strip())
         f.close()
-        return completed_label_id
+        return return_list
     else:
         return []
 
@@ -55,7 +73,7 @@ def store_to_file(file_name, data):
 
 def get_num_in_str(text):
     """Return number in word of letters and digits (ex: 'NDA019501')"""
-    return int(re.match(r"([a-z]+)([0-9]+)", text, re.I).groups()[1])
+    return int(re.search(r"([0-9]+)", text, re.I).groups()[0])
 
 
 def is_number(string):

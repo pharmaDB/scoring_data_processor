@@ -1,9 +1,9 @@
 from bson.objectid import ObjectId
-from db.mongo import connect_mongo, update_db
 import diff_match_patch as dmp_module
 import re
 from itertools import groupby
 
+from db.mongo import connect_mongo, update_db
 from utils import misc
 from utils.logging import getLogger
 
@@ -119,6 +119,7 @@ def add_diff_against_previous_label(docs):
                      application_numbers
     """
 
+    # for first doc in docs, set all sections to 1
     if docs[0]["sections"]:
         docs[0]["diff_against_previous_label"] = []
         for section in docs[0]["sections"]:
@@ -172,6 +173,7 @@ def add_diff_against_previous_label(docs):
                     # select location to insert if name of section includes
                     # number
                     insert_loc = len(docs[i]["diff_against_previous_label"])
+                    # print(docs[i]['_id'], section['name'])
                     if misc.is_number(section["name"].split()[0]):
                         for num in range(
                             len(docs[i]["diff_against_previous_label"])
@@ -376,7 +378,7 @@ def gather_additions(docs):
                         )
                     )
                     and diff["text"][j][1].strip()
-                    not in list("~`’!@#$%^&*()-_=+[{}];:'\"',<>./?|")
+                    not in list("~`’!@#$%^&*()-_=+[{}];:'\"',<>./?|•")
                 ):
                     rebuilt_string, rebuilt_index = rebuild_string(
                         diff["text"], j
@@ -459,6 +461,7 @@ def run_diff(
     label_collection_name,
     processed_label_ids_file,
     processed_nda_file,
+    unprocessed_label_ids_file,
     alt_db_name="",
 ):
     """
@@ -485,17 +488,31 @@ def run_diff(
         if x not in processed_label_ids
     ]
 
+    label_index = 0
+
     # loop through all_label_ids, popping off label_ids after diffing sections
     while len(all_label_ids) > 0:
+        if label_index >= len(all_label_ids):
+            # all labels were traversed, remaining labels have no
+            # application_numbers; store unprocessed label_ids to disk
+            misc.append_to_file(
+                unprocessed_label_ids_file, all_label_ids
+            )
+            break
 
-        # pick 1st label_id
-        label_id_str = str(all_label_ids[0])
+        # pick label_id
+        label_id_str = str(all_label_ids[label_index])
 
         # get a list of NDA numbers (ex. ['NDA019501',]) associated with _id
         application_numbers = _label_collection.find_one(
             {"_id": ObjectId(label_id_str)},
             {"_id": 0, "application_numbers": 1},
         )["application_numbers"]
+
+        if not application_numbers:
+            # if label doesn't have application number skip for now
+            label_index += 1
+            continue
 
         # find all other docs with the same list of NDA numbers
         # len(similar_label_docs) is at least 1

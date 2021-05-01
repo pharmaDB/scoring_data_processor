@@ -26,6 +26,9 @@ PROCESSED_ID_SIMILARITY_FILE = os.path.join(
 PROCESSED_NDA_SIMILARITY_FILE = os.path.join(
     PROCESSED_LOGS, "processed_NDA_similarity.csv"
 )
+UNPROCESSED_ID_DIFF_FILE = os.path.join(
+    PROCESSED_LOGS, "unprocessed_id_diff.csv"
+)
 UNPROCESSED_ID_SIMILARITY_FILE = os.path.join(
     PROCESSED_LOGS, "unprocessed_id_similarity.csv"
 )
@@ -274,11 +277,11 @@ if __name__ == "__main__":
     # reimport of label or patent collections; for development
     if args.reimport_labels:
         reimport_collection(
-            LABEL_COLLECTION, "assets/database_before/labels.json"
+            LABEL_COLLECTION, "assets/database_actual/labels.json"
         )
     if args.reimport_patents:
         reimport_collection(
-            PATENT_COLLECTION, "assets/database_before/patents.json"
+            PATENT_COLLECTION, "assets/database_actual/patents.json"
         )
 
     # rerun all diff and similarity
@@ -291,6 +294,8 @@ if __name__ == "__main__":
             os.remove(PROCESSED_ID_SIMILARITY_FILE)
         if os.path.exists(PROCESSED_NDA_SIMILARITY_FILE):
             os.remove(PROCESSED_NDA_SIMILARITY_FILE)
+        if os.path.exists(UNPROCESSED_ID_DIFF_FILE):
+            os.remove(UNPROCESSED_ID_DIFF_FILE)
         if os.path.exists(UNPROCESSED_ID_SIMILARITY_FILE):
             os.remove(UNPROCESSED_ID_SIMILARITY_FILE)
         if os.path.exists(UNPROCESSED_NDA_SIMILARITY_FILE):
@@ -304,7 +309,10 @@ if __name__ == "__main__":
     if run_diff_and_similarity:
 
         run_diff.run_diff(
-            LABEL_COLLECTION, PROCESSED_ID_DIFF_FILE, PROCESSED_NDA_DIFF_FILE
+            LABEL_COLLECTION,
+            PROCESSED_ID_DIFF_FILE,
+            PROCESSED_NDA_DIFF_FILE,
+            UNPROCESSED_ID_DIFF_FILE,
         )
 
         if args.spacy_word2vec or args.tfidf:

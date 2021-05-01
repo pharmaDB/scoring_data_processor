@@ -13,6 +13,9 @@ resources/models/
 
 # log files of processed labels
 resources/processed_log/
-resources/processed_log_unittest
+resources/processed_log_unittest/
+
+# large MongoDB databases
+assets/database_actual/
 
 Pipfile.lock

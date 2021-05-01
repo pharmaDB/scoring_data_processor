@@ -378,17 +378,32 @@ def run_similarity(
         for x in [str(y) for y in _label_collection.distinct("_id", {})]
         if x not in processed_label_ids
     ]
+
+    label_index = 0
+
     # loop through all_label_ids, popping off label_ids after diffing sections
     while len(all_label_ids) > 0:
+        if label_index >= len(all_label_ids):
+            # all labels were traversed, remaining labels have no
+            # application_numbers; store unprocessed label_ids to disk
+            misc.append_to_file(
+                unprocessed_label_ids_file, all_label_ids
+            )
+            break
 
-        # pick 1st label_id
-        label_id_str = str(all_label_ids[0])
+        # pick label_id
+        label_id_str = str(all_label_ids[label_index])
 
         # get a list of NDA numbers (ex. ['NDA019501',]) associated with _id
         application_numbers = _label_collection.find_one(
             {"_id": ObjectId(label_id_str)},
             {"_id": 0, "application_numbers": 1},
         )["application_numbers"]
+
+        if not application_numbers:
+            # if label doesn't have application number skip for now
+            label_index += 1
+            continue
 
         # find all other docs with the same list of NDA numbers
         # len(similar_label_docs) is at least 1
@@ -402,7 +417,7 @@ def run_similarity(
         # additions_list = [expanded_content, expanded_content...]
         additions_list = get_list_of_additions(similar_label_docs)
 
-        if patent_list and additions_list:
+        if patent_list:
             similar_label_docs = rank_and_score(
                 similar_label_docs, additions_list, patent_list
             )
