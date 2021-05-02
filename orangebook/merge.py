@@ -66,7 +66,10 @@ class OrangeBookMap:
         Parameters:
             nda (int or string): the number portion of an NDA number or string
         """
-        return self._groups_groupby_NDA.get_group(int(nda))["patent"].tolist()
+        try:
+            return self._groups_groupby_NDA.get_group(int(nda))["patent"].tolist()
+        except KeyError:
+            return []
 
     def get_nda(self, patent):
         """Returns a list of NDA numbers given a patent number.
@@ -75,9 +78,12 @@ class OrangeBookMap:
             patent (int or string): the number portion of patent include 'RE'
                                     if applicable
         """
-        return self._groups_groupby_patent.get_group(str(patent))[
-            "nda"
-        ].tolist()
+        try:
+            return self._groups_groupby_patent.get_group(str(patent))[
+                "nda"
+            ].tolist()
+        except KeyError:
+            return []
 
     def get_all_patents(self):
         """Returns a list of all patent numbers."""

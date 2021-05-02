@@ -21,7 +21,7 @@ _patent_collection = None
 _ob = OrangeBookMap()
 
 # initialize SentenceTransformer models
-_device = "cpu"
+_device = None
 # model = SentenceTransformer("allenai/scibert_scivocab_uncased", device=_device)
 # model = SentenceTransformer("allenai/scibert_scivocab_cased", device = "cpu")
 # model = SentenceTransformer("dmis-lab/biobert-large-cased-v1.1", device=_device)
@@ -31,6 +31,28 @@ model = SentenceTransformer("stsb-distilroberta-base-v2", device=_device)
 # common value is 512, longer sentences are truncated
 # print("Max Sequence Length:", model.max_seq_length)
 model.max_seq_length = 512
+
+
+def add_patent_map(docs, application_numbers):
+    """
+    Add to each doc in docs a mapping to patents for each NDA
+
+    Parameters:
+        docs (list): list of label docs from MongoDB having the same
+                     application_numbers
+        application_numbers (list): a list of application numbers such as
+                                    ['NDA204223',]
+    """
+    all_patents = [
+        {
+            "application_number": str(nda),
+            "patents": _ob.get_patents(misc.get_num_in_str(nda)),
+        }
+        for nda in application_numbers
+    ]
+    for doc in docs:
+        doc["nda_to_patent"] = all_patents
+    return docs
 
 
 def get_claims_in_patents_db(all_patents):
@@ -253,11 +275,11 @@ def rank_and_score(docs, additions_list, patent_list, num_scores=3):
 
     for doc in docs:
         if doc["additions"]:
-            for value in doc["additions"].values():
+            for key, value in doc["additions"].items():
                 score_index_list = addition_to_score_index[
                     value["expanded_content"]
                 ]
-                value["scores"] = [
+                doc["additions"][key]["scores"] = [
                     {
                         "patent_number": patent_list[item[1]][0],
                         "claim_number": patent_list[item[1]][1],
@@ -304,6 +326,7 @@ def additions_in_diff_against_previous_label(docs):
             for diff in doc["diff_against_previous_label"]:
                 for text in diff["text"]:
                     if text[0] == 1 and len(text) > 2 and text[2]:
+                        text = text[:3]
                         text.append(doc["additions"][text[2]])
 
 
@@ -351,9 +374,7 @@ def run_similarity(
         if label_index >= len(all_label_ids):
             # all labels were traversed, remaining labels have no
             # application_numbers; store unprocessed label_ids to disk
-            misc.append_to_file(
-                unprocessed_label_ids_file, all_label_ids
-            )
+            misc.append_to_file(unprocessed_label_ids_file, all_label_ids)
             break
 
         # pick label_id
@@ -376,6 +397,9 @@ def run_similarity(
             _label_collection.find({"application_numbers": application_numbers})
         )
 
+        similar_label_docs = add_patent_map(
+            similar_label_docs, application_numbers
+        )
         patent_dict = patent_claims_longhand_form_from_NDA(application_numbers)
         # patent_list = [[patent_num, claim_num, parent_clm_list, claim_text],]
         patent_list = patent_dict_of_dict_to_list_of_list(patent_dict)

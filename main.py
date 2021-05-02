@@ -185,7 +185,7 @@ def parse_args():
         "-bert",
         "--bert",
         action="store_true",
-        help=("Run similarity with Bert.  This is default if flag is not set."),
+        help=("Run similarity with Bert."),
     )
 
     return parser.parse_args()
@@ -302,7 +302,7 @@ if __name__ == "__main__":
             os.remove(UNPROCESSED_NDA_SIMILARITY_FILE)
         run_diff_and_similarity = True
 
-    if len(sys.argv) == 1:
+    if len(sys.argv) == 1 or args.spacy_word2vec or args.tfidf or args.bert:
         # for case when no optional arguments are passed
         run_diff_and_similarity = True
 
@@ -325,6 +325,7 @@ if __name__ == "__main__":
                 fetch.extract_and_clean(file_path)
 
         if args.spacy_word2vec:
+            print("run spacy")
             from similarity import run_similarity_spacy
 
             run_similarity_spacy.run_similarity(
@@ -348,7 +349,7 @@ if __name__ == "__main__":
                 UNPROCESSED_NDA_SIMILARITY_FILE,
             )
 
-        else:
+        elif args.bert:
             from similarity import run_similarity_bert
 
             run_similarity_bert.run_similarity(

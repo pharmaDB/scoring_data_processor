@@ -86,6 +86,10 @@ To output a list of missing patents from the database that are in the Orange Boo
 
 `python3 main.py -mpj <filename>`
 
+These outputs will require confirmation if the file already exists, so use the following to output all files into the `asset/` directory:
+
+`yes | pipenv run python main.py -ob -an -ap -apj -mn -mp -mpj`
+
 To read help:
 
 `python3 main.py -h`

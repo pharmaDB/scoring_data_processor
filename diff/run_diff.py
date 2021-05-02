@@ -120,16 +120,17 @@ def add_diff_against_previous_label(docs):
     """
 
     # for first doc in docs, set all sections to 1
-    if docs[0]["sections"]:
+    if len(docs) > 0:
         docs[0]["diff_against_previous_label"] = []
-        for section in docs[0]["sections"]:
-            docs[0]["diff_against_previous_label"].append(
-                {
-                    "name": section["name"],
-                    "text": [[1, section["text"]]],
-                    "parent": section["parent"],
-                }
-            )
+        if docs[0]["sections"]:
+            for section in docs[0]["sections"]:
+                docs[0]["diff_against_previous_label"].append(
+                    {
+                        "name": section["name"],
+                        "text": [[1, section["text"]]],
+                        "parent": section["parent"],
+                    }
+                )
 
     if len(docs) > 1:
         for i in range(1, len(docs)):
