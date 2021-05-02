@@ -76,7 +76,7 @@ def extract_alternative_numbers(text):
     findall_range = re.findall(r"\d+ to \d+", text)
     if bool(findall_range):
         for range_ in findall_range:
-            i = range_.split("-")
+            i = range_.split("to")
             claim_num.extend(range(int(i[0]), int(i[1]) + 1))
         text = re.sub(r"\d+ to \d+", "", text)
 
