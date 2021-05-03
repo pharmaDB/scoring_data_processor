@@ -168,6 +168,13 @@ def parse_args():
     )
 
     parser.add_argument(
+        "-diff",
+        "--diff",
+        action="store_true",
+        help=("Run diffing_algo."),
+    )
+
+    parser.add_argument(
         "-spacy",
         "--spacy_word2vec",
         action="store_true",
@@ -305,6 +312,14 @@ if __name__ == "__main__":
     if len(sys.argv) == 1 or args.spacy_word2vec or args.tfidf or args.bert:
         # for case when no optional arguments are passed
         run_diff_and_similarity = True
+
+    if args.diff:
+        run_diff.run_diff(
+            LABEL_COLLECTION,
+            PROCESSED_ID_DIFF_FILE,
+            PROCESSED_NDA_DIFF_FILE,
+            UNPROCESSED_ID_DIFF_FILE,
+        )
 
     if run_diff_and_similarity:
 

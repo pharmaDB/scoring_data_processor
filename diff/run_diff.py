@@ -96,6 +96,64 @@ def get_diff(a, b):
 #     return docs
 
 
+def drop_sections(docs):
+    """
+    This function drop sections that are uninteresting for the customer.
+
+    Parameters:
+        docs (list): list of label docs from MongoDB having the same
+        application_numbers
+    """
+    LABEL_SECTIONS = [
+        "INDICATIONS AND USAGE",
+        "DOSAGE FORMS AND STRENGTHS",
+        "DESCRIPTION",
+        "INDICATIONS",
+        "ACTIVE INGREDIENT",
+        "INACTIVE INGREDIENTS",
+        "PURPOSE",
+        "DIRECTIONS",
+        "USE",
+    ]
+
+    for doc in docs:
+        for i in reversed(range(len(doc["sections"]))):
+
+            title_match_text = " ".join(
+                (
+                    doc["sections"][i]["name"]
+                    .upper()
+                    .replace("&", "AND")
+                    .replace("\t", " ")
+                    .lstrip("0123456789. ")
+                ).split()
+            )
+
+            if doc["sections"][i]["parent"]:
+                parent_title_match_text = " ".join(
+                    (
+                        doc["sections"][i]["parent"]
+                        .upper()
+                        .replace("&", "AND")
+                        .replace("\t", " ")
+                        .lstrip("0123456789. ")
+                    ).split()
+                )
+            else:
+                parent_title_match_text = ""
+
+            if not any(
+                [title_match_text in x for x in LABEL_SECTIONS]
+                + [
+                    parent_title_match_text in x
+                    for x in LABEL_SECTIONS
+                    if doc["sections"][i]["parent"]
+                ]
+            ):
+                del doc["sections"][i]
+    return docs
+
+
 def add_diff_against_previous_label(docs):
     """
     Assuming that labels docs are sorted, this method adds a
@@ -127,7 +185,7 @@ def add_diff_against_previous_label(docs):
                 docs[0]["diff_against_previous_label"].append(
                     {
                         "name": section["name"],
-                        "text": [[1, section["text"]]],
+                        "text": [[1, str(section["text"])]],
                         "parent": section["parent"],
                     }
                 )
@@ -147,8 +205,8 @@ def add_diff_against_previous_label(docs):
                         {
                             "name": section_prior["name"],
                             "text": get_diff(
-                                section_prior["text"],
-                                docs[i]["sections"][s_index]["text"],
+                                str(section_prior["text"]),
+                                str(docs[i]["sections"][s_index]["text"]),
                             ),
                             "parent": docs[i]["sections"][s_index]["parent"],
                         }
@@ -158,7 +216,7 @@ def add_diff_against_previous_label(docs):
                     docs[i]["diff_against_previous_label"].append(
                         {
                             "name": section_prior["name"],
-                            "text": [[-1, section_prior["text"]]],
+                            "text": [[-1, str(section_prior["text"])]],
                             "parent": section_prior["parent"],
                         }
                     )
@@ -191,7 +249,7 @@ def add_diff_against_previous_label(docs):
                         insert_loc,
                         {
                             "name": section["name"],
-                            "text": [[1, section["text"]]],
+                            "text": [[1, str(section["text"])]],
                             "parent": section["parent"],
                         },
                     )
@@ -369,17 +427,18 @@ def gather_additions(docs):
                 # be rebuilt around diff
                 if (
                     diff["text"][j][0] == 1
-                    and diff["text"][j][1].strip()
+                    and str(diff["text"][j][1]).strip()
                     and (
                         j == 0
                         or (
                             j > 0
-                            and diff["text"][j][1].lower()
-                            != diff["text"][j - 1][1].lower()
+                            and str(diff["text"][j][1]).lower()
+                            != str(diff["text"][j - 1][1]).lower()
                         )
                     )
-                    and diff["text"][j][1].strip()
-                    not in list("~`’!@#$%^&*()-_=+[{}];:'\"',<>./?|•")
+                    and any(
+                        [i.isalnum() for i in str(diff["text"][j][1].strip())]
+                    )
                 ):
                     rebuilt_string, rebuilt_index = rebuild_string(
                         diff["text"], j
@@ -496,9 +555,7 @@ def run_diff(
         if label_index >= len(all_label_ids):
             # all labels were traversed, remaining labels have no
             # application_numbers; store unprocessed label_ids to disk
-            misc.append_to_file(
-                unprocessed_label_ids_file, all_label_ids
-            )
+            misc.append_to_file(unprocessed_label_ids_file, all_label_ids)
             break
 
         # pick label_id
@@ -521,6 +578,7 @@ def run_diff(
             _label_collection.find({"application_numbers": application_numbers})
         )
         # similar_label_docs = remove_newlines(similar_label_docs)
+        similar_label_docs = drop_sections(similar_label_docs)
 
         groups_by_set_id = group_label_docs_by_set_id(similar_label_docs)
         for set_id_group in groups_by_set_id:

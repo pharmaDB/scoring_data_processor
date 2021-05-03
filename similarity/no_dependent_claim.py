@@ -23,17 +23,7 @@ def drop_claim_number(text):
     Parameters:
         text (string): claim text as a string
     """
-    if bool(
-        re.match(r".*(\d+)\.([a-zA-Z]+)", text.split(" ", 1)[0].strip("\n"))
-    ):
-        text = (
-            text.split(" ", 1)[0].split(".", 1)[1] + " " + text.split(" ", 1)[1]
-        )
-    if bool(re.match(r".*(\d+)\.$", text.split(" ", 1)[0].strip("\n"))):
-        text = text.split(" ", 1)[1]
-    if bool(re.match(r".*(\d+)$", text.split(". ", 1)[0].strip("\n"))):
-        text = text.split(". ", 1)[1]
-    return text
+    return text.lstrip("\n0123456789. ")
 
 
 def drop_reference_numbers(text):

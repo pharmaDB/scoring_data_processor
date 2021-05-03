@@ -115,6 +115,7 @@ def patent_claims_longhand_form_from_NDA(application_numbers):
     ]
     # flatten all_patents into [patent_str,]
     all_patents = [j for i in all_patents for j in i]
+    all_patents = list(set(all_patents))
     # patent_dict = {patent_str:OrderedDict([(claim_num, claim_text),]),}
     patent_dict = get_claims_in_patents_db(all_patents)
     # patent_longhand_dict is returned
