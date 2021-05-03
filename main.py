@@ -227,6 +227,7 @@ def export_missing_NDA(file_name):
     ob = OrangeBookMap()
     all_NDA_in_Orange_Book = ob.get_all_nda()
     all_NDA_in_MongoDB = label_collection.distinct("application_numbers")
+    all_NDA_in_MongoDB = [int(x) for x in all_NDA_in_MongoDB]
     NDA_in_OB_not_in_Mongo = [
         x for x in all_NDA_in_Orange_Book if x not in all_NDA_in_MongoDB
     ]
@@ -242,10 +243,13 @@ def export_missing_patents(file_name, json_convert=False):
     patent_collection = db[PATENT_COLLECTION]
     ob = OrangeBookMap()
     all_patents_in_Orange_Book = ob.get_all_patents()
-    all_patents_in_MongoDB = patent_collection.distinct("patent_no")
+    print(all_patents_in_Orange_Book[:10])
+    all_patents_in_MongoDB = patent_collection.distinct("patent_number")
+    print(all_patents_in_MongoDB[:10])
     patents_in_OB_not_in_Mongo = [
         x for x in all_patents_in_Orange_Book if x not in all_patents_in_MongoDB
     ]
+    print(patents_in_OB_not_in_Mongo[:10])
     if not json_convert:
         misc.store_to_file(file_name, patents_in_OB_not_in_Mongo)
     else:
@@ -284,11 +288,11 @@ if __name__ == "__main__":
     # reimport of label or patent collections; for development
     if args.reimport_labels:
         reimport_collection(
-            LABEL_COLLECTION, "assets/database_actual/labels.json"
+            LABEL_COLLECTION, "assets/database_latest/labels.json"
         )
     if args.reimport_patents:
         reimport_collection(
-            PATENT_COLLECTION, "assets/database_actual/patents.json"
+            PATENT_COLLECTION, "assets/database_latest/patents.json"
         )
 
     # rerun all diff and similarity

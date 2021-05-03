@@ -446,13 +446,16 @@ def run_similarity(
         additions_list = get_list_of_additions(similar_label_docs)
 
         if patent_list:
-            similar_label_docs = rank_and_score(
-                similar_label_docs, additions_list, patent_list
-            )
+            if additions_list:
+                similar_label_docs = rank_and_score(
+                    similar_label_docs, additions_list, patent_list
+                )
 
-            additions_in_diff_against_previous_label(similar_label_docs)
+                additions_in_diff_against_previous_label(similar_label_docs)
 
-            update_db(_label_collection_name, similar_label_docs, alt_db_name)
+                update_db(
+                    _label_collection_name, similar_label_docs, alt_db_name
+                )
 
             similar_label_docs_ids = [str(x["_id"]) for x in similar_label_docs]
 
