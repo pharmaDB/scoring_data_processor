@@ -31,9 +31,10 @@ mongoimport --db test --collection labels --file patents.bson
 ```
 or 
 
-`python3 main.py -rip -ril` once the Install instructions below are completed.
+`python3 main.py -rip -ril` once the Install instructions below are completed.  This will load the `assets/database_latest/` collections into MongoDB.
 
-This will load the `assets/database_before/` collections into MongoDB.  The following code can then be run to turn collections in `assets/database_before/` into the collections in `assets/database_after/`.
+Testing data will operate on data in `assets/database_before/` to turn into the collections in `assets/database_after/`.
+
 
 ## Running the Code
 Requires a minimum python version of `3.6` to run.
@@ -88,7 +89,7 @@ To output a list of missing patents from the database that are in the Orange Boo
 
 These outputs will require confirmation if the file already exists, so use the following to output all files into the `asset/` directory:
 
-`yes | pipenv run python main.py -ob -an -ap -apj -mn -mp -mpj`
+`yes | python3 main.py -ob -an -ap -apj -mn -mp -mpj`
 
 To read help:
 
@@ -99,6 +100,18 @@ To read help:
 Unit tests are run with:
 
 `python3 -m unittest`
+
+## Generating File Export of All DB entries
+
+To export all MongoDB data to file, use the follow.  It is suggested to change the .env file a different MONGODB_NAME, since these command will wipe the database, then re-import all patent and label collections.  
+
+```
+python3 main.py -rip -rip -diff -r
+python3 generate_files.py
+```
+
+Alternatively, an export has already been made for stale date, and is located in `assets/drug_patents_and_labels_db2file.tar.gz`
+
 
 ## Code Formatting
 It is recommended to use the [Black Code Formatter](https://github.com/psf/black) which can be installed as a plugin for most IDEs. `pyproject.toml` holds the formatter settings.
