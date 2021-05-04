@@ -1,5 +1,5 @@
 """
-This file is the generation of a db2file for data analysis purposes.
+This file is for the generation of a db2file for data analysis purposes.
 Run after 'python main.py -rip -ril -diff'
 """
 
@@ -8,7 +8,9 @@ from itertools import groupby
 import os
 import simplejson
 import html
+from collections import OrderedDict
 
+from similarity.no_dependent_claim import dependent_to_independent_claim
 from db.mongo import connect_mongo
 from orangebook.merge import OrangeBookMap
 from utils import misc
@@ -205,17 +207,53 @@ def output_file(nda_str, set_id_group, all_patent):
                     != claim["claim_text"]
                 ):
                     f.write(
-                        html.unescape(claim["claim_text"]).encode(
-                            "unicode_escape"
-                        )
+                        html.unescape(claim["claim_text"])
+                        .replace("\r", "")
+                        .encode("unicode_escape")
                     )
                 else:
                     f.write(
                         html.unescape(
                             claim["claim_number"] + ". " + claim["claim_text"]
-                        ).encode("unicode_escape")
+                        )
+                        .replace("\r", "")
+                        .encode("unicode_escape")
                     )
                 f.write(b"\n")
+
+        # output NDA/patent_longhand
+        claim_num_text_od = OrderedDict()
+        claims = patent_from_collection["claims"]
+        sorted(claims, key=lambda i: i["claim_number"])
+        for claim in claims:
+            claim_num_text_od[int(claim["claim_number"])] = html.unescape(
+                claim["claim_text"]
+            )
+        claims_longhand = dependent_to_independent_claim(
+            claim_num_text_od, str(patent_num)
+        )
+
+        file_name = (
+            "db2file/"
+            + nda_str
+            + "/patents_longhand/"
+            + patent_from_collection["patent_number"]
+        )
+
+        print(file_name)
+
+        if not os.path.exists(os.path.dirname(file_name)):
+            os.makedirs(os.path.dirname(file_name))
+
+        with open(file_name, "wb") as f:
+            for claim_num, value in claims_longhand.items():
+                for interp in value:
+                    f.write(
+                        (str(claim_num) + ". " + interp["text"])
+                        .replace("\r", "")
+                        .encode("unicode_escape")
+                    )
+                    f.write(b"\n")
 
 
 def get_files_from_db():
@@ -261,12 +299,7 @@ def get_files_from_db():
         groups_by_set_id = group_label_docs_by_set_id(similar_label_docs)
 
         for set_id_group in groups_by_set_id:
-            # # sort by published_date
-            # set_id_group = sorted(
-            #     set_id_group,
-            #     key=lambda i: (i["published_date"]),
-            #     reverse=False,
-            # )
+
             all_patents = [
                 {
                     "application_number": str(nda),
@@ -277,14 +310,6 @@ def get_files_from_db():
             output_file(
                 "-".join(application_numbers), set_id_group, all_patents
             )
-            # set_id_group = add_previous_and_next_labels(set_id_group)
-            # set_id_group = add_diff_against_previous_label(set_id_group)
-            # set_id_group = gather_additions(set_id_group)
-
-        # # ungroup similar_label_docs by set id
-        # similar_label_docs = [
-        #     item for sublist in groups_by_set_id for item in sublist
-        # ]
 
         similar_label_docs_ids = [str(x["_id"]) for x in similar_label_docs]
 

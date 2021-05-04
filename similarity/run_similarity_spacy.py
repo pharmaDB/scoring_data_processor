@@ -89,7 +89,7 @@ def get_claims_in_patents_db(all_patents):
             for claim in claims:
                 claim_num_text_od[int(claim["claim_number"])] = html.unescape(
                     claim["claim_text"]
-                )
+                ).replace("\r", "")
         patent_dict[patent] = claim_num_text_od
     return patent_dict
 
