@@ -2,6 +2,8 @@
 
 These files form the analysis for the selection of a NLP model.  The notebooks were run using Google's Colab Pro with GPU settings 'on' and with high memory.  These settings can be changed in Google Colab using `Edit > Notebook settings`.
 
+(Note: `Noise_to_Related_Claims_Histogram_DrugLabelsandPatent.ipynb` was rerunned with model.eval() to ensure determinism)
+
 ## Installation
 
 1. Upload both `.ipynb` files to a Colab account.  This creates a `My Drive > Colab Notebooks` directory in Google Drive.  

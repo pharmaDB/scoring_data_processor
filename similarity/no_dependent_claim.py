@@ -201,8 +201,6 @@ def dependent_to_independent_claim(od, patent_num):
     if not od:
         return {}
 
-    # claim_parent_text_od = OrderedDict([ (claim_num, ([parent_claim_num,..],
-    #                        "text_without_parent_claim")), ...])
     claim_parent_text_od = OrderedDict()
     all_claim_nums = list(od.keys())
     for key, claim_text in od.items():
@@ -221,8 +219,7 @@ def dependent_to_independent_claim(od, patent_num):
     # [(claim_num,([parent_claim_num,..],"text_without_parent_claim")),..]
     claim_parent_text_list = list(claim_parent_text_od.items())
 
-    # no_dependent_dict is the dict returned by the function and consists of
-    # {claim_num: [{'parent_clm': [], "text": claim_text },]
+    # no_dependent_dict is the dict returned by the function
     no_dependent_dict = {}
 
     i = 0
