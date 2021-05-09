@@ -4,33 +4,21 @@ from sentence_transformers import SentenceTransformer, util
 import html
 
 from orangebook.merge import OrangeBookMap
-from similarity.no_dependent_claim import dependent_to_independent_claim
-from db.mongo import connect_mongo, update_db
+from similarity.claim_dependency import get_parent_claims
 from utils import misc
 from utils.logging import getLogger
 
 _logger = getLogger(__name__)
 
-# Store name string and MongoDB collection object
-_label_collection_name = None
-_label_collection = None
-_patent_collection_name = None
-_patent_collection = None
-
-# initialize OrangeBookMap
-_ob = OrangeBookMap()
-
 # initialize SentenceTransformer models
+# device of None will cause SentenceTransformer to test for CUDA
 _device = None
-# model = SentenceTransformer("allenai/scibert_scivocab_uncased", device=_device)
-# model = SentenceTransformer("allenai/scibert_scivocab_cased", device = "cpu")
-# model = SentenceTransformer("dmis-lab/biobert-large-cased-v1.1", device=_device)
-# model = SentenceTransformer("stsb-distilbert-base", device=_device)
-model = SentenceTransformer("stsb-distilroberta-base-v2", device=_device)
+_model = SentenceTransformer("stsb-mpnet-base-v2", device=_device)
 
 # common value is 512, longer sentences are truncated
 # print("Max Sequence Length:", model.max_seq_length)
-model.max_seq_length = 512
+_model.max_seq_length = 512
+_model.eval()
 
 
 def add_patent_map(docs, application_numbers):
@@ -43,10 +31,11 @@ def add_patent_map(docs, application_numbers):
         application_numbers (list): a list of application numbers such as
                                     ['NDA204223',]
     """
+    ob = OrangeBookMap()
     all_patents = [
         {
             "application_number": str(nda),
-            "patents": _ob.get_patents(misc.get_num_in_str(nda)),
+            "patents": ob.get_patents(misc.get_num_in_str(nda)),
         }
         for nda in application_numbers
     ]
@@ -55,15 +44,18 @@ def add_patent_map(docs, application_numbers):
     return docs
 
 
-def get_claims_in_patents_db(all_patents):
+def get_claims_in_patents_db(mongo_client, all_patents):
     """
     Returns an dict of OrderedDict {patent_str:OrderedDict([(claim_num,
     claim_text), ]), } from mongodb.  Order of claim number is important for
     references to preceding claims, so the inner dict must be an OrderedDict.
 
     Parameters:
+        mongo_client (object): MongoClient object with database and collections
         all_patents (list): example: ['4139619', '4596812']
     """
+    patent_collection = mongo_client.patent_collection
+    patent_collection_name = mongo_client.patent_collection_name
     # patent_dict is returned and has form {patent_str:{claim_num:claim_text,},}
     patent_dict = {}
     for patent in all_patents:
@@ -71,13 +63,13 @@ def get_claims_in_patents_db(all_patents):
         # patent_from_collection ex: {'_id': ObjectId('unique_string'),
         # 'patent_number': '4139619', 'expiration_date': '1996-02-13',
         # 'claims': [{'claim_number': 1, 'claim_text': '1. A topical..',}]}
-        patent_from_collection = _patent_collection.find_one(
+        patent_from_collection = patent_collection.find_one(
             {"patent_number": str(patent)}, {"patent_number": 1, "claims": 1}
         )
         if not patent_from_collection:
             _logger.error(
                 f"Unable to find: {str(patent)} in collection: "
-                f"{_patent_collection_name}."
+                f"{patent_collection_name}."
             )
             return {}
         elif "claims" not in patent_from_collection.keys():
@@ -95,39 +87,7 @@ def get_claims_in_patents_db(all_patents):
     return patent_dict
 
 
-def patent_claims_longhand_form_from_NDA(application_numbers):
-    """
-    Return dict of:
-        {patent_str: {claim_num (int): [{'parent_clm': [independent_claim_num,
-        ..., parent_claim_num, grand-parent_claim_num], 'text': claim_text}, ],
-        }, }
-    wherein the value assigned to claim_num is a list that contains all
-    interpretation of that claim when written in long hand form, without any
-    dependencies.
-
-    Parameters:
-        application_numbers (list): a list of application numbers such as
-                                    ['NDA204223',]
-    """
-    # all_patents = [[patent_str,],]
-    all_patents = [
-        _ob.get_patents(misc.get_num_in_str(nda)) for nda in application_numbers
-    ]
-    # flatten all_patents into [patent_str,]
-    all_patents = [j for i in all_patents for j in i]
-    all_patents = list(set(all_patents))
-    # patent_dict = {patent_str:OrderedDict([(claim_num, claim_text),]),}
-    patent_dict = get_claims_in_patents_db(all_patents)
-    # patent_longhand_dict is returned
-    patent_longhand_dict = {}
-    for patent, claim_od in patent_dict.items():
-        patent_longhand_dict[patent] = dependent_to_independent_claim(
-            claim_od, patent
-        )
-    return patent_longhand_dict
-
-
-def patent_dict_of_dict_to_list_of_list(dict_of_dict):
+def patent_claims_from_NDA(mongo_client, application_numbers):
     """
     Return list of list.  For example returns:
         [[patent_num, claim_num, parent_clm_list, claim_text],...]
@@ -135,24 +95,37 @@ def patent_dict_of_dict_to_list_of_list(dict_of_dict):
     Wherein parent_clm_list is:
         [independent_claim_num, ..., parent_claim_num, grand-parent_claim_num]
 
-    Parameters:
-        dict_of_dict (dict): {patent_str: {claim_num (int): [{'parent_clm':
-                    [independent_claim_num, ..., parent_claim_num,
-                    grand-parent_claim_num], 'text': claim_text}, ], }, }
+    For all claims from patent related to the application_numbers.
 
+    Parameters:
+        mongo_client (object): MongoClient object with database and collections
+        application_numbers (list): a list of application numbers such as
+                                    ['NDA204223',]
     """
+    ob = OrangeBookMap()
+    # all_patents = [[patent_str,],]
+    all_patents = [
+        ob.get_patents(misc.get_num_in_str(nda)) for nda in application_numbers
+    ]
+    # flatten all_patents into [patent_str,]
+    all_patents = [j for i in all_patents for j in i]
+    all_patents = list(set(all_patents))
+    # patent_dict = {patent_str:OrderedDict([(claim_num, claim_text),]),}
+    patent_dict = get_claims_in_patents_db(mongo_client, all_patents)
+    # return_list is returned
     return_list = []
-    for patent_num in dict_of_dict.keys():
-        for claim_num, value_list in dict_of_dict[patent_num].items():
-            for value_elem in value_list:
-                return_list.append(
-                    [
-                        patent_num,
-                        claim_num,
-                        value_elem["parent_clm"],
-                        value_elem["text"],
-                    ]
-                )
+    for patent_num, claims_od in patent_dict.items():
+        # parent_claims_dict ex.: { 1: [], 2: [], 3: [1,2]}
+        parent_claims_dict = get_parent_claims(claims_od)
+        for claim_num, claim_text in claims_od.items():
+            return_list.append(
+                [
+                    patent_num,
+                    claim_num,
+                    parent_claims_dict[claim_num],
+                    claim_text,
+                ]
+            )
     return return_list
 
 
@@ -178,7 +151,7 @@ def get_list_of_additions(docs):
 def preprocess(matrix, index, trunc_clm=False):
     """
     Takes as list of lists (in other words a matrix), and returns a list of
-    pre-proposed sentences for all elements at the index specified for the
+    preprocessed sentences for all elements at the index specified for the
     inner list.
 
     For BERT models, dropping punctuation affects accuracy. See
@@ -189,11 +162,10 @@ def preprocess(matrix, index, trunc_clm=False):
     and will automatically truncate longer text inputs.  (The exception to rule
     is for models such as Longformer or Bert-AL, or Reformer. However Bert-AL
     and Reformer are unavailable as HuggingFace models, and Longformer performs
-    poorly based on a few similarity test case examples.) To process longer
-    claim text, this method can the end of the claim if trunc_clm is True. The
-    end of the claims, when written in long hand form is more important, since
-    it is generally where new claim subject matter is recited for dependent
-    claims.
+    poorly.) To process longer claim text, this method truncates the end of the
+    claim if trunc_clm is True. The end of the claims, when written in long
+    hand form is more important, since it is generally where new claim subject
+    matter is recited for dependent claims.
 
     Parameters:
         matrix (list): a list of lists
@@ -205,10 +177,10 @@ def preprocess(matrix, index, trunc_clm=False):
         text_split = text.split()
         if (
             trunc_clm
-            and model.max_seq_length
-            and len(text_split) > model.max_seq_length
+            and _model.max_seq_length
+            and len(text_split) > _model.max_seq_length
         ):
-            return " ".join(text_split[-model.max_seq_length :])
+            return " ".join(text_split[-_model.max_seq_length :])
         else:
             return " ".join(text_split)
 
@@ -218,7 +190,7 @@ def preprocess(matrix, index, trunc_clm=False):
     return return_list
 
 
-def rank_and_score(docs, additions_list, patent_list, num_scores=3):
+def rank_and_score(docs, additions_list, patent_list, num_scores=0):
     """
     Returns a list of label docs in MongoDB format, wherein each doc includes
     doc['additions'][X]['scores'] if doc['additions'][X] exists.
@@ -242,18 +214,19 @@ def rank_and_score(docs, additions_list, patent_list, num_scores=3):
         additions_list (list): [[expanded_content], ...]
         patent_list (list): [[patent_num, claim_num, parent_clm_list,
                              claim_text],..]
-        num_scores (int): number of scores to include with each addition
+        num_scores (int): number of scores to include with each addition; if
+                        num_score<1, all scores are included with each addition
     """
     # create 2 lists of cleaned texts (ex: [expanded_content,] or [claim_text,])
     additions = preprocess(additions_list, 0)
     claims = preprocess(patent_list, 3, True)
 
     # Compute embedding for both lists
-    additions_embeddings = model.encode(
+    additions_embeddings = _model.encode(
         additions,
         convert_to_tensor=True,
     )
-    claims_embeddings = model.encode(
+    claims_embeddings = _model.encode(
         claims,
         convert_to_tensor=True,
     )
@@ -270,9 +243,15 @@ def rank_and_score(docs, additions_list, patent_list, num_scores=3):
     # "expanded_content"
     addition_to_score_index = {}
     for i in range(len(additions)):
-        addition_to_score_index[additions_list[i][0]] = sorted(
-            zip(cosine_scores[i], indices_of_claims), reverse=True
-        )[:num_scores]
+        if num_scores > 0:
+            # truncate the number of scores to length of num_scores
+            addition_to_score_index[additions_list[i][0]] = sorted(
+                zip(cosine_scores[i], indices_of_claims), reverse=True
+            )[:num_scores]
+        else:
+            addition_to_score_index[additions_list[i][0]] = sorted(
+                zip(cosine_scores[i], indices_of_claims), reverse=True
+            )
 
     for doc in docs:
         if doc["additions"]:
@@ -290,27 +269,6 @@ def rank_and_score(docs, additions_list, patent_list, num_scores=3):
                     for item in score_index_list
                 ]
     return docs
-
-
-def setup_MongoDB(
-    label_collection_name, patent_collection_name, alt_db_name=""
-):
-    """
-    This method sets up the MongoDB connection for all methods for this module.
-
-    Parameters:
-        label_collection_name (String): name of the label collection
-        patent_collection_name (String): name of the patent collection
-        alt_db_name (String): this is an optional argument that will set the
-                    db_name to a value other than the value in the .env file.
-    """
-    db = connect_mongo(alt_db_name)
-    global _label_collection_name, _label_collection
-    global _patent_collection_name, _patent_collection
-    _label_collection_name = label_collection_name
-    _label_collection = db[label_collection_name]
-    _patent_collection_name = patent_collection_name
-    _patent_collection = db[patent_collection_name]
 
 
 def additions_in_diff_against_previous_label(docs):
@@ -332,39 +290,36 @@ def additions_in_diff_against_previous_label(docs):
 
 
 def run_similarity(
-    label_collection_name,
-    patent_collection_name,
+    mongo_client,
     processed_label_ids_file,
     processed_nda_file,
     unprocessed_label_ids_file,
     unprocessed_nda_file,
-    alt_db_name="",
 ):
     """
     This method calls other methods in this module and tracks completed label
     IDs and completed NDA numbers.
 
     Parameters:
-        label_collection_name (String): name of the label collection
-        patent_collection_name (String): name of the patent collection
+        mongo_client (object): MongoClient object with database and collections
         processed_label_ids_file (Path): location to store processed ids
         processed_nda_file (Path): location to store processed NDAs
-        alt_db_name (String): this is an optional argument that will set the
-                    db_name to a value other than the value in the .env file.
+        unprocessed_label_ids_file (Path): location to store unprocessed ids
+        unprocessed_nda_file (Path): location to store unprocessed NDAs
     """
-
-    setup_MongoDB(
-        label_collection_name,
-        patent_collection_name,
-    )
+    label_collection = mongo_client.label_collection
+    label_collection_name = mongo_client.label_collection_name
 
     # open processed_label_id_file and return a list of processed _id string
-    processed_label_ids = misc.get_lines_in_file(processed_label_ids_file)
+    if processed_label_ids_file:
+        processed_label_ids = misc.get_lines_in_file(processed_label_ids_file)
+    else:
+        processed_label_ids = []
 
     # get list of label_id strings excluding any string in processed_label_id
     all_label_ids = [
         x
-        for x in [str(y) for y in _label_collection.distinct("_id", {})]
+        for x in [str(y) for y in label_collection.distinct("_id", {})]
         if x not in processed_label_ids
     ]
 
@@ -375,14 +330,15 @@ def run_similarity(
         if label_index >= len(all_label_ids):
             # all labels were traversed, remaining labels have no
             # application_numbers; store unprocessed label_ids to disk
-            misc.append_to_file(unprocessed_label_ids_file, all_label_ids)
+            if unprocessed_label_ids_file:
+                misc.append_to_file(unprocessed_label_ids_file, all_label_ids)
             break
 
         # pick label_id
         label_id_str = str(all_label_ids[label_index])
 
         # get a list of NDA numbers (ex. ['NDA019501',]) associated with _id
-        application_numbers = _label_collection.find_one(
+        application_numbers = label_collection.find_one(
             {"_id": ObjectId(label_id_str)},
             {"_id": 0, "application_numbers": 1},
         )["application_numbers"]
@@ -395,15 +351,16 @@ def run_similarity(
         # find all other docs with the same list of NDA numbers
         # len(similar_label_docs) is at least 1
         similar_label_docs = list(
-            _label_collection.find({"application_numbers": application_numbers})
+            label_collection.find({"application_numbers": application_numbers})
         )
 
+        # add mapping at end of label
         similar_label_docs = add_patent_map(
             similar_label_docs, application_numbers
         )
-        patent_dict = patent_claims_longhand_form_from_NDA(application_numbers)
+
         # patent_list = [[patent_num, claim_num, parent_clm_list, claim_text],]
-        patent_list = patent_dict_of_dict_to_list_of_list(patent_dict)
+        patent_list = patent_claims_from_NDA(mongo_client, application_numbers)
         # additions_list = [expanded_content, expanded_content...]
         additions_list = get_list_of_additions(similar_label_docs)
 
@@ -415,8 +372,8 @@ def run_similarity(
 
                 additions_in_diff_against_previous_label(similar_label_docs)
 
-                update_db(
-                    _label_collection_name, similar_label_docs, alt_db_name
+                mongo_client.update_db(
+                    label_collection_name, similar_label_docs
                 )
 
             similar_label_docs_ids = [str(x["_id"]) for x in similar_label_docs]
@@ -426,12 +383,14 @@ def run_similarity(
                 x for x in all_label_ids if x not in similar_label_docs_ids
             ]
             # store processed_label_ids & processed application_numbers to disk
-            misc.append_to_file(
-                processed_label_ids_file, similar_label_docs_ids
-            )
-            misc.append_to_file(
-                processed_nda_file, str(application_numbers)[1:-1]
-            )
+            if processed_label_ids_file:
+                misc.append_to_file(
+                    processed_label_ids_file, similar_label_docs_ids
+                )
+            if processed_nda_file:
+                misc.append_to_file(
+                    processed_nda_file, str(application_numbers)[1:-1]
+                )
         else:
             similar_label_docs_ids = [str(x["_id"]) for x in similar_label_docs]
 
@@ -441,9 +400,11 @@ def run_similarity(
             ]
             # store unprocessed label_ids & unprocessed application_numbers to
             # disk
-            misc.append_to_file(
-                unprocessed_label_ids_file, similar_label_docs_ids
-            )
-            misc.append_to_file(
-                unprocessed_nda_file, str(application_numbers)[1:-1]
-            )
+            if unprocessed_label_ids_file:
+                misc.append_to_file(
+                    unprocessed_label_ids_file, similar_label_docs_ids
+                )
+            if unprocessed_nda_file:
+                misc.append_to_file(
+                    unprocessed_nda_file, str(application_numbers)[1:-1]
+                )

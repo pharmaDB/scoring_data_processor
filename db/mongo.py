@@ -3,6 +3,7 @@ import os
 import pymongo
 from bson.objectid import ObjectId
 import json
+import sys
 
 from utils.logging import getLogger
 
@@ -15,7 +16,87 @@ _config = dict(
 )
 
 
-def connect_mongo(alt_db_name=""):
+class MongoClient:
+    def __init__(
+        self,
+        label_collection_name,
+        patent_collection_name,
+        alt_db_name=None,
+    ):
+        """
+        Initializes a MongoDB connection and stores strings of collections used
+        by this module.
+
+        Parameters:
+            label_collection_name (String): name of the label collection
+            patent_collection_name (String): name of the patent collection
+            alt_db_name (String): name of database if different from the one in
+                                  `.env`. Used mainly for unit-tests.
+        """
+        self.db = connect_mongo(alt_db_name)
+        self.label_collection_name = label_collection_name
+        self.patent_collection_name = patent_collection_name
+        self.label_collection = self.db[self.label_collection_name]
+        self.patent_collection = self.db[self.patent_collection_name]
+
+    def reimport_collection(self, collection_name, file_name):
+        """
+        Reimports collection from file_name into MongoDB
+
+        Parameters:
+            collection_name (String):
+                name of the collection to reimport
+            file_name (path):
+                location of the json file for the collection to import
+        """
+        db = self.db
+        collection = db[collection_name]
+        collection.drop()
+        with open(file_name, "r") as f:
+            lines = f.readlines()
+            for line in lines:
+                doc = json.loads(line)
+                doc["_id"] = ObjectId(doc["_id"]["$oid"])
+                # additional code to process oid in claims
+                if "claims" in doc.keys():
+                    for item in doc["claims"]:
+                        if "_id" in item.keys():
+                            item["_id"] = ObjectId(item["_id"]["$oid"])
+                collection.insert_one(doc)
+        _logger.info(f"Reimported '{collection_name}' with '{file_name}'")
+
+    def update_db(self, collection_name, docs):
+        """
+        Update all docs in docs in the collection
+
+        Parameters:
+            collection_name (string):
+                MongoDB collection name
+            docs (list):
+                list of sorted label docs from MongoDB having the same
+                application_numbers
+            alt_db_name (String):
+                this is an optional argument that will set the db_name to a value
+                other than the value in the .env file.
+        """
+        db = self.db
+        collection = db[collection_name]
+        for doc in docs:
+            result = collection.replace_one({"_id": doc["_id"]}, doc)
+            if result.matched_count < 1:
+                _logger.error(
+                    f"Unable to uploaded to collection '{collection_name}': "
+                    f"{str(doc)[:250]}" + ("" if len(str(doc)) < 250 else "...")
+                )
+            else:
+                _logger.info(
+                    f"Uploaded to collection '{collection_name}': "
+                    f"{str(doc)[:250]}" + ("" if len(str(doc)) < 250 else "...")
+                )
+        return
+
+
+def connect_mongo(alt_db_name=None):
     """
     This method connects to MongoDB and returns a MongoDB database object
     using the .env file.  alt_db_name can be provided to change change the
@@ -43,65 +124,4 @@ def connect_mongo(alt_db_name=""):
         return mongo[db_name]
     except Exception as e:
         _logger.error(f"Error occured {e}")
-        return
-
-
-def reimport_collection(collection_name, file_name, alt_db_name=""):
-    """
-    Reimports collection from file_name into MongoDB
-
-    Parameters:
-        collection_name (String):
-            name of the collection to reimport
-        file_name (path):
-            location of the json file for the collection to import
-        alt_db_name (String):
-            optional argument that will set the db_name to a value other than
-            the value in the .env file.
-    """
-    db = connect_mongo(alt_db_name)
-    collection = db[collection_name]
-    collection.drop()
-    with open(file_name, "r") as f:
-        lines = f.readlines()
-        for line in lines:
-            doc = json.loads(line)
-            doc["_id"] = ObjectId(doc["_id"]["$oid"])
-            # additional code to process oid in claims
-            if "claims" in doc.keys():
-                for item in doc["claims"]:
-                    if "_id" in item.keys():
-                        item["_id"] = ObjectId(item["_id"]["$oid"])
-            collection.insert_one(doc)
-    _logger.info(f"Reimported '{collection_name}' with '{file_name}'")
-
-
-def update_db(collection_name, docs, alt_db_name=""):
-    """
-    Update all docs in docs in the collection
-
-    Parameters:
-        collection_name (string):
-            MongoDB collection name
-        docs (list):
-            list of sorted label docs from MongoDB having the same
-            application_numbers
-        alt_db_name (String):
-            this is an optional argument that will set the db_name to a value
-            other than the value in the .env file.
-    """
-    db = connect_mongo(alt_db_name)
-    collection = db[collection_name]
-    for doc in docs:
-        result = collection.replace_one({"_id": doc["_id"]}, doc)
-        if result.matched_count < 1:
-            _logger.error(
-                f"Unable to uploaded to collection '{collection_name}': "
-                f"{str(doc)[:250]}" + ("" if len(str(doc)) < 250 else "...")
-            )
-        else:
-            _logger.info(
-                f"Uploaded to collection '{collection_name}': "
-                f"{str(doc)[:250]}" + ("" if len(str(doc)) < 250 else "...")
-            )
-    return
+        sys.exit(1)

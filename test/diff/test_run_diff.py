@@ -1,6 +1,5 @@
 import unittest
 from diff.run_diff import rebuild_string, find_end
-import copy
 
 
 class Test_run_diff(unittest.TestCase):
