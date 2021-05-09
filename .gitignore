@@ -18,4 +18,5 @@ resources/processed_log_unittest/
 # large MongoDB databases
 assets/database_actual*/
 
+Pipfile
 Pipfile.lock

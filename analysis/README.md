@@ -10,7 +10,7 @@ These files form the analysis for the selection of a NLP model.  The notebooks w
 
 2. Next upload `db2file.tar.zip`, from this folder to new folder `My Drive > Colab Notebooks > zip`.
 
-3. Upload `requirements.txt` from the parent folder of this folder with README.md to `My Drive > Colab Notebooks`.
+3. Upload `requirements.txt` from this folder to `My Drive > Colab Notebooks`.
 
 4. Finally, download and convert the following file to a .zip format.
 `https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/en_core_sci_scibert-0.4.0.tar.gz`
