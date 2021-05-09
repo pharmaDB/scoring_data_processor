@@ -1,0 +1,442 @@
+{
+    "_id": "60733ceffaefa1fc4854fe9c",
+    "application_numbers": [
+        "NDA204223"
+    ],
+    "set_id": "b62ee1ef-db55-417a-a02e-b103890f9c4b",
+    "spl_id": "07a87d97-95a5-4899-a88c-9fb3966548b4",
+    "spl_version": "5",
+    "published_date": "2013-11-08",
+    "sections": [
+        {
+            "name": "1 INDICATIONS AND USAGE",
+            "text": "Morphine sulfate is an opioid agonist indicated for the management of pain not responsive to non-narcotic analgesics.",
+            "parent": null
+        },
+        {
+            "name": "2 DOSAGE AND ADMINISTRATION",
+            "text": "\nMorphine Sulfate Injection is intended for intravenous and intramuscular administration.\n\n",
+            "parent": null
+        },
+        {
+            "name": "2.1 General Dosing Considerations",
+            "text": "Avoid Medication Errors\nMorphine Sulfate Injection is available in five concentrations for direct injection. Take care when prescribing and administering Morphine Sulfate Injection to avoid dosing errors due to confusion between different concentrations and between mg and mL, which could result in accidental overdose and death. Ensure the proper dose is communicated and dispensed. When writing prescriptions, include both the total dose in mg and total dose in volume. \nAdministration of Morphine Sulfate Injection should be limited to use by those familiar with the management of respiratory depression. Morphine must be injected slowly; rapid intravenous administration may result in chest wall rigidity.\nSelection of patients for treatment with morphine sulfate should be governed by the same principles that apply to the use of similar opioid analgesics.  Individualize treatment in every case, using non-opioid analgesics, opioids on an as needed basis and/or combination products, and chronic opioid therapy in a progressive plan of pain management such as outlined by the World Health Organization, the Agency for Healthcare Research and Quality, and the American Pain Society.",
+            "parent": "2 DOSAGE AND ADMINISTRATION"
+        },
+        {
+            "name": "2.2 Individualization of Dosage",
+            "text": "Adjust the dosing regimen for each patient individually, taking into account the patient's prior analgesic treatment experience.  In the selection of the initial dose of Morphine Sulfate Injection USP, give attention to the following:\nthe total daily dose, potency and specific characteristics of the opioid the patient has been taking previously;\nthe reliability of the relative potency estimate used to calculate the equivalent Morphine Sulfate Injection USP dose needed;\nthe patient's degree of opioid tolerance;\nthe general condition and medical status of the patient;\nconcurrent medications;\nthe type and severity of the patient's pain;\nrisk factors for abuse, addiction or diversion, including a prior history of abuse, addiction.\nThe following dosing recommendation, therefore, can only be considered suggested approaches to what is actually a series of clinical decisions over time in management of the pain of each individual patient.\nContinual re-evaluation of the patient receiving Morphine Sulfate Injection USP is important, with special attention to the management of pain and the occurrence of side effects associated with therapy.",
+            "parent": "2 DOSAGE AND ADMINISTRATION"
+        },
+        {
+            "name": "2.3 Direct Intravenous Injection",
+            "text": "The usual starting dose in adults is 0.1 mg to 0.2 mg per kg every 4 hours as needed to manage pain.\nInspect Morphine Sulfate Injection for particulate matter and discoloration prior to administration.\nAdminister the injection slowly.\nMonitor the patient closely for signs of respiratory and central nervous system depression.",
+            "parent": "2 DOSAGE AND ADMINISTRATION"
+        },
+        {
+            "name": "2.4 Intramuscular Injection",
+            "text": "The initial IM dose is 10 mg, every 4 hours as needed to manage pain (based on a 70 kg adult).\nInspect Morphine Sulfate Injection for particulate matter and discoloration prior to administration.\nMonitor the patient closely for signs of respiratory and central nervous system depression.",
+            "parent": "2 DOSAGE AND ADMINISTRATION"
+        },
+        {
+            "name": "2.5 Dosing with Hepatic and Renal Impairment",
+            "text": "Morphine Sulfate pharmacokinetics have been reported to be significantly altered in patients with cirrhosis and renal failure. Start these patients with lower doses of Morphine Sulfate Injection USP and titrate slowly while carefully monitoring for respiratory and central nervous system depression. [See Use in Specific Populations (8.7 and 8.8).]",
+            "parent": "2 DOSAGE AND ADMINISTRATION"
+        },
+        {
+            "name": "3 DOSAGE FORMS AND STRENGTHS",
+            "text": "Morphine Sulfate Injection USP is available in the following strengths for intravenous and intramuscular administration.\n2 mg/mL in 1 mL prefilled disposable syringe for IV or IM use.\n4 mg/mL in 1 mL prefilled disposable syringe for IV or IM use.\n5 mg/mL in 1 mL prefilled disposable syringe for IV or IM use.\n8 mg/mL in 1 mL prefilled disposable syringe for IV or IM use.\n10 mg/mL in 1 mL prefilled disposable syringe for IV or IM use.",
+            "parent": null
+        },
+        {
+            "name": "8 USE IN SPECIFIC POPULATIONS",
+            "text": "",
+            "parent": null
+        },
+        {
+            "name": "8.1 Pregnancy",
+            "text": "Teratogenic Effects (Pregnancy Category C)\nNo formal studies to assess the teratogenic effects of morphine in animals have been conducted. It is also not known whether morphine can cause fetal harm when administered to a pregnant woman or can affect reproductive capacity. Morphine should be given to a pregnant woman only if clearly needed.\nIn humans, the frequency of congenital anomalies have been reported to be no greater than expected among the children of 70 women who were treated with morphine during the first four months of pregnancy or in 448 women treated with morphine anytime during pregnancy. Furthermore, no malformations were observed in the infant of a woman who attempted suicide by taking an overdose of morphine and other medication during the first trimester of pregnancy.\nSeveral literature reports indicate that morphine administered subcutaneously during the early gestational period in mice and hamsters produced neurological, soft tissue and skeletal abnormalities. With one exception, the effects that have been reported were following doses that were maternally toxic and the abnormalities noted were characteristic of those observed when maternal toxicity is present. In one study, following subcutaneous infusion of doses greater than or equal to 0.15 mg/kg to mice, exencephaly, hydronephrosis, intestinal hemorrhage, split supraoccipital, malformed sternebrae and malformed xiphoid were noted in the absence of maternal toxicity. In the hamster, morphine sulfate given subcutaneously on gestation day 8 produced exencephaly and cranioschisis. In rats treated with subcutaneous infusions of morphine during the period of organogenesis, no teratogenicity was observed.\nNo maternal toxicity was observed in this study however, increased mortality and growth retardation were seen in the offspring. In two studies performed in the rabbit, no evidence of teratogenicity was reported at subcutaneous doses up to 100 mg/kg.",
+            "parent": "8 USE IN SPECIFIC POPULATIONS"
+        },
+        {
+            "name": "8.2 Labor and Delivery",
+            "text": "Morphine readily passes into the fetal circulation and may result in respiratory depression and psycho-physiologic effects in neonates. Naloxone and resuscitative equipment should be available for reversal of narcotic-induced respiratory depression in the neonate. In addition, parenteral morphine may reduce the strength, duration and frequency of uterine contractions resulting in prolonged labor. However, this effect is not consistent and may be offset by an increased rate of cervical dilatation, which tends to shorten labor. Closely observe neonates whose mothers received opioid analgesics during labor for signs of respiratory depression.",
+            "parent": "8 USE IN SPECIFIC POPULATIONS"
+        },
+        {
+            "name": "8.3 Nursing Mothers",
+            "text": "Low levels of Morphine Sulfate Injection USP have been detected in maternal milk.  The milk:plasma morphine AUC ratio is about 2:5:1.  The amount of Morphine Sulfate Injection USP delivered to the infant depends on the plasma concentration of the mother, the amount of milk ingested by the infant and the extent of first-pass metabolism.  Because of the potential for serious adverse reactions in nursing infants from Morphine Sulfate Injection USP including respiratory depression, sedation and possibly withdrawal symptoms upon cessation of Morphine Sulfate Injection USP administration to the mother, decide whether to discontinue nursing or to discontinue the drug, taking into account the importance of the drug to the mother.",
+            "parent": "8 USE IN SPECIFIC POPULATIONS"
+        },
+        {
+            "name": "8.4 Pediatric Use",
+            "text": "The safety and effectiveness of Morphine Sulfate Injection in pediatric patients below the age of 18 have not been established.",
+            "parent": "8 USE IN SPECIFIC POPULATIONS"
+        },
+        {
+            "name": "8.5 Geriatric Use",
+            "text": "The pharmacodynamic effects of morphine in the elderly are more variable than in the younger population. Older patients will vary widely in the effective initial dose, rate of development of tolerance and the frequency and magnitude of associated adverse effects as the dose is increased. Initial doses should be based on careful clinical observation following \u201ctest doses\u201d after making due allowances for the effects of the patient's age and infirmity on his/her ability to clear the drug.\nElderly patients may be more susceptible to respiratory depression and/or respiratory arrest following administration of morphine.\nIn general, use caution when selecting a dose for an elderly patient, usually starting at the low end of the dosing range, reflecting the greater frequency of decreased hepatic, renal or cardiac function and of concomitant disease or other drug therapy.",
+            "parent": "8 USE IN SPECIFIC POPULATIONS"
+        },
+        {
+            "name": "8.6 Gender",
+            "text": "While evidence of greater post-operative Morphine Sulfate Injection USP consumption in men compared to women is present in the literature, clinically significant differences in analgesic outcomes and pharmacokinetic parameters have not been consistently demonstrated.  Some studies have shown an increased sensitivity to the adverse effects of Morphine Sulfate Injection USP, including respiratory depression, in women compared to men.",
+            "parent": "8 USE IN SPECIFIC POPULATIONS"
+        },
+        {
+            "name": "8.7 Hepatic Impairment",
+            "text": "Morphine sulfate pharmacokinetics have been reported to be significantly altered in patients with cirrhosis.  Clearance was found to decrease with a corresponding increase in half-life.  The M3G and M6G to morphine AUC ratio is also decreased in these subjects, indicating diminished metabolic activity.  Start these patients cautiously with lower doses of Morphine Sulfate Injection USP and titrate slowly while carefully monitoring for side effects.",
+            "parent": "8 USE IN SPECIFIC POPULATIONS"
+        },
+        {
+            "name": "8.8 Renal Impairment",
+            "text": "Morphine sulfate pharmacokinetics are altered in patients with renal failure.  Clearance is decreased and the metabolites, M3G and M6G, may accumulate to much higher plasma levels in patients with renal failure as compared to patients with normal renal function.  Start these patients cautiously with lower doses of Morphine Sulfate Injection USP and titrate slowly while carefully monitoring for side effects.",
+            "parent": "8 USE IN SPECIFIC POPULATIONS"
+        },
+        {
+            "name": "11 DESCRIPTION",
+            "text": "Morphine sulfate, an opioid agonist, is a fine white powder. When exposed to air it gradually loses water of hydration, and darkens on prolonged exposure to light. It is soluble in water and ethanol at room temperature. It is chemically designated as 7,8-Didehydro-4,5-epoxy-17-methyl-(5\u03b1,6\u03b1)-morphinan-3,6diol sulfate (2: 1) (salt), pentahydrate, with the following structural formula:\n(C17H19NO3)2 \u2022 H2SO4 \u2022 5H2O           Molecular Weight is 758.83\nMorphine Sulfate Injection USP is a sterile, nonpyrogenic solution of Morphine Sulfate Injection USP, free of antioxidants and preservatives.\nEach 1 mL syringe contains 2 mg, 4 mg, 5 mg, 8 mg or 10 mg of Morphine Sulfate, USP in 1 mL total volume with the following inactive ingredients: for the 2 mg/mL, 4 mg/mL and 5 mg/mL, 8.4 mg sodium chloride, 2.3 mg of sodium citrate, 0.74 mg of citric acid, 0.111 mg of edetate disodium, 0.053 mg of calcium chloride and water for injection.  For the 8 mg/mL and 10 mg/mL, 7.5 mg sodium chloride, 3.45 mg of sodium citrate, 1.11 mg of citric acid, 0.111 mg of edetate disodium, 0.053 mg of calcium chloride and water for injection.",
+            "parent": null
+        },
+        {
+            "name": "12 CLINICAL PHARMACOLOGY",
+            "text": "",
+            "parent": null
+        },
+        {
+            "name": "12.1 Mechanism of Action",
+            "text": "Morphine, a full opioid agonist, is relatively selective for the m\u03bc receptor, although it can interact with other opioid receptors at higher doses. In addition to analgesia, the widely diverse effects of morphine sulfate include drowsiness, changes in mood, respiratory depression, decreased gastrointestinal motility, nausea, vomiting, and alterations of the endocrine and autonomic nervous system.",
+            "parent": "12 CLINICAL PHARMACOLOGY"
+        },
+        {
+            "name": "12.2 Pharmacodynamics",
+            "text": "Morphine concentrations are not predictive of analgesic response, especially in patients previously treated with opioids.  The minimum effective concentration varies widely and is influenced by a variety of factors, including the extent of previous opioid use, age and general medical condition.  Effective doses in tolerant patients may be significantly higher than in opioid-na\u00efve patients.\nOnset of analgesia occurs with 5-20 minutes following intramuscular administration of morphine, rising to peak analgesia sixty minutes after a single intramuscular injection.  The duration of analgesia after a single injection is usually three to four hours.  Morphine and similar opioid analgesics rapidly induce tolerance to their effects, so that the duration of analgesia may be shorter following subsequent doses of morphine.  Once patients are started on morphine, the dose required for satisfactory analgesia will rise, with the rate of development of tolerance varying depending on the patient's prior narcotic use, level of pain, degree of anxiety, use of other CNS active drugs, circulatory status, total dose and the inter-dose interval.",
+            "parent": "12 CLINICAL PHARMACOLOGY"
+        },
+        {
+            "name": "12.3 Pharmacokinetics",
+            "text": "Morphine has an apparent volume of distribution ranging from 1.0 to 4.7 L/kg after intravenous dosage.  Protein binding is low, about 36%, and muscle tissue binding is reported as 54%.  A blood-brain barrier exists, and when morphine is introduced outside of the CNS (e.g., intravenously), plasma concentrations of morphine remain higher than the corresponding CSF morphine levels.\nAverage peak morphine plasma levels of 67.4 \u00b1 22.5 ng/mL were noted around 5 to 30 minutes following intramuscular injection of 10 mg morphine sulfate from a prefilled syringe.  \nMorphine has a total plasma clearance which ranges from 0.9 to 1.2 L/kg/h (liters/kilogram/hour) in postoperative patients, but shows considerable interindividual variation.  The major pathway of clearance is hepatic glucuronidation to morphine -3-glucuronide, which is pharmacologically inactive.  The major excretion path of the conjugate is through the kidneys, with about 10% in the feces.  Morphine is also eliminated by the kidneys, 2 to 12% being excreted unchanged in the urine.  Terminal half-life is commonly reported to vary from 1.5 to 4.5 hours, although the longer half-lives were obtained when morphine levels were monitored over protracted periods with very sensitive radioimmunoassay methods.  The accepted elimination half-life in normal subjects is 1.5 to 2 hours.",
+            "parent": "12 CLINICAL PHARMACOLOGY"
+        }
+    ],
+    "previous_label_published_date": null,
+    "previous_label_spl_id": null,
+    "previous_label_spl_version": null,
+    "next_label_published_date": "2015-12-22",
+    "next_label_spl_id": "374be517-c8bd-4ecf-b9c4-bac8ed7ab2ba",
+    "next_label_spl_version": "7",
+    "diff_against_previous_label": [
+        {
+            "name": "1 INDICATIONS AND USAGE",
+            "text": [
+                [
+                    1,
+                    "Morphine sulfate is an opioid agonist indicated for the management of pain not responsive to non-narcotic analgesics.",
+                    "0"
+                ]
+            ],
+            "parent": null
+        },
+        {
+            "name": "2 DOSAGE AND ADMINISTRATION",
+            "text": [
+                [
+                    1,
+                    "\nMorphine Sulfate Injection is intended for intravenous and intramuscular administration.\n\n",
+                    "1"
+                ]
+            ],
+            "parent": null
+        },
+        {
+            "name": "2.1 General Dosing Considerations",
+            "text": [
+                [
+                    1,
+                    "Avoid Medication Errors\nMorphine Sulfate Injection is available in five concentrations for direct injection. Take care when prescribing and administering Morphine Sulfate Injection to avoid dosing errors due to confusion between different concentrations and between mg and mL, which could result in accidental overdose and death. Ensure the proper dose is communicated and dispensed. When writing prescriptions, include both the total dose in mg and total dose in volume. \nAdministration of Morphine Sulfate Injection should be limited to use by those familiar with the management of respiratory depression. Morphine must be injected slowly; rapid intravenous administration may result in chest wall rigidity.\nSelection of patients for treatment with morphine sulfate should be governed by the same principles that apply to the use of similar opioid analgesics.  Individualize treatment in every case, using non-opioid analgesics, opioids on an as needed basis and/or combination products, and chronic opioid therapy in a progressive plan of pain management such as outlined by the World Health Organization, the Agency for Healthcare Research and Quality, and the American Pain Society.",
+                    "2"
+                ]
+            ],
+            "parent": "2 DOSAGE AND ADMINISTRATION"
+        },
+        {
+            "name": "2.2 Individualization of Dosage",
+            "text": [
+                [
+                    1,
+                    "Adjust the dosing regimen for each patient individually, taking into account the patient's prior analgesic treatment experience.  In the selection of the initial dose of Morphine Sulfate Injection USP, give attention to the following:\nthe total daily dose, potency and specific characteristics of the opioid the patient has been taking previously;\nthe reliability of the relative potency estimate used to calculate the equivalent Morphine Sulfate Injection USP dose needed;\nthe patient's degree of opioid tolerance;\nthe general condition and medical status of the patient;\nconcurrent medications;\nthe type and severity of the patient's pain;\nrisk factors for abuse, addiction or diversion, including a prior history of abuse, addiction.\nThe following dosing recommendation, therefore, can only be considered suggested approaches to what is actually a series of clinical decisions over time in management of the pain of each individual patient.\nContinual re-evaluation of the patient receiving Morphine Sulfate Injection USP is important, with special attention to the management of pain and the occurrence of side effects associated with therapy.",
+                    "3"
+                ]
+            ],
+            "parent": "2 DOSAGE AND ADMINISTRATION"
+        },
+        {
+            "name": "2.3 Direct Intravenous Injection",
+            "text": [
+                [
+                    1,
+                    "The usual starting dose in adults is 0.1 mg to 0.2 mg per kg every 4 hours as needed to manage pain.\nInspect Morphine Sulfate Injection for particulate matter and discoloration prior to administration.\nAdminister the injection slowly.\nMonitor the patient closely for signs of respiratory and central nervous system depression.",
+                    "4"
+                ]
+            ],
+            "parent": "2 DOSAGE AND ADMINISTRATION"
+        },
+        {
+            "name": "2.4 Intramuscular Injection",
+            "text": [
+                [
+                    1,
+                    "The initial IM dose is 10 mg, every 4 hours as needed to manage pain (based on a 70 kg adult).\nInspect Morphine Sulfate Injection for particulate matter and discoloration prior to administration.\nMonitor the patient closely for signs of respiratory and central nervous system depression.",
+                    "5"
+                ]
+            ],
+            "parent": "2 DOSAGE AND ADMINISTRATION"
+        },
+        {
+            "name": "2.5 Dosing with Hepatic and Renal Impairment",
+            "text": [
+                [
+                    1,
+                    "Morphine Sulfate pharmacokinetics have been reported to be significantly altered in patients with cirrhosis and renal failure. Start these patients with lower doses of Morphine Sulfate Injection USP and titrate slowly while carefully monitoring for respiratory and central nervous system depression. [See Use in Specific Populations (8.7 and 8.8).]",
+                    "6"
+                ]
+            ],
+            "parent": "2 DOSAGE AND ADMINISTRATION"
+        },
+        {
+            "name": "3 DOSAGE FORMS AND STRENGTHS",
+            "text": [
+                [
+                    1,
+                    "Morphine Sulfate Injection USP is available in the following strengths for intravenous and intramuscular administration.\n2 mg/mL in 1 mL prefilled disposable syringe for IV or IM use.\n4 mg/mL in 1 mL prefilled disposable syringe for IV or IM use.\n5 mg/mL in 1 mL prefilled disposable syringe for IV or IM use.\n8 mg/mL in 1 mL prefilled disposable syringe for IV or IM use.\n10 mg/mL in 1 mL prefilled disposable syringe for IV or IM use.",
+                    "7"
+                ]
+            ],
+            "parent": null
+        },
+        {
+            "name": "8 USE IN SPECIFIC POPULATIONS",
+            "text": [
+                [
+                    1,
+                    ""
+                ]
+            ],
+            "parent": null
+        },
+        {
+            "name": "8.1 Pregnancy",
+            "text": [
+                [
+                    1,
+                    "Teratogenic Effects (Pregnancy Category C)\nNo formal studies to assess the teratogenic effects of morphine in animals have been conducted. It is also not known whether morphine can cause fetal harm when administered to a pregnant woman or can affect reproductive capacity. Morphine should be given to a pregnant woman only if clearly needed.\nIn humans, the frequency of congenital anomalies have been reported to be no greater than expected among the children of 70 women who were treated with morphine during the first four months of pregnancy or in 448 women treated with morphine anytime during pregnancy. Furthermore, no malformations were observed in the infant of a woman who attempted suicide by taking an overdose of morphine and other medication during the first trimester of pregnancy.\nSeveral literature reports indicate that morphine administered subcutaneously during the early gestational period in mice and hamsters produced neurological, soft tissue and skeletal abnormalities. With one exception, the effects that have been reported were following doses that were maternally toxic and the abnormalities noted were characteristic of those observed when maternal toxicity is present. In one study, following subcutaneous infusion of doses greater than or equal to 0.15 mg/kg to mice, exencephaly, hydronephrosis, intestinal hemorrhage, split supraoccipital, malformed sternebrae and malformed xiphoid were noted in the absence of maternal toxicity. In the hamster, morphine sulfate given subcutaneously on gestation day 8 produced exencephaly and cranioschisis. In rats treated with subcutaneous infusions of morphine during the period of organogenesis, no teratogenicity was observed.\nNo maternal toxicity was observed in this study however, increased mortality and growth retardation were seen in the offspring. In two studies performed in the rabbit, no evidence of teratogenicity was reported at subcutaneous doses up to 100 mg/kg.",
+                    "8"
+                ]
+            ],
+            "parent": "8 USE IN SPECIFIC POPULATIONS"
+        },
+        {
+            "name": "8.2 Labor and Delivery",
+            "text": [
+                [
+                    1,
+                    "Morphine readily passes into the fetal circulation and may result in respiratory depression and psycho-physiologic effects in neonates. Naloxone and resuscitative equipment should be available for reversal of narcotic-induced respiratory depression in the neonate. In addition, parenteral morphine may reduce the strength, duration and frequency of uterine contractions resulting in prolonged labor. However, this effect is not consistent and may be offset by an increased rate of cervical dilatation, which tends to shorten labor. Closely observe neonates whose mothers received opioid analgesics during labor for signs of respiratory depression.",
+                    "9"
+                ]
+            ],
+            "parent": "8 USE IN SPECIFIC POPULATIONS"
+        },
+        {
+            "name": "8.3 Nursing Mothers",
+            "text": [
+                [
+                    1,
+                    "Low levels of Morphine Sulfate Injection USP have been detected in maternal milk.  The milk:plasma morphine AUC ratio is about 2:5:1.  The amount of Morphine Sulfate Injection USP delivered to the infant depends on the plasma concentration of the mother, the amount of milk ingested by the infant and the extent of first-pass metabolism.  Because of the potential for serious adverse reactions in nursing infants from Morphine Sulfate Injection USP including respiratory depression, sedation and possibly withdrawal symptoms upon cessation of Morphine Sulfate Injection USP administration to the mother, decide whether to discontinue nursing or to discontinue the drug, taking into account the importance of the drug to the mother.",
+                    "10"
+                ]
+            ],
+            "parent": "8 USE IN SPECIFIC POPULATIONS"
+        },
+        {
+            "name": "8.4 Pediatric Use",
+            "text": [
+                [
+                    1,
+                    "The safety and effectiveness of Morphine Sulfate Injection in pediatric patients below the age of 18 have not been established.",
+                    "11"
+                ]
+            ],
+            "parent": "8 USE IN SPECIFIC POPULATIONS"
+        },
+        {
+            "name": "8.5 Geriatric Use",
+            "text": [
+                [
+                    1,
+                    "The pharmacodynamic effects of morphine in the elderly are more variable than in the younger population. Older patients will vary widely in the effective initial dose, rate of development of tolerance and the frequency and magnitude of associated adverse effects as the dose is increased. Initial doses should be based on careful clinical observation following \u201ctest doses\u201d after making due allowances for the effects of the patient's age and infirmity on his/her ability to clear the drug.\nElderly patients may be more susceptible to respiratory depression and/or respiratory arrest following administration of morphine.\nIn general, use caution when selecting a dose for an elderly patient, usually starting at the low end of the dosing range, reflecting the greater frequency of decreased hepatic, renal or cardiac function and of concomitant disease or other drug therapy.",
+                    "12"
+                ]
+            ],
+            "parent": "8 USE IN SPECIFIC POPULATIONS"
+        },
+        {
+            "name": "8.6 Gender",
+            "text": [
+                [
+                    1,
+                    "While evidence of greater post-operative Morphine Sulfate Injection USP consumption in men compared to women is present in the literature, clinically significant differences in analgesic outcomes and pharmacokinetic parameters have not been consistently demonstrated.  Some studies have shown an increased sensitivity to the adverse effects of Morphine Sulfate Injection USP, including respiratory depression, in women compared to men.",
+                    "13"
+                ]
+            ],
+            "parent": "8 USE IN SPECIFIC POPULATIONS"
+        },
+        {
+            "name": "8.7 Hepatic Impairment",
+            "text": [
+                [
+                    1,
+                    "Morphine sulfate pharmacokinetics have been reported to be significantly altered in patients with cirrhosis.  Clearance was found to decrease with a corresponding increase in half-life.  The M3G and M6G to morphine AUC ratio is also decreased in these subjects, indicating diminished metabolic activity.  Start these patients cautiously with lower doses of Morphine Sulfate Injection USP and titrate slowly while carefully monitoring for side effects.",
+                    "14"
+                ]
+            ],
+            "parent": "8 USE IN SPECIFIC POPULATIONS"
+        },
+        {
+            "name": "8.8 Renal Impairment",
+            "text": [
+                [
+                    1,
+                    "Morphine sulfate pharmacokinetics are altered in patients with renal failure.  Clearance is decreased and the metabolites, M3G and M6G, may accumulate to much higher plasma levels in patients with renal failure as compared to patients with normal renal function.  Start these patients cautiously with lower doses of Morphine Sulfate Injection USP and titrate slowly while carefully monitoring for side effects.",
+                    "15"
+                ]
+            ],
+            "parent": "8 USE IN SPECIFIC POPULATIONS"
+        },
+        {
+            "name": "11 DESCRIPTION",
+            "text": [
+                [
+                    1,
+                    "Morphine sulfate, an opioid agonist, is a fine white powder. When exposed to air it gradually loses water of hydration, and darkens on prolonged exposure to light. It is soluble in water and ethanol at room temperature. It is chemically designated as 7,8-Didehydro-4,5-epoxy-17-methyl-(5\u03b1,6\u03b1)-morphinan-3,6diol sulfate (2: 1) (salt), pentahydrate, with the following structural formula:\n(C17H19NO3)2 \u2022 H2SO4 \u2022 5H2O           Molecular Weight is 758.83\nMorphine Sulfate Injection USP is a sterile, nonpyrogenic solution of Morphine Sulfate Injection USP, free of antioxidants and preservatives.\nEach 1 mL syringe contains 2 mg, 4 mg, 5 mg, 8 mg or 10 mg of Morphine Sulfate, USP in 1 mL total volume with the following inactive ingredients: for the 2 mg/mL, 4 mg/mL and 5 mg/mL, 8.4 mg sodium chloride, 2.3 mg of sodium citrate, 0.74 mg of citric acid, 0.111 mg of edetate disodium, 0.053 mg of calcium chloride and water for injection.  For the 8 mg/mL and 10 mg/mL, 7.5 mg sodium chloride, 3.45 mg of sodium citrate, 1.11 mg of citric acid, 0.111 mg of edetate disodium, 0.053 mg of calcium chloride and water for injection.",
+                    "16"
+                ]
+            ],
+            "parent": null
+        },
+        {
+            "name": "12 CLINICAL PHARMACOLOGY",
+            "text": [
+                [
+                    1,
+                    ""
+                ]
+            ],
+            "parent": null
+        },
+        {
+            "name": "12.1 Mechanism of Action",
+            "text": [
+                [
+                    1,
+                    "Morphine, a full opioid agonist, is relatively selective for the m\u03bc receptor, although it can interact with other opioid receptors at higher doses. In addition to analgesia, the widely diverse effects of morphine sulfate include drowsiness, changes in mood, respiratory depression, decreased gastrointestinal motility, nausea, vomiting, and alterations of the endocrine and autonomic nervous system.",
+                    "17"
+                ]
+            ],
+            "parent": "12 CLINICAL PHARMACOLOGY"
+        },
+        {
+            "name": "12.2 Pharmacodynamics",
+            "text": [
+                [
+                    1,
+                    "Morphine concentrations are not predictive of analgesic response, especially in patients previously treated with opioids.  The minimum effective concentration varies widely and is influenced by a variety of factors, including the extent of previous opioid use, age and general medical condition.  Effective doses in tolerant patients may be significantly higher than in opioid-na\u00efve patients.\nOnset of analgesia occurs with 5-20 minutes following intramuscular administration of morphine, rising to peak analgesia sixty minutes after a single intramuscular injection.  The duration of analgesia after a single injection is usually three to four hours.  Morphine and similar opioid analgesics rapidly induce tolerance to their effects, so that the duration of analgesia may be shorter following subsequent doses of morphine.  Once patients are started on morphine, the dose required for satisfactory analgesia will rise, with the rate of development of tolerance varying depending on the patient's prior narcotic use, level of pain, degree of anxiety, use of other CNS active drugs, circulatory status, total dose and the inter-dose interval.",
+                    "18"
+                ]
+            ],
+            "parent": "12 CLINICAL PHARMACOLOGY"
+        },
+        {
+            "name": "12.3 Pharmacokinetics",
+            "text": [
+                [
+                    1,
+                    "Morphine has an apparent volume of distribution ranging from 1.0 to 4.7 L/kg after intravenous dosage.  Protein binding is low, about 36%, and muscle tissue binding is reported as 54%.  A blood-brain barrier exists, and when morphine is introduced outside of the CNS (e.g., intravenously), plasma concentrations of morphine remain higher than the corresponding CSF morphine levels.\nAverage peak morphine plasma levels of 67.4 \u00b1 22.5 ng/mL were noted around 5 to 30 minutes following intramuscular injection of 10 mg morphine sulfate from a prefilled syringe.  \nMorphine has a total plasma clearance which ranges from 0.9 to 1.2 L/kg/h (liters/kilogram/hour) in postoperative patients, but shows considerable interindividual variation.  The major pathway of clearance is hepatic glucuronidation to morphine -3-glucuronide, which is pharmacologically inactive.  The major excretion path of the conjugate is through the kidneys, with about 10% in the feces.  Morphine is also eliminated by the kidneys, 2 to 12% being excreted unchanged in the urine.  Terminal half-life is commonly reported to vary from 1.5 to 4.5 hours, although the longer half-lives were obtained when morphine levels were monitored over protracted periods with very sensitive radioimmunoassay methods.  The accepted elimination half-life in normal subjects is 1.5 to 2 hours.",
+                    "19"
+                ]
+            ],
+            "parent": "12 CLINICAL PHARMACOLOGY"
+        }
+    ],
+    "additions": {
+        "0": {
+            "expanded_content": "Morphine sulfate is an opioid agonist indicated for the management of pain not responsive to non-narcotic analgesics."
+        },
+        "1": {
+            "expanded_content": "\nMorphine Sulfate Injection is intended for intravenous and intramuscular administration.\n\n"
+        },
+        "2": {
+            "expanded_content": "Avoid Medication Errors\nMorphine Sulfate Injection is available in five concentrations for direct injection. Take care when prescribing and administering Morphine Sulfate Injection to avoid dosing errors due to confusion between different concentrations and between mg and mL, which could result in accidental overdose and death. Ensure the proper dose is communicated and dispensed. When writing prescriptions, include both the total dose in mg and total dose in volume. \nAdministration of Morphine Sulfate Injection should be limited to use by those familiar with the management of respiratory depression. Morphine must be injected slowly; rapid intravenous administration may result in chest wall rigidity.\nSelection of patients for treatment with morphine sulfate should be governed by the same principles that apply to the use of similar opioid analgesics.  Individualize treatment in every case, using non-opioid analgesics, opioids on an as needed basis and/or combination products, and chronic opioid therapy in a progressive plan of pain management such as outlined by the World Health Organization, the Agency for Healthcare Research and Quality, and the American Pain Society."
+        },
+        "3": {
+            "expanded_content": "Adjust the dosing regimen for each patient individually, taking into account the patient's prior analgesic treatment experience.  In the selection of the initial dose of Morphine Sulfate Injection USP, give attention to the following:\nthe total daily dose, potency and specific characteristics of the opioid the patient has been taking previously;\nthe reliability of the relative potency estimate used to calculate the equivalent Morphine Sulfate Injection USP dose needed;\nthe patient's degree of opioid tolerance;\nthe general condition and medical status of the patient;\nconcurrent medications;\nthe type and severity of the patient's pain;\nrisk factors for abuse, addiction or diversion, including a prior history of abuse, addiction.\nThe following dosing recommendation, therefore, can only be considered suggested approaches to what is actually a series of clinical decisions over time in management of the pain of each individual patient.\nContinual re-evaluation of the patient receiving Morphine Sulfate Injection USP is important, with special attention to the management of pain and the occurrence of side effects associated with therapy."
+        },
+        "4": {
+            "expanded_content": "The usual starting dose in adults is 0.1 mg to 0.2 mg per kg every 4 hours as needed to manage pain.\nInspect Morphine Sulfate Injection for particulate matter and discoloration prior to administration.\nAdminister the injection slowly.\nMonitor the patient closely for signs of respiratory and central nervous system depression."
+        },
+        "5": {
+            "expanded_content": "The initial IM dose is 10 mg, every 4 hours as needed to manage pain (based on a 70 kg adult).\nInspect Morphine Sulfate Injection for particulate matter and discoloration prior to administration.\nMonitor the patient closely for signs of respiratory and central nervous system depression."
+        },
+        "6": {
+            "expanded_content": "Morphine Sulfate pharmacokinetics have been reported to be significantly altered in patients with cirrhosis and renal failure. Start these patients with lower doses of Morphine Sulfate Injection USP and titrate slowly while carefully monitoring for respiratory and central nervous system depression. [See Use in Specific Populations (8.7 and 8.8).]"
+        },
+        "7": {
+            "expanded_content": "Morphine Sulfate Injection USP is available in the following strengths for intravenous and intramuscular administration.\n2 mg/mL in 1 mL prefilled disposable syringe for IV or IM use.\n4 mg/mL in 1 mL prefilled disposable syringe for IV or IM use.\n5 mg/mL in 1 mL prefilled disposable syringe for IV or IM use.\n8 mg/mL in 1 mL prefilled disposable syringe for IV or IM use.\n10 mg/mL in 1 mL prefilled disposable syringe for IV or IM use."
+        },
+        "8": {
+            "expanded_content": "Teratogenic Effects (Pregnancy Category C)\nNo formal studies to assess the teratogenic effects of morphine in animals have been conducted. It is also not known whether morphine can cause fetal harm when administered to a pregnant woman or can affect reproductive capacity. Morphine should be given to a pregnant woman only if clearly needed.\nIn humans, the frequency of congenital anomalies have been reported to be no greater than expected among the children of 70 women who were treated with morphine during the first four months of pregnancy or in 448 women treated with morphine anytime during pregnancy. Furthermore, no malformations were observed in the infant of a woman who attempted suicide by taking an overdose of morphine and other medication during the first trimester of pregnancy.\nSeveral literature reports indicate that morphine administered subcutaneously during the early gestational period in mice and hamsters produced neurological, soft tissue and skeletal abnormalities. With one exception, the effects that have been reported were following doses that were maternally toxic and the abnormalities noted were characteristic of those observed when maternal toxicity is present. In one study, following subcutaneous infusion of doses greater than or equal to 0.15 mg/kg to mice, exencephaly, hydronephrosis, intestinal hemorrhage, split supraoccipital, malformed sternebrae and malformed xiphoid were noted in the absence of maternal toxicity. In the hamster, morphine sulfate given subcutaneously on gestation day 8 produced exencephaly and cranioschisis. In rats treated with subcutaneous infusions of morphine during the period of organogenesis, no teratogenicity was observed.\nNo maternal toxicity was observed in this study however, increased mortality and growth retardation were seen in the offspring. In two studies performed in the rabbit, no evidence of teratogenicity was reported at subcutaneous doses up to 100 mg/kg."
+        },
+        "9": {
+            "expanded_content": "Morphine readily passes into the fetal circulation and may result in respiratory depression and psycho-physiologic effects in neonates. Naloxone and resuscitative equipment should be available for reversal of narcotic-induced respiratory depression in the neonate. In addition, parenteral morphine may reduce the strength, duration and frequency of uterine contractions resulting in prolonged labor. However, this effect is not consistent and may be offset by an increased rate of cervical dilatation, which tends to shorten labor. Closely observe neonates whose mothers received opioid analgesics during labor for signs of respiratory depression."
+        },
+        "10": {
+            "expanded_content": "Low levels of Morphine Sulfate Injection USP have been detected in maternal milk.  The milk:plasma morphine AUC ratio is about 2:5:1.  The amount of Morphine Sulfate Injection USP delivered to the infant depends on the plasma concentration of the mother, the amount of milk ingested by the infant and the extent of first-pass metabolism.  Because of the potential for serious adverse reactions in nursing infants from Morphine Sulfate Injection USP including respiratory depression, sedation and possibly withdrawal symptoms upon cessation of Morphine Sulfate Injection USP administration to the mother, decide whether to discontinue nursing or to discontinue the drug, taking into account the importance of the drug to the mother."
+        },
+        "11": {
+            "expanded_content": "The safety and effectiveness of Morphine Sulfate Injection in pediatric patients below the age of 18 have not been established."
+        },
+        "12": {
+            "expanded_content": "The pharmacodynamic effects of morphine in the elderly are more variable than in the younger population. Older patients will vary widely in the effective initial dose, rate of development of tolerance and the frequency and magnitude of associated adverse effects as the dose is increased. Initial doses should be based on careful clinical observation following \u201ctest doses\u201d after making due allowances for the effects of the patient's age and infirmity on his/her ability to clear the drug.\nElderly patients may be more susceptible to respiratory depression and/or respiratory arrest following administration of morphine.\nIn general, use caution when selecting a dose for an elderly patient, usually starting at the low end of the dosing range, reflecting the greater frequency of decreased hepatic, renal or cardiac function and of concomitant disease or other drug therapy."
+        },
+        "13": {
+            "expanded_content": "While evidence of greater post-operative Morphine Sulfate Injection USP consumption in men compared to women is present in the literature, clinically significant differences in analgesic outcomes and pharmacokinetic parameters have not been consistently demonstrated.  Some studies have shown an increased sensitivity to the adverse effects of Morphine Sulfate Injection USP, including respiratory depression, in women compared to men."
+        },
+        "14": {
+            "expanded_content": "Morphine sulfate pharmacokinetics have been reported to be significantly altered in patients with cirrhosis.  Clearance was found to decrease with a corresponding increase in half-life.  The M3G and M6G to morphine AUC ratio is also decreased in these subjects, indicating diminished metabolic activity.  Start these patients cautiously with lower doses of Morphine Sulfate Injection USP and titrate slowly while carefully monitoring for side effects."
+        },
+        "15": {
+            "expanded_content": "Morphine sulfate pharmacokinetics are altered in patients with renal failure.  Clearance is decreased and the metabolites, M3G and M6G, may accumulate to much higher plasma levels in patients with renal failure as compared to patients with normal renal function.  Start these patients cautiously with lower doses of Morphine Sulfate Injection USP and titrate slowly while carefully monitoring for side effects."
+        },
+        "16": {
+            "expanded_content": "Morphine sulfate, an opioid agonist, is a fine white powder. When exposed to air it gradually loses water of hydration, and darkens on prolonged exposure to light. It is soluble in water and ethanol at room temperature. It is chemically designated as 7,8-Didehydro-4,5-epoxy-17-methyl-(5\u03b1,6\u03b1)-morphinan-3,6diol sulfate (2: 1) (salt), pentahydrate, with the following structural formula:\n(C17H19NO3)2 \u2022 H2SO4 \u2022 5H2O           Molecular Weight is 758.83\nMorphine Sulfate Injection USP is a sterile, nonpyrogenic solution of Morphine Sulfate Injection USP, free of antioxidants and preservatives.\nEach 1 mL syringe contains 2 mg, 4 mg, 5 mg, 8 mg or 10 mg of Morphine Sulfate, USP in 1 mL total volume with the following inactive ingredients: for the 2 mg/mL, 4 mg/mL and 5 mg/mL, 8.4 mg sodium chloride, 2.3 mg of sodium citrate, 0.74 mg of citric acid, 0.111 mg of edetate disodium, 0.053 mg of calcium chloride and water for injection.  For the 8 mg/mL and 10 mg/mL, 7.5 mg sodium chloride, 3.45 mg of sodium citrate, 1.11 mg of citric acid, 0.111 mg of edetate disodium, 0.053 mg of calcium chloride and water for injection."
+        },
+        "17": {
+            "expanded_content": "Morphine, a full opioid agonist, is relatively selective for the m\u03bc receptor, although it can interact with other opioid receptors at higher doses. In addition to analgesia, the widely diverse effects of morphine sulfate include drowsiness, changes in mood, respiratory depression, decreased gastrointestinal motility, nausea, vomiting, and alterations of the endocrine and autonomic nervous system."
+        },
+        "18": {
+            "expanded_content": "Morphine concentrations are not predictive of analgesic response, especially in patients previously treated with opioids.  The minimum effective concentration varies widely and is influenced by a variety of factors, including the extent of previous opioid use, age and general medical condition.  Effective doses in tolerant patients may be significantly higher than in opioid-na\u00efve patients.\nOnset of analgesia occurs with 5-20 minutes following intramuscular administration of morphine, rising to peak analgesia sixty minutes after a single intramuscular injection.  The duration of analgesia after a single injection is usually three to four hours.  Morphine and similar opioid analgesics rapidly induce tolerance to their effects, so that the duration of analgesia may be shorter following subsequent doses of morphine.  Once patients are started on morphine, the dose required for satisfactory analgesia will rise, with the rate of development of tolerance varying depending on the patient's prior narcotic use, level of pain, degree of anxiety, use of other CNS active drugs, circulatory status, total dose and the inter-dose interval."
+        },
+        "19": {
+            "expanded_content": "Morphine has an apparent volume of distribution ranging from 1.0 to 4.7 L/kg after intravenous dosage.  Protein binding is low, about 36%, and muscle tissue binding is reported as 54%.  A blood-brain barrier exists, and when morphine is introduced outside of the CNS (e.g., intravenously), plasma concentrations of morphine remain higher than the corresponding CSF morphine levels.\nAverage peak morphine plasma levels of 67.4 \u00b1 22.5 ng/mL were noted around 5 to 30 minutes following intramuscular injection of 10 mg morphine sulfate from a prefilled syringe.  \nMorphine has a total plasma clearance which ranges from 0.9 to 1.2 L/kg/h (liters/kilogram/hour) in postoperative patients, but shows considerable interindividual variation.  The major pathway of clearance is hepatic glucuronidation to morphine -3-glucuronide, which is pharmacologically inactive.  The major excretion path of the conjugate is through the kidneys, with about 10% in the feces.  Morphine is also eliminated by the kidneys, 2 to 12% being excreted unchanged in the urine.  Terminal half-life is commonly reported to vary from 1.5 to 4.5 hours, although the longer half-lives were obtained when morphine levels were monitored over protracted periods with very sensitive radioimmunoassay methods.  The accepted elimination half-life in normal subjects is 1.5 to 2 hours."
+        }
+    },
+    "nda_to_patent": [
+        {
+            "application_number": "NDA204223",
+            "patents": [
+                "9192608",
+                "9248229",
+                "9072781"
+            ]
+        }
+    ]
+}

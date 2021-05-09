@@ -3,16 +3,11 @@ import diff_match_patch as dmp_module
 import re
 from itertools import groupby
 
-from db.mongo import connect_mongo, update_db
 from utils import misc
 from utils.logging import getLogger
 
 _logger = getLogger(__name__)
-dmp = dmp_module.diff_match_patch()
-
-# Store name string and MongoDB collection object for Label collection
-_label_collection_name = None
-_label_collection = None
+_dmp = dmp_module.diff_match_patch()
 
 
 def add_previous_and_next_labels(docs):
@@ -75,83 +70,10 @@ def add_previous_and_next_labels(docs):
 
 
 def get_diff(a, b):
-    diff = dmp.diff_main(a, b)
-    dmp.diff_cleanupSemantic(diff)
+    diff = _dmp.diff_main(a, b)
+    _dmp.diff_cleanupSemantic(diff)
     diff = [list(x) for x in diff]
     return diff
-
-
-# def remove_newlines(docs):
-#     """
-#     This function removes all newlines in docs[X]['sections']['text'],
-#     since bs4 text features inserts newlines for certain XML in odd locations.
-
-#     Parameters:
-#         docs (list): list of label docs from MongoDB having the same
-#         application_numbers
-#     """
-#     for doc in docs:
-#         for section in doc["sections"]:
-#             section["text"] = " ".join(section["text"].split())
-#     return docs
-
-
-def drop_sections(docs):
-    """
-    This function drop sections that are uninteresting for the customer.
-
-    Parameters:
-        docs (list): list of label docs from MongoDB having the same
-        application_numbers
-    """
-    LABEL_SECTIONS = [
-        "INDICATIONS AND USAGE",
-        "DOSAGE FORMS AND STRENGTHS",
-        "DESCRIPTION",
-        "INDICATIONS",
-        "ACTIVE INGREDIENT",
-        "INACTIVE INGREDIENTS",
-        "PURPOSE",
-        "DIRECTIONS",
-        "USE",
-    ]
-
-    for doc in docs:
-        for i in reversed(range(len(doc["sections"]))):
-
-            title_match_text = " ".join(
-                (
-                    doc["sections"][i]["name"]
-                    .upper()
-                    .replace("&", "AND")
-                    .replace("\t", " ")
-                    .lstrip("0123456789. ")
-                ).split()
-            )
-
-            if doc["sections"][i]["parent"]:
-                parent_title_match_text = " ".join(
-                    (
-                        doc["sections"][i]["parent"]
-                        .upper()
-                        .replace("&", "AND")
-                        .replace("\t", " ")
-                        .lstrip("0123456789. ")
-                    ).split()
-                )
-            else:
-                parent_title_match_text = ""
-
-            if not any(
-                [title_match_text in x for x in LABEL_SECTIONS]
-                + [
-                    parent_title_match_text in x
-                    for x in LABEL_SECTIONS
-                    if doc["sections"][i]["parent"]
-                ]
-            ):
-                del doc["sections"][i]
-    return docs
 
 
 def add_diff_against_previous_label(docs):
@@ -457,20 +379,7 @@ def gather_additions(docs):
                         # the scores are mock data at the moment
                         doc["additions"][str(additions_num)] = {
                             "expanded_content": rebuilt_string,
-                            "scores": [
-                                # {
-                                #     "patent_number": "5202128",
-                                #     "claim_number": 6,
-                                #     "parent_claim_numbers": [1, 5],
-                                #     "score": 0.8,
-                                # },
-                                # {
-                                #     "patent_number": "5202128",
-                                #     "claim_number": 5,
-                                #     "parent_claim_numbers": [1],
-                                #     "score": 0.5,
-                                # },
-                            ],
+                            "scores": [],
                         }
                         diff["text"][j].append(str(additions_num))
                         additions_num += 1
@@ -502,49 +411,34 @@ def group_label_docs_by_set_id(docs):
     return return_list
 
 
-def setup_MongoDB(label_collection_name, alt_db_name=""):
-    """
-    This method sets up the MongoDB connection for all methods for this module.
-
-    Parameters:
-        label_collection_name (String): name of the label collection
-        alt_db_name (String): this is an optional argument that will set the
-                    db_name to a value other than the value in the .env file.
-    """
-    db = connect_mongo(alt_db_name)
-    global _label_collection_name, _label_collection
-    _label_collection_name = label_collection_name
-    _label_collection = db[label_collection_name]
-
-
 def run_diff(
-    label_collection_name,
+    mongo_client,
     processed_label_ids_file,
     processed_nda_file,
     unprocessed_label_ids_file,
-    alt_db_name="",
 ):
     """
     This method calls other methods in this module and tracks completed
     label IDs and completed NDA numbers.
 
     Parameters:
-        label_collection_name (String): name of the label collection
+        mongo_client (object): MongoClient object with database and collections
         processed_label_ids_file (Path): location to store processed ids
         processed_nda_file (Path): location to store processed NDAs
-        alt_db_name (String): This is an optional argument that will set the
-                    db_name to a value other than the value in the .env file.
-                    Used mainly for unit-tests.
+        unprocessed_label_ids_file (Path): location to store unprocessed ids
     """
-    setup_MongoDB(label_collection_name, alt_db_name)
+    label_collection = mongo_client.label_collection
 
     # open processed_label_id_file and return a list of processed _id string
-    processed_label_ids = misc.get_lines_in_file(processed_label_ids_file)
+    if processed_label_ids_file:
+        processed_label_ids = misc.get_lines_in_file(processed_label_ids_file)
+    else:
+        processed_label_ids = []
 
     # get list of label_id strings excluding any string in processed_label_id
     all_label_ids = [
         x
-        for x in [str(y) for y in _label_collection.distinct("_id", {})]
+        for x in [str(y) for y in label_collection.distinct("_id", {})]
         if x not in processed_label_ids
     ]
 
@@ -555,14 +449,15 @@ def run_diff(
         if label_index >= len(all_label_ids):
             # all labels were traversed, remaining labels have no
             # application_numbers; store unprocessed label_ids to disk
-            misc.append_to_file(unprocessed_label_ids_file, all_label_ids)
+            if unprocessed_label_ids_file:
+                misc.append_to_file(unprocessed_label_ids_file, all_label_ids)
             break
 
         # pick label_id
         label_id_str = str(all_label_ids[label_index])
 
         # get a list of NDA numbers (ex. ['NDA019501',]) associated with _id
-        application_numbers = _label_collection.find_one(
+        application_numbers = label_collection.find_one(
             {"_id": ObjectId(label_id_str)},
             {"_id": 0, "application_numbers": 1},
         )["application_numbers"]
@@ -575,10 +470,8 @@ def run_diff(
         # find all other docs with the same list of NDA numbers
         # len(similar_label_docs) is at least 1
         similar_label_docs = list(
-            _label_collection.find({"application_numbers": application_numbers})
+            label_collection.find({"application_numbers": application_numbers})
         )
-        # similar_label_docs = remove_newlines(similar_label_docs)
-        similar_label_docs = drop_sections(similar_label_docs)
 
         groups_by_set_id = group_label_docs_by_set_id(similar_label_docs)
         for set_id_group in groups_by_set_id:
@@ -596,7 +489,9 @@ def run_diff(
             item for sublist in groups_by_set_id for item in sublist
         ]
 
-        update_db(_label_collection_name, similar_label_docs, alt_db_name)
+        mongo_client.update_db(
+            mongo_client.label_collection_name, similar_label_docs
+        )
 
         similar_label_docs_ids = [str(x["_id"]) for x in similar_label_docs]
 
@@ -605,5 +500,11 @@ def run_diff(
             x for x in all_label_ids if x not in similar_label_docs_ids
         ]
         # store processed_label_ids and processed application_numbers to disk
-        misc.append_to_file(processed_label_ids_file, similar_label_docs_ids)
-        misc.append_to_file(processed_nda_file, str(application_numbers)[1:-1])
+        if processed_label_ids_file:
+            misc.append_to_file(
+                processed_label_ids_file, similar_label_docs_ids
+            )
+        if processed_nda_file:
+            misc.append_to_file(
+                processed_nda_file, str(application_numbers)[1:-1]
+            )
