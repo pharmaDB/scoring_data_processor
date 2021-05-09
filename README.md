@@ -87,6 +87,10 @@ These outputs will require confirmation if the file already exists, so use the f
 
 `yes | python3 main.py -ob -an -ap -apj -mn -mp -mpj`
 
+To output all addition and patent claim set from the database excluding all scores.
+
+`python3 main.py -db2file`
+
 To read help:
 
 `python3 main.py -h`
