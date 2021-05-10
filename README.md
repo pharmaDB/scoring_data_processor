@@ -203,7 +203,7 @@ A compressed version of the export with stale data is located at `analysis/hoste
 
 The zipped file can be hosted on a webserver that can be started with:
 
-`nohup python3 server.py &`
+`sudo nohup python3 server.py &`
 
 ## Running the Tests
 
