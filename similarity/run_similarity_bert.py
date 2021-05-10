@@ -2,6 +2,7 @@ from collections import OrderedDict
 from bson.objectid import ObjectId
 from sentence_transformers import SentenceTransformer, util
 import html
+import os
 
 from orangebook.merge import OrangeBookMap
 from similarity.claim_dependency import get_parent_claims
@@ -19,29 +20,6 @@ _model = SentenceTransformer("stsb-mpnet-base-v2", device=_device)
 # print("Max Sequence Length:", model.max_seq_length)
 _model.max_seq_length = 512
 _model.eval()
-
-
-def add_patent_map(docs, application_numbers):
-    """
-    Add to each doc in docs a mapping to patents for each NDA
-
-    Parameters:
-        docs (list): list of label docs from MongoDB having the same
-                     application_numbers
-        application_numbers (list): a list of application numbers such as
-                                    ['NDA204223',]
-    """
-    ob = OrangeBookMap()
-    all_patents = [
-        {
-            "application_number": str(nda),
-            "patents": ob.get_patents(misc.get_num_in_str(nda)),
-        }
-        for nda in application_numbers
-    ]
-    for doc in docs:
-        doc["nda_to_patent"] = all_patents
-    return docs
 
 
 def get_claims_in_patents_db(mongo_client, all_patents):
@@ -331,6 +309,13 @@ def run_similarity(
         if x not in processed_label_ids
     ]
 
+    if unprocessed_label_ids_file and os.path.exists(
+        unprocessed_label_ids_file
+    ):
+        os.remove(unprocessed_label_ids_file)
+    if unprocessed_nda_file and os.path.exists(unprocessed_nda_file):
+        os.remove(unprocessed_nda_file)
+
     label_index = 0
 
     # loop through all_label_ids, popping off label_ids after diffing sections
@@ -362,11 +347,6 @@ def run_similarity(
             label_collection.find({"application_numbers": application_numbers})
         )
 
-        # add mapping at end of label
-        similar_label_docs = add_patent_map(
-            similar_label_docs, application_numbers
-        )
-
         # patent_list = [[patent_num, claim_num, parent_clm_list, claim_text],]
         patent_list = patent_claims_from_NDA(mongo_client, application_numbers)
         # additions_list = [expanded_content, expanded_content...]
@@ -382,6 +362,11 @@ def run_similarity(
 
                 similar_label_docs = additions_in_diff_against_previous_label(
                     similar_label_docs
+                )
+
+                # update MongoDB
+                mongo_client.update_db(
+                    label_collection_name, similar_label_docs
                 )
 
             # store processed_label_ids & processed application_numbers to disk
@@ -404,9 +389,6 @@ def run_similarity(
                 misc.append_to_file(
                     unprocessed_nda_file, str(application_numbers)[1:-1]
                 )
-
-        # update MongoDB
-        mongo_client.update_db(label_collection_name, similar_label_docs)
 
         # remove similar_label_docs_ids from all_label_ids
         all_label_ids = [

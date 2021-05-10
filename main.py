@@ -8,7 +8,11 @@ from diff import run_diff
 from db.mongo import MongoClient
 from utils.logging import getLogger
 from utils import fetch
-from export import get_files_from_db, export_lists
+from export import (
+    get_files_from_db,
+    export_lists,
+    export_label_collection_as_csv_zip,
+)
 
 _logger = getLogger("main")
 
@@ -207,10 +211,26 @@ def parse_args():
         type=Path,
         const=Path(__file__).absolute().parent / "analysis" / "db2file",
         help=(
-            "Output list of additions and patent claim sets from the database to"
-            " Folder_Name. If unset, Folder_Name is '/analysis/db2file/'."
+            "Output list of additions and patent claim sets from the database "
+            "to Folder_Name. If unset, Folder_Name is '/analysis/db2file/'."
         ),
         metavar=("Folder_Name"),
+    )
+
+    parser.add_argument(
+        "-db2csv",
+        "--db2csv",
+        nargs="?",
+        type=Path,
+        const=Path(__file__).absolute().parent
+        / "assets"
+        / "hosted_folder"
+        / "db2csv.csv",
+        help=(
+            "Output the entire database to a csv file File_Name. If unset"
+            ", File_Name is '/assets/hosted_folder/db2csv.csv'."
+        ),
+        metavar=("File_Name"),
     )
 
     return parser.parse_args()
@@ -289,8 +309,7 @@ if __name__ == "__main__":
         # for case when no optional arguments are passed
         run_diff_and_similarity = True
 
-    if run_diff_and_similarity:
-
+    if run_diff_and_similarity or args.db2csv:
         run_diff.run_diff(
             mongo_client,
             PROCESSED_ID_DIFF_FILE,
@@ -311,7 +330,7 @@ if __name__ == "__main__":
             UNPROCESSED_NDA_SIMILARITY_FILE,
         )
 
-    if args.diff or args.db2file:
+    elif args.diff or args.db2file:
         run_diff.run_diff(
             mongo_client,
             PROCESSED_ID_DIFF_FILE,
@@ -321,3 +340,8 @@ if __name__ == "__main__":
 
     if args.db2file:
         get_files_from_db.get_files_from_db(mongo_client, args.db2file)
+
+    if args.db2csv:
+        export_label_collection_as_csv_zip.run_export_csv_zip(
+            mongo_client, args.db2csv
+        )

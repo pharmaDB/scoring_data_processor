@@ -12,8 +12,7 @@ from pathlib import Path
 
 from similarity.claim_dependency import dependent_to_independent_claim
 from orangebook.merge import OrangeBookMap
-from diff.run_diff import group_label_docs_by_set_id
-from similarity.run_similarity_bert import add_patent_map
+from diff.run_diff import group_label_docs_by_set_id, add_patent_map
 from utils import misc
 from utils.logging import getLogger
 
@@ -226,8 +225,7 @@ def get_files_from_db(mongo_client, db2file_folder):
     while len(all_label_ids) > 0:
         if label_index >= len(all_label_ids):
             # all labels were traversed, remaining labels have no
-            # application_numbers; store unprocessed label_ids to disk
-            misc.append_to_file("log_db2file/unprocessed_ids", all_label_ids)
+            # application_numbers
             break
 
         # pick label_id

@@ -1,6 +1,7 @@
 from bson.objectid import ObjectId
 import diff_match_patch as dmp_module
 import re
+import os
 from itertools import groupby
 
 from utils import misc
@@ -411,6 +412,29 @@ def group_label_docs_by_set_id(docs):
     return return_list
 
 
+def add_patent_map(docs, application_numbers):
+    """
+    Add to each doc in docs a mapping to patents for each NDA
+
+    Parameters:
+        docs (list): list of label docs from MongoDB having the same
+                     application_numbers
+        application_numbers (list): a list of application numbers such as
+                                    ['NDA204223',]
+    """
+    ob = OrangeBookMap()
+    all_patents = [
+        {
+            "application_number": str(nda),
+            "patents": ob.get_patents(misc.get_num_in_str(nda)),
+        }
+        for nda in application_numbers
+    ]
+    for doc in docs:
+        doc["nda_to_patent"] = all_patents
+    return docs
+
+
 def run_diff(
     mongo_client,
     processed_label_ids_file,
@@ -450,6 +474,7 @@ def run_diff(
             # all labels were traversed, remaining labels have no
             # application_numbers; store unprocessed label_ids to disk
             if unprocessed_label_ids_file:
+                os.remove(unprocessed_label_ids_file)
                 misc.append_to_file(unprocessed_label_ids_file, all_label_ids)
             break
 
@@ -488,6 +513,11 @@ def run_diff(
         similar_label_docs = [
             item for sublist in groups_by_set_id for item in sublist
         ]
+
+        # add mapping at end of label
+        similar_label_docs = add_patent_map(
+            similar_label_docs, application_numbers
+        )
 
         mongo_client.update_db(
             mongo_client.label_collection_name, similar_label_docs

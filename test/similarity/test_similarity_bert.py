@@ -14,11 +14,11 @@ class Test_run_similarity(unittest.TestCase):
     mongo_client = MongoClient("labels", "patents", "unittest")
     mongo_client.label_collection_name
     mongo_client.reimport_collection(
-        mongo_client.label_collection_name, "assets/database_before/labels.json"
+        mongo_client.label_collection_name, "assets/database_testing/labels.json"
     )
     mongo_client.reimport_collection(
         mongo_client.patent_collection_name,
-        "assets/database_before/patents.json",
+        "assets/database_testing/patents.json",
     )
     run_diff(mongo_client, None, None, None)
 

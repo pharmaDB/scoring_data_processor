@@ -171,15 +171,39 @@ These outputs will require confirmation if the file already exists, so use the f
 
 `yes | python3 main.py -ob -an -ap -apj -mn -mp -mpj`
 
-To output all addition and patent claim set from the database excluding all scores.
-
-`python3 main.py -db2file`
-
-Alternatively, a compressed version of the export with stale data is located at `analysis/db2file.tar.gz`
 
 To read help:
 
 `python3 main.py -h`
+
+
+## Exporting Database
+
+### Export To Folder
+
+To output all addition and patent claim set from the database excluding all scores into folders.
+
+`python3 main.py -db2file <folder_name>`
+
+If `<folder_name>` is not set, file is stored in the `analysis` folder.
+
+Alternatively, a compressed version of the export with stale data is located at `analysis/db2file.tar.gz`
+
+### Export To CSV (Zipped)
+
+To output all addition and patent claim set from the database including all scores into a single `.csv` file.
+
+`python3 main.py -db2csv <filename>`
+
+The `<filename>` is optional.  If not set folder is stored in `/assets/hosted_folder/db2csv.zip`.
+
+A compressed version of the export with stale data is located at `analysis/hosted_folder/db2csv.zip`
+
+### Hosting CSV (Zipped)
+
+The zipped file can be hosted on a webserver that can be started with:
+
+`nohup python3 server.py &`
 
 ## Running the Tests
 
