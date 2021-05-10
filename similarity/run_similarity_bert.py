@@ -287,6 +287,7 @@ def additions_in_diff_against_previous_label(docs):
                     if text[0] == 1 and len(text) > 2 and text[2]:
                         text = text[:3]
                         text.append(doc["additions"][text[2]])
+    return docs
 
 
 def run_similarity(
@@ -372,7 +373,9 @@ def run_similarity(
                     similar_label_docs, additions_list, patent_list
                 )
 
-                additions_in_diff_against_previous_label(similar_label_docs)
+                similar_label_docs = additions_in_diff_against_previous_label(
+                    similar_label_docs
+                )
 
             # store processed_label_ids & processed application_numbers to disk
             if processed_label_ids_file:
@@ -396,9 +399,7 @@ def run_similarity(
                 )
 
         # update MongoDB
-        mongo_client.update_db(
-            label_collection_name, similar_label_docs
-        )
+        mongo_client.update_db(label_collection_name, similar_label_docs)
 
         # remove similar_label_docs_ids from all_label_ids
         all_label_ids = [
