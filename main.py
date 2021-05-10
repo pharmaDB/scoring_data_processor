@@ -229,19 +229,26 @@ if __name__ == "__main__":
         file_path = fetch.download(url, ORANGE_BOOK_FOLDER)
         fetch.extract_and_clean(file_path)
 
-    # export all patents or NDA from the Orange Book
-    if args.all_NDA_from_Orange_Book:
-        export_lists.export_all_NDA(args.all_NDA_from_Orange_Book)
-    if args.all_patents_from_Orange_Book:
-        export_lists.export_all_patents(args.all_patents_from_Orange_Book)
-    if args.all_patents_from_Orange_Book_json:
-        export_lists.export_all_patents(
-            args.all_patents_from_Orange_Book_json, True
-        )
-
     label_collection_name = _config["MONGODB_LABEL_COLLECTION_NAME"]
     patent_collection_name = _config["MONGODB_PATENT_COLLECTION_NAME"]
-    mongo_client = MongoClient(label_collection_name, patent_collection_name)
+    orange_book_collection_name = _config["MONGODB_ORANGE_BOOK_COLLECTION_NAME"]
+    mongo_client = MongoClient(
+        label_collection_name,
+        patent_collection_name,
+        orange_book_collection_name,
+    )
+
+    # export all patents or NDA from the Orange Book
+    if args.all_NDA_from_Orange_Book:
+        export_lists.export_all_NDA(mongo_client, args.all_NDA_from_Orange_Book)
+    if args.all_patents_from_Orange_Book:
+        export_lists.export_all_patents(
+            mongo_client, args.all_patents_from_Orange_Book
+        )
+    if args.all_patents_from_Orange_Book_json:
+        export_lists.export_all_patents(
+            mongo_client, args.all_patents_from_Orange_Book_json, True
+        )
 
     # reimport of label or patent collections; for development
     if args.reimport_labels:

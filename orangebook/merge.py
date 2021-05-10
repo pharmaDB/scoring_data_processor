@@ -56,9 +56,48 @@ def _merge_all_csv():
     return df_joined
 
 
+def _get_all_associations_from_mongo(mongo_client):
+    """Queries the OrangeBook collection in MongoDB, returning a
+    dataframe with columns (nda, patent)
+
+    Args:
+        mongo_client (MongoClient): The mongo DB client initialized with the
+                                    expected credentials
+
+    Returns:
+        pandas.DataFrame: Dataframe with columns "nda" and "patent" from the
+                          OrangeBook data in the MongoDB
+    """
+    # Get all documents from MongoDB
+    docs = mongo_client.orange_book_collection.find()
+    if not docs.count():
+        # Compile the OrangeBook locally, if no data found in MongoDB
+        return _merge_all_csv()
+    ndas, patents = [], []
+    for doc in docs:
+        ndas.append(int(doc["nda"]))
+        patents.append(str(doc["patent_num"]))
+    df = pd.DataFrame(data={"nda": ndas, "patent": patents})
+    return df
+
+
 class OrangeBookMap:
-    _groups_groupby_NDA = _merge_all_csv().groupby(["nda"])
-    _groups_groupby_patent = _merge_all_csv().groupby(["patent"])
+    _groups_groupby_NDA = None
+    _groups_groupby_patent = None
+
+    def __init__(self, mongo_client):
+        # Initialize class attributes
+        if (
+            OrangeBookMap._groups_groupby_NDA is None
+            or OrangeBookMap._groups_groupby_patent is None
+        ):
+            orange_book_data = _get_all_associations_from_mongo(mongo_client)
+            OrangeBookMap._groups_groupby_NDA = orange_book_data.groupby(
+                ["nda"]
+            )
+            OrangeBookMap._groups_groupby_patent = orange_book_data.groupby(
+                ["patent"]
+            )
 
     def get_patents(self, nda):
         """Returns a list of patent numbers given an NDA number.
@@ -67,7 +106,9 @@ class OrangeBookMap:
             nda (int or string): the number portion of an NDA number or string
         """
         try:
-            return self._groups_groupby_NDA.get_group(int(nda))["patent"].tolist()
+            return self._groups_groupby_NDA.get_group(int(nda))[
+                "patent"
+            ].tolist()
         except KeyError:
             return []
 

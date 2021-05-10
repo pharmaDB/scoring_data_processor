@@ -21,6 +21,7 @@ class MongoClient:
         self,
         label_collection_name,
         patent_collection_name,
+        orange_book_collection_name,
         alt_db_name=None,
     ):
         """
@@ -30,14 +31,17 @@ class MongoClient:
         Parameters:
             label_collection_name (String): name of the label collection
             patent_collection_name (String): name of the patent collection
+            orange_book_collection_name (String): name of the orangebook collection
             alt_db_name (String): name of database if different from the one in
                                   `.env`. Used mainly for unit-tests.
         """
         self.db = connect_mongo(alt_db_name)
         self.label_collection_name = label_collection_name
         self.patent_collection_name = patent_collection_name
+        self.orange_book_collection_name = orange_book_collection_name
         self.label_collection = self.db[self.label_collection_name]
         self.patent_collection = self.db[self.patent_collection_name]
+        self.orange_book_collection = self.db[self.orange_book_collection_name]
 
     def reimport_collection(self, collection_name, file_name):
         """

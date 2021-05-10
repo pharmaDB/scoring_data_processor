@@ -21,7 +21,7 @@ _model.max_seq_length = 512
 _model.eval()
 
 
-def add_patent_map(docs, application_numbers):
+def add_patent_map(mongo_client, docs, application_numbers):
     """
     Add to each doc in docs a mapping to patents for each NDA
 
@@ -31,7 +31,7 @@ def add_patent_map(docs, application_numbers):
         application_numbers (list): a list of application numbers such as
                                     ['NDA204223',]
     """
-    ob = OrangeBookMap()
+    ob = OrangeBookMap(mongo_client)
     all_patents = [
         {
             "application_number": str(nda),
@@ -102,7 +102,7 @@ def patent_claims_from_NDA(mongo_client, application_numbers):
         application_numbers (list): a list of application numbers such as
                                     ['NDA204223',]
     """
-    ob = OrangeBookMap()
+    ob = OrangeBookMap(mongo_client)
     # all_patents = [[patent_str,],]
     all_patents = [
         ob.get_patents(misc.get_num_in_str(nda)) for nda in application_numbers
@@ -364,7 +364,7 @@ def run_similarity(
 
         # add mapping at end of label
         similar_label_docs = add_patent_map(
-            similar_label_docs, application_numbers
+            mongo_client, similar_label_docs, application_numbers
         )
 
         # patent_list = [[patent_num, claim_num, parent_clm_list, claim_text],]
