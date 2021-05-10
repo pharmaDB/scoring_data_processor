@@ -281,12 +281,19 @@ def additions_in_diff_against_previous_label(docs):
                  application_numbers
     """
     for doc in docs:
-        if doc["additions"]:
-            for diff in doc["diff_against_previous_label"]:
-                for text in diff["text"]:
+        if doc["additions"] and doc["diff_against_previous_label"]:
+            for i in range(len(doc["diff_against_previous_label"])):
+                for j in range(
+                    len(doc["diff_against_previous_label"][i]["text"])
+                ):
+                    text = doc["diff_against_previous_label"][i]["text"][j]
                     if text[0] == 1 and len(text) > 2 and text[2]:
-                        text = text[:3]
-                        text.append(doc["additions"][text[2]])
+                        doc["diff_against_previous_label"][i]["text"][j] = text[
+                            :3
+                        ]
+                        doc["diff_against_previous_label"][i]["text"][j].append(
+                            doc["additions"][text[2]]
+                        )
     return docs
 
 
