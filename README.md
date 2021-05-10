@@ -6,6 +6,90 @@ This package maps changes in drug label to patent claims using the Orange Book T
 Running this package without any optional argument will calculate and store diffs between adjacent labels (by date) for
 each drug as defined by NDA number(s) into the label collection of the MongoDB database. The diffs will also be collated to patent claims from the patents collection of the MongoDB database. Labels that are already processed are stored in `resources/processed_log/processed_id_diff.csv` and `resources/processed_log/processed_id_similarity.csv`. These labels will not be re-processed unless optional argument `-r` is set. Running optional arguments other than `-r` will not additionally run the diffing steps or diffs-to-patent-claims mapping unless those flags are set.
 
+##Changes to the Label Collection
+
+Regarding the label collection, this package adds the the following information to labels stored in a MongoDB database:
+
+```
+previous_label_published_date: null,
+previous_label_spl_id: null,
+previous_label_spl_version: null,
+next_label_published_date: '2019-07-24',
+next_label_spl_id: '0c01a1fd-afc2-4c3e-9d5a-5000fa5a9339',
+next_label_spl_version: '2',
+diff_against_previous_label: [
+    {
+        name: '1 INDICATIONS AND USAGE',
+        text: [
+            [
+                1,
+                'DRIZALMA Sprinkle is indicated for the treatment of:\n•Major Depressive Disorder in adults [see Clinical Studies (14.1)]\n•Generalized Anxiety Disorder in adults and pediatric patients 7 years to 17 years old [see Clinical Studies (14.2)]\n•Diabetic Peripheral Neuropathy in adults [see Clinical Studies (14.3)]\nChronic Musculoskeletal Pain in adults [see Clinical Studies (14.4)]',
+                '0',
+                {
+                    expanded_content: 'DRIZALMA Sprinkle is indicated for the treatment of:\n•Major Depressive Disorder in adults [see Clinical Studies (14.1)]\n•Generalized Anxiety Disorder in adults and pediatric patients 7 years to 17 years old [see Clinical Studies (14.2)]\n•Diabetic Peripheral Neuropathy in adults [see Clinical Studies (14.3)]\nChronic Musculoskeletal Pain in adults [see Clinical Studies (14.4)]',
+                    scores: [
+                        {
+                            patent_number: '9839626',
+                            claim_number: 16,
+                            parent_claim_numbers: [],
+                            score: 0.4180474579334259
+                        },
+                        ...
+                    ]
+                 },
+                 ...
+             ],
+             ...
+          ]
+    },
+    ...
+]
+additions: {
+        '0': {
+            expanded_content: 'DRIZALMA Sprinkle is indicated for the treatment of:\n•Major Depressive Disorder in adults [see Clinical Studies (14.1)]\n•Generalized Anxiety Disorder in adults and pediatric patients 7 years to 17 years old [see Clinical Studies (14.2)]\n•Diabetic Peripheral Neuropathy in adults [see Clinical Studies (14.3)]\nChronic Musculoskeletal Pain in adults [see Clinical Studies (14.4)]',
+            scores: [
+                {
+                    patent_number: '9839626',
+                    claim_number: 16,
+                    parent_claim_numbers: [],
+                    score: 0.4180474579334259
+                },
+                ...
+               ]
+            },
+        ...
+}
+nda_to_patent: [
+    {
+        application_number: '212516',
+        patents: [
+            '10413525',
+            '9839626'
+        ]
+    }
+]
+
+```
+
+`diff_against_previous_label` includes all changes versus the previous label for the same set-id.
+
+Note that the first index of each element of `text` within `diff_against_previous_label` indicates whether diff_against_previous_label is an addition `1`, subtraction `-1`, or no change `0` relative to the previous labeled with the same set-id.
+
+The second index of each element of `text` within `diff_against_previous_label` indicates the actual text in question.
+
+The third index of each element of `text` within `diff_against_previous_label` refers to the key in `additions`
+
+The fourth index of each element of `text` within `diff_against_previous_label` copies the value of `additions` for the key in the third index of each element of `text` within `diff_against_previous_label`.  This is a request from the front end developers to ease development.
+
+`additions` stores all additions by a key, which is the value in the third index of each element of `text` within `diff_against_previous_label`.
+
+`expanded_context` refers to the text within the second index of each element of `text` within `diff_against_previous_label`, when the first index of each element of `text` within `diff_against_previous_label` is 1, but is expanded in some cases to include up to the start and end of the sentence surrounding the second index of each element of `text` within `diff_against_previous_label`.  For example, if the addition were just one word, expanded context will include the entire sentence which has that word.
+
+`scores` list the related claim for each addition in order from highest to lowest scoring claim for all related `patent_numbers`.  The related `patent_number` are determined by an Orange Book lookup.
+
+`nda_to_patent` lists all related patent for each NDA number.
+
+
 ## MongoDB Set Up
 The connection info for the Mongo DB instance is set in the `.env` file. This should work for a standard MongoDB set up on localhost. If using a different set of DB configs, this file must be updated.
 
@@ -91,6 +175,8 @@ To output all addition and patent claim set from the database excluding all scor
 
 `python3 main.py -db2file`
 
+Alternatively, a compressed version of the export with stale data is located at `analysis/db2file.tar.gz`
+
 To read help:
 
 `python3 main.py -h`
@@ -99,18 +185,8 @@ To read help:
 
 Unit tests are run with:
 
+
 `python3 -m unittest`
-
-## Generating File Export of All DB entries
-
-To export all MongoDB data to file, use the follow.  It is suggested to change the `.env` file to a different `MONGODB_NAME`, since these command will wipe the database, then re-import all patent and label collections.
-
-```
-python3 main.py -rip -rip -diff -r
-python3 generate_files.py
-```
-
-Alternatively, a compressed version of the export with stale data is located at `analysis/db2file.tar.gz`
 
 
 ## Code Formatting
