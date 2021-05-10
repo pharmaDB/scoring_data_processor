@@ -364,6 +364,8 @@ def run_similarity(
         # additions_list = [expanded_content, expanded_content...]
         additions_list = get_list_of_additions(similar_label_docs)
 
+        similar_label_docs_ids = [str(x["_id"]) for x in similar_label_docs]
+
         if patent_list:
             if additions_list:
                 similar_label_docs = rank_and_score(
@@ -372,16 +374,6 @@ def run_similarity(
 
                 additions_in_diff_against_previous_label(similar_label_docs)
 
-                mongo_client.update_db(
-                    label_collection_name, similar_label_docs
-                )
-
-            similar_label_docs_ids = [str(x["_id"]) for x in similar_label_docs]
-
-            # remove similar_label_docs_ids from all_label_ids
-            all_label_ids = [
-                x for x in all_label_ids if x not in similar_label_docs_ids
-            ]
             # store processed_label_ids & processed application_numbers to disk
             if processed_label_ids_file:
                 misc.append_to_file(
@@ -392,12 +384,6 @@ def run_similarity(
                     processed_nda_file, str(application_numbers)[1:-1]
                 )
         else:
-            similar_label_docs_ids = [str(x["_id"]) for x in similar_label_docs]
-
-            # remove similar_label_docs_ids from all_label_ids
-            all_label_ids = [
-                x for x in all_label_ids if x not in similar_label_docs_ids
-            ]
             # store unprocessed label_ids & unprocessed application_numbers to
             # disk
             if unprocessed_label_ids_file:
@@ -408,3 +394,13 @@ def run_similarity(
                 misc.append_to_file(
                     unprocessed_nda_file, str(application_numbers)[1:-1]
                 )
+
+        # update MongoDB
+        mongo_client.update_db(
+            label_collection_name, similar_label_docs
+        )
+
+        # remove similar_label_docs_ids from all_label_ids
+        all_label_ids = [
+            x for x in all_label_ids if x not in similar_label_docs_ids
+        ]
