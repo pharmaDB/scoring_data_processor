@@ -8,7 +8,6 @@ import zipfile
 import os
 from urllib.parse import urlparse
 import sys
-import re
 
 from utils.logging import getLogger
 
@@ -76,3 +75,5 @@ def extract_and_clean(file_name):
     _logger.info("Deleting %s" % file_name)
     if os.path.exists(file_name):
         os.remove(file_name)
+
+
