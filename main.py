@@ -181,7 +181,7 @@ def parse_args():
         nargs="?",
         type=Path,
         const=Path(__file__).absolute().parent
-        / "assets"
+        / "resources"
         / "database_latest"
         / "labels.json",
         help=(
@@ -197,7 +197,7 @@ def parse_args():
         nargs="?",
         type=Path,
         const=Path(__file__).absolute().parent
-        / "assets"
+        / "resources"
         / "database_latest"
         / "orangebook.json",
         help=(
@@ -213,7 +213,7 @@ def parse_args():
         nargs="?",
         type=Path,
         const=Path(__file__).absolute().parent
-        / "assets"
+        / "resources"
         / "database_latest"
         / "patents.json",
         help=(
