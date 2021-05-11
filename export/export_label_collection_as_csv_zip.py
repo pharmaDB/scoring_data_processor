@@ -18,7 +18,7 @@ def compress_file(file_name):
     new_zip_file = os.path.abspath(file_name) + ".zip"
     _logger.info("Compressing %s" % file_name)
     zip_file = zipfile.ZipFile(new_zip_file, "w", zipfile.ZIP_DEFLATED)
-    zip_file.write(file_name)
+    zip_file.write(file_name, os.path.basename(file_name))
     zip_file.close()
 
 

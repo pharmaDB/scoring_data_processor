@@ -309,6 +309,7 @@ if __name__ == "__main__":
         # for case when no optional arguments are passed
         run_diff_and_similarity = True
 
+    # if run_diff_and_similarity:
     if run_diff_and_similarity or args.db2csv:
         run_diff.run_diff(
             mongo_client,
