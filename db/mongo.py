@@ -2,6 +2,7 @@ from dotenv import dotenv_values
 import os
 import pymongo
 from bson.objectid import ObjectId
+import dateutil
 import json
 import sys
 
@@ -21,23 +22,26 @@ class MongoClient:
         self,
         label_collection_name,
         patent_collection_name,
+        orange_book_collection_name,
         alt_db_name=None,
     ):
         """
-        Initializes a MongoDB connection and stores strings of collections used
-        by this module.
+        Initializes a MongoDB connection and stores strings of collection names
 
         Parameters:
             label_collection_name (String): name of the label collection
             patent_collection_name (String): name of the patent collection
+            orange_book_collection_name (String): name of orange book collection
             alt_db_name (String): name of database if different from the one in
                                   `.env`. Used mainly for unit-tests.
         """
         self.db = connect_mongo(alt_db_name)
         self.label_collection_name = label_collection_name
         self.patent_collection_name = patent_collection_name
+        self.orange_book_collection_name = orange_book_collection_name
         self.label_collection = self.db[self.label_collection_name]
         self.patent_collection = self.db[self.patent_collection_name]
+        self.orange_book_collection = self.db[self.orange_book_collection_name]
 
     def reimport_collection(self, collection_name, file_name):
         """
@@ -62,6 +66,10 @@ class MongoClient:
                     for item in doc["claims"]:
                         if "_id" in item.keys():
                             item["_id"] = ObjectId(item["_id"]["$oid"])
+                if "created_at" in doc:
+                    doc["created_at"] = dateutil.parser.parse(
+                        doc["created_at"]["$date"]
+                    )
                 collection.insert_one(doc)
         _logger.info(f"Reimported '{collection_name}' with '{file_name}'")
 

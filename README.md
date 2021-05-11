@@ -97,24 +97,24 @@ A sample docker set up for mongo, that maps to `localhost:27017` can be found [h
 
 ![Mongo Express Labels Info](./assets/mongo_express.png)
 
-To load the bson collection files into the docker container, after running `docker-compose up` per the docker and MongoDB setup [here](https://github.com/pharmaDB/etl_pipeline), find the docker container using `docker ps -a`.  Assuming that `docker ps -a` indicates that `mongo_local` is the name of the docker container that is running MongoDB, then confirm that `MONGODB_HOST` and `MONGODB_PORT` from `.env` matches the address and port underneath `PORTS` of `docker ps -a` for `mongo_local`.
+To load the json collection files into the docker container, after running `docker-compose up` per the docker and MongoDB setup [here](https://github.com/pharmaDB/etl_pipeline), find the docker container using `docker ps -a`.  Assuming that `docker ps -a` indicates that `mongo_local` is the name of the docker container that is running MongoDB, then confirm that `MONGODB_HOST` and `MONGODB_PORT` from `.env` matches the address and port underneath `PORTS` of `docker ps -a` for `mongo_local`.
 
 Then you may use either of the following two sets of commands to loads the test collections into the databases:
 
 ```
-docker cp assets/database_before/labels.bson mongo_local:.
-docker cp assets/database_before/patents.bson mongo_local:.
+docker cp resources/database_latest/labels.json mongo_local:.
+docker cp resources/database_latest/patents.json mongo_local:.
+docker cp resources/database_latest/orange_book.json mongo_local:.
+
 
 docker exec -it mongo_local sh
-mongoimport --db test --collection labels --file labels.bson
-mongoimport --db test --collection labels --file patents.bson
+mongoimport --db latest --collection labels --file labels.json
+mongoimport --db latest --collection labels --file patents.json
+mongoimport --db latest --collection labels --file patents.json
 ```
 or 
 
-`python3 main.py -rip -ril` once the Install instructions below are completed.  This will load the `assets/database_latest/` collections into MongoDB.  **(Warning: `python3 main.py -rip -ril` is for the import of collections during testing and development period, and should not be used for production!  In production, the databases are already populated, by scripts from other repositories.  In which case, this module merely performs the diffing and similarity comparisons on data that is already stored on MongoDB.)**
-
-Testing data will operate on data in `assets/database_before/` to turn into the collections in `assets/database_after/`.
-
+Change `MONGODB_NAME` to `latest` in `.env`.  Then run `python3 main.py -rip -ril -rio` once the Install instructions below are completed.  This will load the `resources/database_latest/` collections into MongoDB.  **(Warning: `python3 main.py -rip -ril -rio` is for the import of collections during testing and development period, and should not be used for production!  In production, the databases are already populated, by scripts from other repositories.  In which case, this module merely performs the diffing and similarity comparisons on data that is already stored on MongoDB.)**
 
 ## Running the Code
 Requires a minimum python version of `3.6` to run.
@@ -195,9 +195,9 @@ To output all addition and patent claim set from the database including all scor
 
 `python3 main.py -db2csv <filename>`
 
-The `<filename>` is optional.  If not set folder is stored in `/assets/hosted_folder/db2csv.zip`.
+The `<filename>` is optional.  If not set folder is stored in `/resources/hosted_folder/db2csv.zip`.
 
-A compressed version of the export with stale data is located at `analysis/hosted_folder/db2csv.zip`
+A compressed version of the export with stale data is located at `resources/hosted_folder/db2csv.zip`
 
 ### Hosting CSV (Zipped)
 

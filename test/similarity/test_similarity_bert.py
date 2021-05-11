@@ -11,14 +11,21 @@ _logger = getLogger(__name__)
 class Test_run_similarity(unittest.TestCase):
 
     # initial setup of unittest database
-    mongo_client = MongoClient("labels", "patents", "unittest")
+    mongo_client = MongoClient(
+        "labels", "patents", "orangebook", alt_db_name="unittest"
+    )
     mongo_client.label_collection_name
     mongo_client.reimport_collection(
-        mongo_client.label_collection_name, "assets/database_testing/labels.json"
+        mongo_client.label_collection_name,
+        "resources/database_testing/labels.json",
     )
     mongo_client.reimport_collection(
         mongo_client.patent_collection_name,
-        "assets/database_testing/patents.json",
+        "resources/database_testing/patents.json",
+    )
+    mongo_client.reimport_collection(
+        mongo_client.orange_book_collection_name,
+        "resources/database_testing/orangebook.json",
     )
     run_diff(mongo_client, None, None, None)
 
@@ -45,9 +52,9 @@ class Test_run_similarity(unittest.TestCase):
             },
         )
         self.assertIn("additions", label)
-        self.assertIn("scores", label["additions"]['0'])
-        self.assertIn("score", label["additions"]['0']["scores"][0])
-        self.assertIn("patent_number", label["additions"]['0']["scores"][0])
+        self.assertIn("scores", label["additions"]["0"])
+        self.assertIn("score", label["additions"]["0"]["scores"][0])
+        self.assertIn("patent_number", label["additions"]["0"]["scores"][0])
         self.assertIn("nda_to_patent", label)
         self.assertIn("patents", label["nda_to_patent"][0])
 

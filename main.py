@@ -62,10 +62,13 @@ def parse_args():
         "--all_NDA_from_Orange_Book",
         nargs="?",
         type=Path,
-        const=Path(__file__).absolute().parent / "assets" / "all_NDA",
+        const=Path(__file__).absolute().parent
+        / "assets"
+        / "db_state"
+        / "all_NDA",
         help=(
             "Output list of all NDA from Orange Book to File_Name. If unset"
-            ", File_Name is '/assets/all_NDA'."
+            ", File_Name is '/assets/db_state/all_NDA'."
         ),
         metavar=("File_Name"),
     )
@@ -75,10 +78,13 @@ def parse_args():
         "--all_patents_from_Orange_Book",
         nargs="?",
         type=Path,
-        const=Path(__file__).absolute().parent / "assets" / "all_patents",
+        const=Path(__file__).absolute().parent
+        / "assets"
+        / "db_state"
+        / "all_patents",
         help=(
             "Output list of patents from Orange Book to File_Name. If unset, "
-            "File_Name is '/assets/all_patents'."
+            "File_Name is '/assets/db_state/all_patents'."
         ),
         metavar=("File_Name"),
     )
@@ -88,10 +94,13 @@ def parse_args():
         "--all_patents_from_Orange_Book_json",
         nargs="?",
         type=Path,
-        const=Path(__file__).absolute().parent / "assets" / "all_patents.json",
+        const=Path(__file__).absolute().parent
+        / "assets"
+        / "db_state"
+        / "all_patents.json",
         help=(
             "Output list of patents from Orange Book to File_Name. If unset, "
-            "File_Name is '/assets/all_patents.json'."
+            "File_Name is '/assets/db_state/all_patents.json'."
         ),
         metavar=("File_Name"),
     )
@@ -101,10 +110,13 @@ def parse_args():
         "--missing_NDA_from_database",
         nargs="?",
         type=Path,
-        const=Path(__file__).absolute().parent / "assets" / "missing_NDA",
+        const=Path(__file__).absolute().parent
+        / "assets"
+        / "db_state"
+        / "missing_NDA",
         help=(
             "Output list of NDA from Orange Book not in MongoDB to "
-            "File_Name. If unset, File_Name is '/assets/missing_NDA'."
+            "File_Name. If unset, File_Name is '/assets/db_state/missing_NDA'."
         ),
         metavar=("File_Name"),
     )
@@ -114,10 +126,13 @@ def parse_args():
         "--missing_patents_from_database",
         nargs="?",
         type=Path,
-        const=Path(__file__).absolute().parent / "assets" / "missing_patents",
+        const=Path(__file__).absolute().parent
+        / "assets"
+        / "db_state"
+        / "missing_patents",
         help=(
             "Output list of patents from Orange Book not in MongoDB to "
-            "File_Name. If unset, File_Name is '/assets/missing_patents'."
+            "File_Name. If unset, File_Name is '/assets/db_state/missing_patents'."
         ),
         metavar=("File_Name"),
     )
@@ -129,10 +144,11 @@ def parse_args():
         type=Path,
         const=Path(__file__).absolute().parent
         / "assets"
+        / "db_state"
         / "missing_patents.json",
         help=(
             "Output list of patents from Orange Book not in MongoDB to "
-            "File_Name. If unset, File_Name is '/assets/missing_patents.json'."
+            "File_Name. If unset, File_Name is '/assets/db_state/missing_patents.json'."
         ),
         metavar=("File_Name"),
     )
@@ -170,6 +186,22 @@ def parse_args():
         help=(
             "Reimport label collection from json file. (for development).  "
             "If unset, File_Name is '/assets/database_latest/labels.json'."
+        ),
+        metavar=("File_Name"),
+    )
+
+    parser.add_argument(
+        "-rio",
+        "--reimport_orange_book",
+        nargs="?",
+        type=Path,
+        const=Path(__file__).absolute().parent
+        / "assets"
+        / "database_latest"
+        / "orangebook.json",
+        help=(
+            "Reimport orange_book collection from json file. (for development)."
+            "If unset, File_Name is '/assets/database_latest/orangebook.json'."
         ),
         metavar=("File_Name"),
     )
@@ -261,7 +293,12 @@ if __name__ == "__main__":
 
     label_collection_name = _config["MONGODB_LABEL_COLLECTION_NAME"]
     patent_collection_name = _config["MONGODB_PATENT_COLLECTION_NAME"]
-    mongo_client = MongoClient(label_collection_name, patent_collection_name)
+    orange_book_collection_name = _config["MONGODB_ORANGE_BOOK_COLLECTION_NAME"]
+    mongo_client = MongoClient(
+        label_collection_name,
+        patent_collection_name,
+        orange_book_collection_name,
+    )
 
     # reimport of label or patent collections; for development
     if args.reimport_labels:
@@ -271,6 +308,10 @@ if __name__ == "__main__":
     if args.reimport_patents:
         mongo_client.reimport_collection(
             patent_collection_name, args.reimport_patents
+        )
+    if args.reimport_orange_book:
+        mongo_client.reimport_collection(
+            orange_book_collection_name, args.reimport_orange_book
         )
 
     # export list of missing patents or NDA from the database

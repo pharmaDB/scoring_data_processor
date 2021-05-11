@@ -80,7 +80,7 @@ def patent_claims_from_NDA(mongo_client, application_numbers):
         application_numbers (list): a list of application numbers such as
                                     ['NDA204223',]
     """
-    ob = OrangeBookMap()
+    ob = OrangeBookMap(mongo_client)
     # all_patents = [[patent_str,],]
     all_patents = [
         ob.get_patents(misc.get_num_in_str(nda)) for nda in application_numbers

@@ -4,6 +4,7 @@ import re
 import os
 from itertools import groupby
 
+from orangebook.merge import OrangeBookMap
 from utils import misc
 from utils.logging import getLogger
 
@@ -412,17 +413,18 @@ def group_label_docs_by_set_id(docs):
     return return_list
 
 
-def add_patent_map(docs, application_numbers):
+def add_patent_map(mongo_client, docs, application_numbers):
     """
     Add to each doc in docs a mapping to patents for each NDA
 
     Parameters:
+        mongo_client (object): MongoClient object with database and collections
         docs (list): list of label docs from MongoDB having the same
                      application_numbers
         application_numbers (list): a list of application numbers such as
                                     ['NDA204223',]
     """
-    ob = OrangeBookMap()
+    ob = OrangeBookMap(mongo_client)
     all_patents = [
         {
             "application_number": str(nda),
@@ -516,7 +518,7 @@ def run_diff(
 
         # add mapping at end of label
         similar_label_docs = add_patent_map(
-            similar_label_docs, application_numbers
+            mongo_client, similar_label_docs, application_numbers
         )
 
         mongo_client.update_db(

@@ -8,7 +8,7 @@ import os
 from http.server import HTTPServer, CGIHTTPRequestHandler
 
 # Set host folder name here:
-folder_name = "./assets/hosted_folder/"
+folder_name = "./resources/hosted_folder/"
 
 # Make folder if non-existant
 folder_name = os.path.abspath(folder_name)

@@ -254,7 +254,7 @@ def get_files_from_db(mongo_client, db2file_folder):
         groups_by_set_id = group_label_docs_by_set_id(similar_label_docs)
 
         # initialize OrangeBookMap
-        ob = OrangeBookMap()
+        ob = OrangeBookMap(mongo_client)
 
         for set_id_group in groups_by_set_id:
 
