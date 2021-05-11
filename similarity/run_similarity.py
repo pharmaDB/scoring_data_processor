@@ -185,7 +185,7 @@ def rank_and_score(docs, additions_list, patent_list, num_scores=0):
     """
     # create 2 lists of cleaned texts (ex: [expanded_content,] or [claim_text,])
     additions = preprocess(additions_list, 0)
-    claims = preprocess(patent_list, 3, True)
+    claims = preprocess(patent_list, 3)
 
     # Compute embedding for both lists
     additions_embeddings = _model.encode(
