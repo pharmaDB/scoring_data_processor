@@ -3,8 +3,11 @@
 # scoring_data_processor
 This package maps changes in drug label to patent claims using the Orange Book Table's of Exclusivity.
 
-Running this package without any optional argument will calculate and store diffs between adjacent labels (by date) for
-each drug as defined by NDA number(s) into the label collection of the MongoDB database. The diffs will also be collated to patent claims from the patents collection of the MongoDB database. Labels that are already processed are stored in `resources/processed_log/processed_id_diff.csv` and `resources/processed_log/processed_id_similarity.csv`. These labels will not be re-processed unless optional argument `-r` is set. Running optional arguments other than `-r` will not additionally run the diffing steps or diffs-to-patent-claims mapping unless those flags are set.
+Running this package without any optional argument will calculate and store diffs between adjacent labels (by date) for each drug as defined by NDA number(s) into the label collection of the MongoDB database. If the diff is an addition with alphanumeric characters, it will be mapped to patent claims from the patents collection of the MongoDB database.
+
+Labels that are already processed are stored in `resources/processed_log/processed_id_diff.csv` and `resources/processed_log/processed_id_similarity.csv`. These labels will not be re-processed unless optional argument `-r` is set. Running optional arguments other than `-r` will not additionally run the diffing steps or diffs-to-patent-claims mapping unless those flags are set.
+
+Running this package with the `-since` flag will cause this package to update the diff and similarity for all labels on or since the date passed to the `-since` flag.
 
 ##Changes to the Label Collection
 
@@ -138,6 +141,10 @@ To run sequential label diff and similarity comparisons of diffs to patent claim
 `python3 main.py -r`
 
 If `-r` is omitted, labels that have already been processed and stored in `resources/processed_log` with not be reprocessed.
+
+Alternatively, to run sequential label diff and similarity comparisons of diffs to patent claims for all NDAs based on update date in the `orangebook` MongoDB collection:
+
+`python3 main.py -since <YYYY-MM-DD>`
 
 To download latest Orange Book:
 

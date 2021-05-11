@@ -442,6 +442,7 @@ def run_diff(
     processed_label_ids_file,
     processed_nda_file,
     unprocessed_label_ids_file,
+    since_date=None,
 ):
     """
     This method calls other methods in this module and tracks completed
@@ -452,21 +453,39 @@ def run_diff(
         processed_label_ids_file (Path): location to store processed ids
         processed_nda_file (Path): location to store processed NDAs
         unprocessed_label_ids_file (Path): location to store unprocessed ids
+        since_date (datetime): optional argument
     """
     label_collection = mongo_client.label_collection
 
-    # open processed_label_id_file and return a list of processed _id string
-    if processed_label_ids_file:
-        processed_label_ids = misc.get_lines_in_file(processed_label_ids_file)
-    else:
-        processed_label_ids = []
+    # select all label_ids with date on or after since_date
+    if since_date:
+        ob = OrangeBookMap(mongo_client)
+        NDA_list = ob.get_all_nda_past_date(since_date)
+        # $in finds all labels with any NDA in NDA_list
+        # https://docs.mongodb.com/manual/reference/operator/query/in/
+        all_label_ids = []
+        for x in NDA_list:
+            for y in label_collection.find(
+                {"application_numbers": {"$in": x}}, {"_id", 1}
+            ):
+                all_label_ids.append(str(y["_id"]))
+        all_label_ids = list(set(all_label_ids))
 
-    # get list of label_id strings excluding any string in processed_label_id
-    all_label_ids = [
-        x
-        for x in [str(y) for y in label_collection.distinct("_id", {})]
-        if x not in processed_label_ids
-    ]
+    else:
+        # open processed_label_id_file and return a list of processed _id string
+        if processed_label_ids_file:
+            processed_label_ids = misc.get_lines_in_file(
+                processed_label_ids_file
+            )
+        else:
+            processed_label_ids = []
+
+        # get list of label_id strings excluding any string in processed_label_id
+        all_label_ids = [
+            x
+            for x in [str(y) for y in label_collection.distinct("_id", {})]
+            if x not in processed_label_ids
+        ]
 
     label_index = 0
 
@@ -495,9 +514,13 @@ def run_diff(
             continue
 
         # find all other docs with the same list of NDA numbers
+        # $all disregard order
+        # see https://docs.mongodb.com/manual/tutorial/query-arrays/
         # len(similar_label_docs) is at least 1
         similar_label_docs = list(
-            label_collection.find({"application_numbers": application_numbers})
+            label_collection.find(
+                {"application_numbers": {"$all": application_numbers}}
+            )
         )
 
         groups_by_set_id = group_label_docs_by_set_id(similar_label_docs)

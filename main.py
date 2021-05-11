@@ -1,5 +1,6 @@
 import argparse
 from dotenv import dotenv_values
+from datetime import datetime
 import os
 from pathlib import Path
 import sys
@@ -230,10 +231,10 @@ def parse_args():
     )
 
     parser.add_argument(
-        "-bert",
-        "--bert",
+        "-similarity",
+        "--similarity",
         action="store_true",
-        help=("Run similarity with Bert."),
+        help=("Run similarity module."),
     )
 
     parser.add_argument(
@@ -265,7 +266,24 @@ def parse_args():
         metavar=("File_Name"),
     )
 
+    parser.add_argument(
+        "-since",
+        "--since",
+        type=valid_date,
+        help=(
+            "The starting date for diffing and similarity comparisons.  Use "
+            "format YYYY-MM-DD."
+        ),
+    )
     return parser.parse_args()
+
+
+def valid_date(s):
+    try:
+        return datetime.strptime(s, "%Y-%m-%d")
+    except ValueError:
+        msg = "Not a valid date: '{0}'.".format(s)
+        raise argparse.ArgumentTypeError(msg)
 
 
 if __name__ == "__main__":
@@ -281,16 +299,6 @@ if __name__ == "__main__":
         file_path = fetch.download(url, ORANGE_BOOK_FOLDER)
         fetch.extract_and_clean(file_path)
 
-    # export all patents or NDA from the Orange Book
-    if args.all_NDA_from_Orange_Book:
-        export_lists.export_all_NDA(args.all_NDA_from_Orange_Book)
-    if args.all_patents_from_Orange_Book:
-        export_lists.export_all_patents(args.all_patents_from_Orange_Book)
-    if args.all_patents_from_Orange_Book_json:
-        export_lists.export_all_patents(
-            args.all_patents_from_Orange_Book_json, True
-        )
-
     label_collection_name = _config["MONGODB_LABEL_COLLECTION_NAME"]
     patent_collection_name = _config["MONGODB_PATENT_COLLECTION_NAME"]
     orange_book_collection_name = _config["MONGODB_ORANGE_BOOK_COLLECTION_NAME"]
@@ -300,18 +308,16 @@ if __name__ == "__main__":
         orange_book_collection_name,
     )
 
-    # reimport of label or patent collections; for development
-    if args.reimport_labels:
-        mongo_client.reimport_collection(
-            label_collection_name, args.reimport_labels
+    # export all patents or NDA from the Orange Book
+    if args.all_NDA_from_Orange_Book:
+        export_lists.export_all_NDA(mongo_client, args.all_NDA_from_Orange_Book)
+    if args.all_patents_from_Orange_Book:
+        export_lists.export_all_patents(
+            mongo_client, args.all_patents_from_Orange_Book
         )
-    if args.reimport_patents:
-        mongo_client.reimport_collection(
-            patent_collection_name, args.reimport_patents
-        )
-    if args.reimport_orange_book:
-        mongo_client.reimport_collection(
-            orange_book_collection_name, args.reimport_orange_book
+    if args.all_patents_from_Orange_Book_json:
+        export_lists.export_all_patents(
+            mongo_client, args.all_patents_from_Orange_Book_json, True
         )
 
     # export list of missing patents or NDA from the database
@@ -326,6 +332,20 @@ if __name__ == "__main__":
     if args.missing_patents_from_database_json:
         export_lists.export_missing_patents(
             mongo_client, args.missing_patents_from_database_json, True
+        )
+
+    # reimport of label or patent collections; for development
+    if args.reimport_labels:
+        mongo_client.reimport_collection(
+            label_collection_name, args.reimport_labels
+        )
+    if args.reimport_patents:
+        mongo_client.reimport_collection(
+            patent_collection_name, args.reimport_patents
+        )
+    if args.reimport_orange_book:
+        mongo_client.reimport_collection(
+            orange_book_collection_name, args.reimport_orange_book
         )
 
     # rerun all diff and similarity
@@ -346,30 +366,32 @@ if __name__ == "__main__":
             os.remove(UNPROCESSED_NDA_SIMILARITY_FILE)
         run_diff_and_similarity = True
 
-    if len(sys.argv) == 1 or args.bert:
+    if len(sys.argv) == 1 or args.similarity or args.db2csv:
         # for case when no optional arguments are passed
         run_diff_and_similarity = True
 
     # if run_diff_and_similarity:
-    if run_diff_and_similarity or args.db2csv:
+    if run_diff_and_similarity:
         run_diff.run_diff(
             mongo_client,
             PROCESSED_ID_DIFF_FILE,
             PROCESSED_NDA_DIFF_FILE,
             UNPROCESSED_ID_DIFF_FILE,
+            args.since,
         )
 
         # do not run diff again
         args.diff = False
 
-        from similarity import run_similarity_bert
+        from similarity import run_similarity
 
-        run_similarity_bert.run_similarity(
+        run_similarity.run_similarity(
             mongo_client,
             PROCESSED_ID_SIMILARITY_FILE,
             PROCESSED_NDA_SIMILARITY_FILE,
             UNPROCESSED_ID_SIMILARITY_FILE,
             UNPROCESSED_NDA_SIMILARITY_FILE,
+            args.since,
         )
 
     elif args.diff or args.db2file:
@@ -378,6 +400,7 @@ if __name__ == "__main__":
             PROCESSED_ID_DIFF_FILE,
             PROCESSED_NDA_DIFF_FILE,
             UNPROCESSED_ID_DIFF_FILE,
+            args.since,
         )
 
     if args.db2file:

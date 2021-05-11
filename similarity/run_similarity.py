@@ -49,10 +49,10 @@ def get_claims_in_patents_db(mongo_client, all_patents):
                 f"Unable to find: {str(patent)} in collection: "
                 f"{patent_collection_name}."
             )
-            return {}
+            # return {}
         elif "claims" not in patent_from_collection.keys():
             _logger.error(f"Patent: {str(patent)} missing 'claims' key.")
-            return {}
+            # return {}
         else:
             # claims is in form [{'claim_number': 1, 'claim_text': '...'},]
             claims = patent_from_collection["claims"]
@@ -61,7 +61,8 @@ def get_claims_in_patents_db(mongo_client, all_patents):
                 claim_num_text_od[int(claim["claim_number"])] = html.unescape(
                     claim["claim_text"]
                 ).replace("\r", "")
-        patent_dict[patent] = claim_num_text_od
+        if claim_num_text_od:
+            patent_dict[patent] = claim_num_text_od
     return patent_dict
 
 
@@ -136,14 +137,14 @@ def preprocess(matrix, index, trunc_clm=False):
     https://www.aclweb.org/anthology/2020.pam-1.15.pdf.  The BERT models
     should also handle case or uncased situations automatically.
 
-    Bert models generally are not able to embed text with more than 512 tokens
-    and will automatically truncate longer text inputs.  (The exception to rule
-    is for models such as Longformer or Bert-AL, or Reformer. However Bert-AL
-    and Reformer are unavailable as HuggingFace models, and Longformer performs
-    poorly.) To process longer claim text, this method truncates the end of the
-    claim if trunc_clm is True. The end of the claims, when written in long
-    hand form is more important, since it is generally where new claim subject
-    matter is recited for dependent claims.
+    Transformer models generally are not able to embed text with more than 512
+    tokens and will automatically truncate longer text inputs.  (The exception
+    to rule is for models such as Longformer or Bert-AL, or Reformer. However
+    Bert-AL and Reformer are unavailable as HuggingFace models, and Longformer
+    performs poorly.) To process longer claim text, this method truncates the
+    end of the claim if trunc_clm is True. The end of the claims, when written
+    in long hand form is more important, since it is generally where new claim
+    subject matter is recited for dependent claims.
 
     Parameters:
         matrix (list): a list of lists
@@ -281,6 +282,7 @@ def run_similarity(
     processed_nda_file,
     unprocessed_label_ids_file,
     unprocessed_nda_file,
+    since_date=None,
 ):
     """
     This method calls other methods in this module and tracks completed label
@@ -296,18 +298,35 @@ def run_similarity(
     label_collection = mongo_client.label_collection
     label_collection_name = mongo_client.label_collection_name
 
-    # open processed_label_id_file and return a list of processed _id string
-    if processed_label_ids_file:
-        processed_label_ids = misc.get_lines_in_file(processed_label_ids_file)
-    else:
-        processed_label_ids = []
+    # select all label_ids with date on or after since_date
+    if since_date:
+        ob = OrangeBookMap(mongo_client)
+        NDA_list = ob.get_all_nda_past_date(since_date)
+        # $in finds all labels with any NDA in NDA_list
+        # https://docs.mongodb.com/manual/reference/operator/query/in/
+        all_label_ids = []
+        for x in NDA_list:
+            for y in label_collection.find(
+                {"application_numbers": {"$in": x}}, {"_id", 1}
+            ):
+                all_label_ids.append(str(y["_id"]))
+        all_label_ids = list(set(all_label_ids))
 
-    # get list of label_id strings excluding any string in processed_label_id
-    all_label_ids = [
-        x
-        for x in [str(y) for y in label_collection.distinct("_id", {})]
-        if x not in processed_label_ids
-    ]
+    else:
+        # open processed_label_id_file and return a list of processed _id string
+        if processed_label_ids_file:
+            processed_label_ids = misc.get_lines_in_file(
+                processed_label_ids_file
+            )
+        else:
+            processed_label_ids = []
+
+        # get list of label_id strings excluding any string in processed_label_id
+        all_label_ids = [
+            x
+            for x in [str(y) for y in label_collection.distinct("_id", {})]
+            if x not in processed_label_ids
+        ]
 
     if unprocessed_label_ids_file and os.path.exists(
         unprocessed_label_ids_file
@@ -342,9 +361,13 @@ def run_similarity(
             continue
 
         # find all other docs with the same list of NDA numbers
+        # $all disregard order
+        # see https://docs.mongodb.com/manual/tutorial/query-arrays/
         # len(similar_label_docs) is at least 1
         similar_label_docs = list(
-            label_collection.find({"application_numbers": application_numbers})
+            label_collection.find(
+                {"application_numbers": {"$all": application_numbers}}
+            )
         )
 
         # patent_list = [[patent_num, claim_num, parent_clm_list, claim_text],]

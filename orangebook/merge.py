@@ -4,6 +4,7 @@ Module is for merging all old OrangeBook files so that a lookup can be made.
 
 import glob
 import pandas as pd
+import dateutil
 
 from utils.logging import getLogger
 
@@ -71,11 +72,12 @@ def _get_all_associations_from_mongo(mongo_client):
     if not docs.count():
         # Compile the OrangeBook locally, if no data found in MongoDB
         return _merge_all_csv()
-    ndas, patents = [], []
+    ndas, patents, dates = [], [], []
     for doc in docs:
         ndas.append(int(doc["nda"]))
         patents.append(str(doc["patent_num"]))
-    df = pd.DataFrame(data={"nda": ndas, "patent": patents})
+        dates.append(dateutil.parser.parse(doc["created_at"]["$date"]))
+    df = pd.DataFrame(data={"nda": ndas, "patent": patents, "date": dates})
     return df
 
 
@@ -83,6 +85,7 @@ class OrangeBookMap:
 
     _groups_groupby_NDA = None
     _groups_groupby_patent = None
+    _orange_book_sort_by_date_df = None
 
     def __init__(self, mongo_client):
         # Initialize class attributes
@@ -97,6 +100,10 @@ class OrangeBookMap:
             OrangeBookMap._groups_groupby_patent = orange_book_data.groupby(
                 ["patent"]
             )
+            if "date" in orange_book_data.columns:
+                OrangeBookMap._orange_book_sort_by_date_df = (
+                    orange_book_data.sort_values(by="date")
+                )
 
     def get_patents(self, nda):
         """Returns a list of patent numbers given an NDA number.
@@ -105,7 +112,9 @@ class OrangeBookMap:
             nda (int or string): the number portion of an NDA number or string
         """
         try:
-            return self._groups_groupby_NDA.get_group(int(nda))["patent"].tolist()
+            return self._groups_groupby_NDA.get_group(int(nda))[
+                "patent"
+            ].tolist()
         except KeyError:
             return []
 
@@ -130,3 +139,19 @@ class OrangeBookMap:
     def get_all_nda(self):
         """Returns a list of all NDA numbers."""
         return list(self._groups_groupby_NDA.groups.keys())
+
+    def get_all_nda_past_date(self, date_):
+        """Returns a list of NDA numbers on or after date_
+
+        Parameters:
+            date_ (datetime): datetime object
+        """
+        if self._orange_book_sort_by_date_df:
+            mask = self._orange_book_sort_by_date_df["date"] >= date_
+            return self._orange_book_sort_by_date_df.loc[mask]["nda"].to_list()
+        else:
+            _logger.warning(
+                "Not getting Orange Book data from Mongo.  There "
+                "is no last retrieval date field in Orange Book csv!"
+            )
+            return []

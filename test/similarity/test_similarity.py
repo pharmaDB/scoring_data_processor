@@ -1,6 +1,6 @@
 import unittest
 from diff.run_diff import run_diff
-from similarity import run_similarity_bert as r
+from similarity import run_similarity as r
 
 from db.mongo import MongoClient
 from utils.logging import getLogger
