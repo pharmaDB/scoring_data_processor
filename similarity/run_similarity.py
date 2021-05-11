@@ -154,12 +154,10 @@ def preprocess(matrix, index, trunc_clm=False):
 
     def remove_endline_plus_truncate(text, trunc_clm):
         text_split = text.split()
-        if (
-            trunc_clm
-            and _model.max_seq_length
-            and len(text_split) > _model.max_seq_length
-        ):
-            return " ".join(text_split[-_model.max_seq_length :])
+        # we truncate at around 512/1.05, since [sep] and punctuation are tokens
+        trunc_size = int(_model.max_seq_length / 1.05)
+        if trunc_clm and len(text_split) > trunc_size:
+            return " ".join(text_split[-trunc_size:])
         else:
             return " ".join(text_split)
 
