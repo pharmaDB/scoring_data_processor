@@ -127,7 +127,7 @@ def get_list_of_additions(docs):
     return return_list
 
 
-def preprocess(matrix, index, trunc_clm=False):
+def preprocess(matrix, index):
     """
     Takes as list of lists (in other words a matrix), and returns a list of
     preprocessed sentences for all elements at the index specified for the
@@ -141,29 +141,18 @@ def preprocess(matrix, index, trunc_clm=False):
     tokens and will automatically truncate longer text inputs.  (The exception
     to rule is for models such as Longformer or Bert-AL, or Reformer. However
     Bert-AL and Reformer are unavailable as HuggingFace models, and Longformer
-    performs poorly.) To process longer claim text, this method truncates the
-    end of the claim if trunc_clm is True. The end of the claims, when written
-    in long hand form is more important, since it is generally where new claim
-    subject matter is recited for dependent claims.
+    performs poorly.)
 
     Parameters:
         matrix (list): a list of lists
-        index (int): index of inner list starting at 0.
-        trunc_clm (bool): optional parameter to keep preamble and end of claim text
+        index (int): index of inner list starting at 0
     """
 
-    def remove_endline_plus_truncate(text, trunc_clm):
+    def remove_endline(text):
         text_split = text.split()
-        # we truncate at around 512/1.05, since [sep] and punctuation are tokens
-        trunc_size = int(_model.max_seq_length / 1.05)
-        if trunc_clm and len(text_split) > trunc_size:
-            return " ".join(text_split[-trunc_size:])
-        else:
-            return " ".join(text_split)
+        return " ".join(text_split)
 
-    return_list = [
-        remove_endline_plus_truncate(row[index], trunc_clm) for row in matrix
-    ]
+    return_list = [remove_endline(row[index]) for row in matrix]
     return return_list
 
 
