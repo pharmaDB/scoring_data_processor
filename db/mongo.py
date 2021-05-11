@@ -43,6 +43,18 @@ class MongoClient:
         self.patent_collection = self.db[self.patent_collection_name]
         self.orange_book_collection = self.db[self.orange_book_collection_name]
 
+    def drop_collection(self, collection_name):
+        """
+        Drop collection from MongoDB
+
+        Parameters:
+            collection_name (String):
+                name of the collection to reimport
+        """
+        db = self.db
+        collection = db[collection_name]
+        collection.drop()
+
     def reimport_collection(self, collection_name, file_name):
         """
         Reimports collection from file_name into MongoDB

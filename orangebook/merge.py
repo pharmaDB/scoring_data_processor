@@ -76,7 +76,7 @@ def _get_all_associations_from_mongo(mongo_client):
     for doc in docs:
         ndas.append(int(doc["nda"]))
         patents.append(str(doc["patent_num"]))
-        dates.append(dateutil.parser.parse(doc["created_at"]["$date"]))
+        dates.append(doc["created_at"])
     df = pd.DataFrame(data={"nda": ndas, "patent": patents, "date": dates})
     return df
 
@@ -146,7 +146,7 @@ class OrangeBookMap:
         Parameters:
             date_ (datetime): datetime object
         """
-        if self._orange_book_sort_by_date_df:
+        if isinstance(self._orange_book_sort_by_date_df, pd.DataFrame):
             mask = self._orange_book_sort_by_date_df["date"] >= date_
             return self._orange_book_sort_by_date_df.loc[mask]["nda"].to_list()
         else:
