@@ -256,7 +256,7 @@ def parse_args():
         nargs="?",
         type=Path,
         const=Path(__file__).absolute().parent
-        / "assets"
+        / "resources"
         / "hosted_folder"
         / "db2csv.csv",
         help=(

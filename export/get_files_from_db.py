@@ -245,11 +245,13 @@ def get_files_from_db(mongo_client, db2file_folder):
         # find all other docs with the same list of NDA numbers
         # len(similar_label_docs) is at least 1
         similar_label_docs = list(
-            label_collection.find({"application_numbers": application_numbers})
+            label_collection.find(
+                {"application_numbers": {"$all": application_numbers}}
+            )
         )
-        similar_label_docs = add_patent_map(
-            similar_label_docs, application_numbers
-        )
+        # similar_label_docs = add_patent_map(
+        #     mongo_client, similar_label_docs, application_numbers
+        # )
 
         groups_by_set_id = group_label_docs_by_set_id(similar_label_docs)
 

@@ -195,7 +195,9 @@ def loop_through_set_id(mongo_client, file_name):
         # find all other docs with the same list of NDA numbers
         # len(similar_label_docs) is at least 1
         similar_label_docs = list(
-            label_collection.find({"application_numbers": application_numbers})
+            label_collection.find(
+                {"application_numbers": {"$all": application_numbers}}
+            )
         )
 
         groups_by_set_id = group_label_docs_by_set_id(similar_label_docs)
@@ -232,5 +234,5 @@ def run_export_csv_zip(mongo_client, file_name):
     delete_file(os.path.abspath(file_name) + ".zip")
     loop_through_set_id(mongo_client, file_name)
     compress_file(file_name)
-    # delete zip file
+    # delete csv file
     delete_file(file_name)

@@ -100,9 +100,11 @@ A sample docker set up for mongo, that maps to `localhost:27017` can be found [h
 
 ![Mongo Express Labels Info](./assets/mongo_express.png)
 
-To load the json collection files into the docker container, after running `docker-compose up` per the docker and MongoDB setup [here](https://github.com/pharmaDB/etl_pipeline), find the docker container using `docker ps -a`.  Assuming that `docker ps -a` indicates that `mongo_local` is the name of the docker container that is running MongoDB, then confirm that `MONGODB_HOST` and `MONGODB_PORT` from `.env` matches the address and port underneath `PORTS` of `docker ps -a` for `mongo_local`.
+To load the a stale-state json collection files (current as of 2021-05-12) into the docker container, after running `docker-compose up` per the docker and MongoDB setup [here](https://github.com/pharmaDB/etl_pipeline), find the docker container using `docker ps -a`.  Assuming that `docker ps -a` indicates that `mongo_local` is the name of the docker container that is running MongoDB, then confirm that `MONGODB_HOST` and `MONGODB_PORT` from `.env` matches the address and port underneath `PORTS` of `docker ps -a` for `mongo_local`.
 
-Then you may use either of the following two sets of commands to loads the test collections into the databases:
+Then uncompress both `database_latest.tar.gz` and `processed_log.tar.gz` in the `resources/` folder.  This should create `resources/database_latest` and `resources/processed_log` folders.
+
+Then you may use either of the following two sets of commands to loads the latest collections into the databases:
 
 ```
 docker cp resources/database_latest/labels.json mongo_local:.
@@ -117,7 +119,7 @@ mongoimport --db latest --collection labels --file patents.json
 ```
 or 
 
-Change `MONGODB_NAME` to `latest` in `.env`.  Then run `python3 main.py -rip -ril -rio` once the Install instructions below are completed.  This will load the `resources/database_latest/` collections into MongoDB.  **(Warning: `python3 main.py -rip -ril -rio` is for the import of collections during testing and development period, and should not be used for production!  In production, the databases are already populated, by scripts from other repositories.  In which case, this module merely performs the diffing and similarity comparisons on data that is already stored on MongoDB.)**
+Change `MONGODB_NAME` to `latest` in `.env`.  Then run `python3 main.py -rip -ril -rio` once the Install instructions below are completed.  This will load the `resources/database_latest/` collections into MongoDB.  **(Warning: `python3 main.py -rip -ril -rio` is for the import of collections during testing and development period, and should not be used for production!  In production, the databases are already populated by scripts from other repositories.  In which case, this module merely performs the diffing and similarity comparisons on data that is already stored on MongoDB.)**
 
 ## Running the Code
 Requires a minimum python version of `3.6` to run.
