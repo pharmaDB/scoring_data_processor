@@ -14,5 +14,6 @@ resources/models/
 # log files of processed labels
 resources/processed_log/
 resources/processed_log_unittest/
+# resources/database_latest/
 
 Pipfile.lock
