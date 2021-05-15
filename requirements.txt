@@ -24,7 +24,7 @@ pathy==0.5.2
 preshed==3.0.5
 psutil==5.8.0
 pybind11==2.6.1
-pydantic==1.7.3
+pydantic==1.7.4
 pymongo==3.11.3
 pyparsing==2.4.7
 pysbd==0.3.4
