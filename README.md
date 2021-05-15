@@ -114,12 +114,12 @@ docker cp resources/database_latest/orange_book.json mongo_local:.
 
 docker exec -it mongo_local sh
 mongoimport --db latest --collection labels --file labels.json
-mongoimport --db latest --collection labels --file patents.json
-mongoimport --db latest --collection labels --file patents.json
+mongoimport --db latest --collection patents --file patents.json
+mongoimport --db latest --collection orangebook --file orangebook.json
 ```
 or 
 
-Change `MONGODB_NAME` to `latest` in `.env`.  Then run `python3 main.py -rip -ril -rio` once the Install instructions below are completed.  This will load the `resources/database_latest/` collections into MongoDB.  **(Warning: `python3 main.py -rip -ril -rio` is for the import of collections during testing and development period, and should not be used for production!  In production, the databases are already populated by scripts from other repositories.  In which case, this module merely performs the diffing and similarity comparisons on data that is already stored on MongoDB.)**
+Change `MONGODB_NAME` to `latest` in `.env`.  Then run `python3 main.py -rip -ril -rio` once the Install instructions below are completed.  This will load the `resources/database_pharmadb/` collections into MongoDB.  **(Warning: `python3 main.py -rip -ril -rio` is for the import of collections during testing and development period, and should not be used for production!  In production, the databases are already populated by scripts from other repositories.  In which case, this module merely performs the diffing and similarity comparisons on data that is already stored on MongoDB.)**
 
 ## Running the Code
 Requires a minimum python version of `3.6` to run.
