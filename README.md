@@ -115,7 +115,7 @@ docker cp resources/database_latest/orangebook.json mongo_local:.
 
 docker exec -it mongo_local sh
 mongoimport --db latest --collection labels --file labels.json
-mongoimport --db latest --collection labels --file labelmap.json
+mongoimport --db latest --collection labelmap --file labelmap.json
 mongoimport --db latest --collection patents --file patents.json
 mongoimport --db latest --collection orangebook --file orangebook.json
 ```
