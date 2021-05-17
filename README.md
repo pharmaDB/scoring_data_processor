@@ -93,7 +93,7 @@ The fourth index of each element of `text` within `diff_against_previous_label` 
 `nda_to_patent` lists all related patent for each NDA number.
 
 
-## MongoDB Set Up
+## MongoDB Set Up (For Development/Testing)
 The connection info for the Mongo DB instance is set in the `.env` file. This should work for a standard MongoDB set up on localhost. If using a different set of DB configs, this file must be updated.
 
 A sample docker set up for mongo, that maps to `localhost:27017` can be found [here](https://github.com/pharmaDB/etl_pipeline). This set up also includes the Mongo Express viewer.
@@ -108,18 +108,20 @@ Then you may use either of the following two sets of commands to loads the lates
 
 ```
 docker cp resources/database_latest/labels.json mongo_local:.
+docker cp resources/database_latest/labelmap.json mongo_local:.
 docker cp resources/database_latest/patents.json mongo_local:.
-docker cp resources/database_latest/orange_book.json mongo_local:.
+docker cp resources/database_latest/orangebook.json mongo_local:.
 
 
 docker exec -it mongo_local sh
 mongoimport --db latest --collection labels --file labels.json
+mongoimport --db latest --collection labels --file labelmap.json
 mongoimport --db latest --collection patents --file patents.json
 mongoimport --db latest --collection orangebook --file orangebook.json
 ```
 or 
 
-Change `MONGODB_NAME` to `latest` in `.env`.  Then run `python3 main.py -rip -ril -rio` once the Install instructions below are completed.  This will load the `resources/database_pharmadb/` collections into MongoDB.  **(Warning: `python3 main.py -rip -ril -rio` is for the import of collections during testing and development period, and should not be used for production!  In production, the databases are already populated by scripts from other repositories.  In which case, this module merely performs the diffing and similarity comparisons on data that is already stored on MongoDB.)**
+Change `MONGODB_NAME` to `latest` in `.env`.  Then run `python3 main.py -rip -ril -rilm -rio` once the Install instructions below are completed.  This will load the `resources/database_pharmadb/` collections into MongoDB.  **(Warning: `python3 main.py -rip -ril -rilm -rio` is for the import of collections during testing and development period, and should not be used for production!  In production, the databases are already populated by scripts from other repositories.  In which case, this module merely performs the diffing and similarity comparisons on data that is already stored on MongoDB.)**
 
 ## Running the Code
 Requires a minimum python version of `3.6` to run.

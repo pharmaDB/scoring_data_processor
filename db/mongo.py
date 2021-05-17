@@ -21,6 +21,7 @@ class MongoClient:
     def __init__(
         self,
         label_collection_name,
+        labelmap_collection_name,
         patent_collection_name,
         orange_book_collection_name,
         alt_db_name=None,
@@ -37,6 +38,7 @@ class MongoClient:
         """
         self.db = connect_mongo(alt_db_name)
         self.label_collection_name = label_collection_name
+        self.labelmap_collection_name = labelmap_collection_name
         self.patent_collection_name = patent_collection_name
         self.orange_book_collection_name = orange_book_collection_name
         self.label_collection = self.db[self.label_collection_name]

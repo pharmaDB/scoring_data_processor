@@ -192,6 +192,22 @@ def parse_args():
     )
 
     parser.add_argument(
+        "-rilm",
+        "--reimport_labelmap",
+        nargs="?",
+        type=Path,
+        const=Path(__file__).absolute().parent
+        / "resources"
+        / "database_latest"
+        / "labelmap.json",
+        help=(
+            "Reimport labelmap collection from json file. (for development).  "
+            "If unset, File_Name is '/assets/database_latest/labelmap.json'."
+        ),
+        metavar=("File_Name"),
+    )
+
+    parser.add_argument(
         "-rio",
         "--reimport_orange_book",
         nargs="?",
@@ -300,10 +316,12 @@ if __name__ == "__main__":
         fetch.extract_and_clean(file_path)
 
     label_collection_name = _config["MONGODB_LABEL_COLLECTION_NAME"]
+    labelmap_collection_name = _config["MONGODB_LABELMAP_COLLECTION_NAME"]
     patent_collection_name = _config["MONGODB_PATENT_COLLECTION_NAME"]
     orange_book_collection_name = _config["MONGODB_ORANGE_BOOK_COLLECTION_NAME"]
     mongo_client = MongoClient(
         label_collection_name,
+        labelmap_collection_name,
         patent_collection_name,
         orange_book_collection_name,
     )
@@ -338,6 +356,10 @@ if __name__ == "__main__":
     if args.reimport_labels:
         mongo_client.reimport_collection(
             label_collection_name, args.reimport_labels
+        )
+    if args.reimport_labelmap:
+        mongo_client.reimport_collection(
+            labelmap_collection_name, args.reimport_labelmap
         )
     if args.reimport_patents:
         mongo_client.reimport_collection(
