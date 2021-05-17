@@ -9,7 +9,7 @@ Labels that are already processed are stored in `resources/processed_log/process
 
 Running this package with the `-since` flag will cause this package to update the diff and similarity for all labels on or since the date passed to the `-since` flag.
 
-##Changes to the Label Collection
+## Changes to the Label Collection
 
 Regarding the label collection, this package adds the the following information to labels stored in a MongoDB database:
 
