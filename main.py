@@ -291,6 +291,13 @@ def parse_args():
             "format YYYY-MM-DD."
         ),
     )
+
+    parser.add_argument(
+        "-truncate_scores",
+        "--truncate_scores",
+        action="store_true",
+        help=("Truncate scores to reduce size of database"),
+    )
     return parser.parse_args()
 
 
@@ -432,3 +439,7 @@ if __name__ == "__main__":
         export_label_collection_as_csv_zip.run_export_csv_zip(
             mongo_client, args.db2csv
         )
+
+    if args.truncate_scores:
+        from similarity import truncate_score
+        truncate_score.run_truncation(mongo_client)
