@@ -88,6 +88,12 @@ def append_to_csv(file_name, nda_str, set_id_group):
             )
             + ","
             + label["published_date"]
+            + ","
+            + label["name"]
+            + ","
+            + label["generic_name"]
+            + ","
+            + label["active_ingredient"]
         )
         _logger.info(
             f"\n\tset_id: {label['set_id']}\tspl_id: {label['spl_version']}\t"
@@ -105,25 +111,25 @@ def append_to_csv(file_name, nda_str, set_id_group):
                             output_string_1 + ',"' + fix_text(text[1]) + '"'
                         )
                         # add expanded_content
-                        output_string_3 = (
+                        output_string_2 = (
                             output_string_2
                             + ',"'
                             + fix_text(text[3]["expanded_content"])
                             + '"'
                         )
                         for score in text[3]["scores"]:
-                            output_string_4 = (
-                                output_string_3
+                            output_string_3 = (
+                                output_string_2
                                 + ","
                                 + str(score["patent_number"])
                             )
-                            output_string_4 = (
-                                output_string_4
+                            output_string_3 = (
+                                output_string_3
                                 + ","
                                 + str(score["claim_number"])
                             )
-                            output_string_4 = (
-                                output_string_4
+                            output_string_3 = (
+                                output_string_3
                                 + ","
                                 + ";".join(
                                     [
@@ -132,10 +138,12 @@ def append_to_csv(file_name, nda_str, set_id_group):
                                     ]
                                 )
                             )
-                            output_string_4 = (
-                                output_string_4 + "," + str(score["score"])
+                            output_string_3 = (
+                                output_string_3
+                                + ","
+                                + str(round(score["score"], 9))
                             )
-                            multi_line += [output_string_4]
+                            multi_line += [output_string_3]
 
     return multi_line
 
@@ -162,9 +170,9 @@ def loop_through_set_id(mongo_client, file_name):
     all_label_ids = [str(y) for y in label_collection.distinct("_id", {})]
 
     csv_heading = (
-        "NDA,set_id,previous_published_date,published_date,section_name,"
-        "addition,expanded_content,patent_number,claim_number,parent_claim,"
-        "score"
+        "NDA,set_id,previous_published_date,published_date,name,generic_name,"
+        "active_ingredient,section_name,addition,expanded_content,patent_number"
+        ",claim_number,parent_claim,score"
     )
 
     final_csv = [csv_heading]
